@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+	package="com.zhaoshouren.android.apps.deskclock" android:installLocation="internalOnly">
+
+	<uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+	<uses-permission android:name="android.permission.WAKE_LOCK" />
+	<uses-permission android:name="android.permission.VIBRATE" />
+	<uses-permission android:name="android.permission.WRITE_SETTINGS" />
+	<uses-permission android:name="android.permission.DISABLE_KEYGUARD" />
+	<uses-permission android:name="android.permission.READ_PHONE_STATE" />
+	<uses-permission android:name="android.permission.DEVICE_POWER" />
+	<uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+	<uses-permission android:name="android.permission.INTERNET" />
+	<uses-sdk android:targetSdkVersion="8" android:minSdkVersion="7" />
+
+	<application android:label="@string/app_label"
+		android:icon="@drawable/ic_launcher_alarmclock" android:debuggable="true">
+
+		<provider
+			android:name="com.zhaoshouren.android.apps.deskclock.providers.AlarmContentProvider"
+			android:authorities="com.zhaoshouren.android.apps.deskclock" />
+
+		<activity
+			android:name="com.zhaoshouren.android.apps.deskclock.ui.DeskClockActivity"
+			android:label="@string/app_label" android:theme="@android:style/Theme.Wallpaper.NoTitleBar"
+			android:icon="@drawable/ic_launcher_alarmclock" android:launchMode="singleInstance"
+			android:configChanges="orientation|keyboardHidden|keyboard|navigation">
+			
+
+			<!-- while docked, this is our home application -->
+			<meta-data android:name="android.dock_home" android:value="true" />
+
+			<intent-filter>
+				<action android:name="android.intent.action.MAIN" />
+				<category android:name="android.intent.category.DEFAULT" />
+				<category android:name="android.intent.category.LAUNCHER" />
+				<category android:name="android.intent.category.DESK_DOCK" />
+			</intent-filter>
+		</activity>
+
+		<activity
+			android:name="com.zhaoshouren.android.apps.deskclock.ui.AlarmClockActivity"
+			android:label="@string/alarm_list_title" android:taskAffinity=""
+			android:excludeFromRecents="true"
+			android:configChanges="orientation|keyboardHidden|keyboard|navigation"
+			android:exported="true" />
+
+		<activity
+			android:name="com.zhaoshouren.android.apps.deskclock.ui.SettingsPreferenceActivity"
+			android:label="@string/settings" android:taskAffinity=""
+			android:excludeFromRecents="true">
+			<intent-filter>
+				<action android:name="android.intent.action.MAIN" />
+			</intent-filter>
+		</activity>
+
+		<activity android:name="com.zhaoshouren.android.apps.deskclock.ui.SetAlarmPreferenceActivity"
+			android:label="@string/set_alarm" android:configChanges="orientation|keyboardHidden|keyboard|navigation" />
+
+		<activity android:name="com.zhaoshouren.android.apps.deskclock.ui.AlarmAlertActivity"
+			android:excludeFromRecents="true" android:theme="@style/alarm_alert"
+			android:launchMode="singleInstance" android:taskAffinity=""
+			android:configChanges="orientation|keyboardHidden|keyboard|navigation" />
+
+		<!-- This activity is basically the same as AlarmAlert but with a more 
+			generic theme. It also shows as full screen (with status bar) but with the 
+			wallpaper background. -->
+		<activity
+			android:name="com.zhaoshouren.android.apps.deskclock.ui.AlarmAlertFullScreenActivity"
+			android:excludeFromRecents="true"
+			android:theme="@android:style/Theme.Wallpaper.NoTitleBar"
+			android:launchMode="singleInstance" android:taskAffinity=""
+			android:configChanges="orientation|keyboardHidden|keyboard|navigation" />
+
+		<receiver
+			android:name="com.zhaoshouren.android.apps.deskclock.receivers.AlarmBroadcastReceiver">
+			<intent-filter>
+				<action android:name="com.zhaoshouren.android.apps.deskclock.ALARM_ALERT" />
+				<action android:name="alarm_killed" />
+				<action android:name="cancel_snooze" />
+			</intent-filter>
+		</receiver>
+
+		<!-- This service receives the same intent as AlarmReceiver but it does 
+			not respond to the same broadcast. The AlarmReceiver will receive the alert 
+			broadcast and will start this service with the same intent. The service plays 
+			the alarm alert and vibrates the device. This allows the alert to continue 
+			playing even if another activity causes the AlarmAlert activity to pause. -->
+		<service
+			android:name="com.zhaoshouren.android.apps.deskclock.services.AlarmPlayerService">
+			<intent-filter>
+				<action android:name="com.zhaoshouren.android.apps.deskclock.ALARM_ALERT" />
+			</intent-filter>
+		</service>
+
+		<receiver
+			android:name="com.zhaoshouren.android.apps.deskclock.receivers.AlarmInitBroadcastReceiver" android:permission="android.permission.RECEIVE_BOOT_COMPLETED">
+			<intent-filter>
+				<action android:name="android.intent.action.BOOT_COMPLETED" />
+				<action android:name="android.intent.action.TIME_SET" />
+				<action android:name="android.intent.action.TIMEZONE_CHANGED" />
+				<action android:name="android.intent.action.LOCALE_CHANGED" />
+			</intent-filter>
+		</receiver>
+
+		<receiver
+			android:name="com.zhaoshouren.android.apps.deskclock.receivers.DeskClockBroadcastReceiver">
+			<intent-filter>
+				<action android:name="android.intent.action.ACTION_POWER_CONNECTED" />
+				<action android:name="android.intent.action.ACTION_POWER_DISCONNECTED" />
+			</intent-filter>
+		</receiver>
+
+		<receiver
+			android:name="com.zhaoshouren.android.apps.deskclock.receivers.AnalogClockAppWidgetProvider"
+			android:label="@string/gadget_analog" android:icon="@drawable/ic_widget_analog_clock">
+			<intent-filter>
+				<action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+			</intent-filter>
+			<meta-data android:name="android.appwidget.provider"
+				android:resource="@xml/appwidget_analog" />
+		</receiver>
+
+		<receiver
+			android:name="com.zhaoshouren.android.apps.deskclock.receivers.DigitalClockAppWidgetProvider"
+			android:label="@string/gadget_digital" android:icon="@drawable/ic_widget_digital_clock">
+			<intent-filter>
+				<action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+				<action android:name="android.appwidget.action.APPWIDGET_ENABLED" />
+				<action android:name="android.appwidget.action.APPWIDGET_DISABLED" />
+			</intent-filter>
+			<meta-data android:name="android.appwidget.provider"
+				android:resource="@xml/appwidget_digital" />
+		</receiver>
+
+		<service
+			android:name="com.zhaoshouren.android.apps.deskclock.services.DigitalClockService">
+			<intent-filter>
+				<action android:name="com.zhaoshouren.android.apps.deskclock.DIGITAL_CLOCK" />
+			</intent-filter>
+		</service>
+	</application>
+</manifest>
+
