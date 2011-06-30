@@ -1,7 +1,6 @@
 package com.zhaoshouren.android.apps.deskclock.utils;
 
 import android.content.Context;
-import android.text.TextUtils;
 import android.text.format.DateFormat;
 import android.text.format.Time;
 
