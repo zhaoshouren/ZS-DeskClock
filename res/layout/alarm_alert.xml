@@ -45,7 +45,7 @@
             android:layout_marginLeft="10dip"
             android:layout_marginRight="10dip"/>
 
-        <com.android.deskclock.DigitalClock
+        <com.zhaoshouren.android.apps.deskclock.ui.DigitalClockLayout
             style="@style/clock"
             android:paddingTop="30dip"
             android:paddingBottom="30dip"
@@ -58,14 +58,14 @@
                 android:textSize="64sp"
                 android:textColor="?android:attr/textColorPrimary"/>
 
-            <TextView android:id="@+id/am_pm"
+            <TextView android:id="@+id/amPm"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textStyle="bold"
                 android:textAppearance="?android:attr/textAppearanceMedium"
                 android:textColor="?android:attr/textColorPrimary"/>
 
-        </com.android.deskclock.DigitalClock>
+        </com.zhaoshouren.android.apps.deskclock.ui.DigitalClockLayout>
 
         <LinearLayout
             android:layout_width="wrap_content"

@@ -16,44 +16,32 @@
 ** limitations under the License.
 */
 -->
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical">
-
-    <ListView android:id="@android:id/list"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_weight="1"
-        android:drawSelectorOnTop="false"/>
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        style="@android:style/ButtonBar">
-
-        <Button android:id="@+id/alarm_save"
-            android:focusable="true"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:text="@string/done"/>
-
-        <Button android:id="@+id/alarm_revert"
-            android:focusable="true"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:text="@string/revert"/>
-
-        <Button android:id="@+id/alarm_delete"
-            android:focusable="true"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:text="@string/delete"/>
-
+    android:layout_height="match_parent" android:gravity="fill_vertical">
+    <LinearLayout style="@android:style/ButtonBar" android:layout_width="match_parent" android:orientation="horizontal" android:layout_height="wrap_content" android:layout_alignParentBottom="true">
+        <Button android:text="@string/save" android:focusable="true" android:layout_width="match_parent" android:layout_weight="1" android:layout_height="match_parent" android:id="@+id/alarm_save"></Button>
+        <Button android:text="@android:string/cancel" android:focusable="true" android:layout_width="match_parent" android:layout_weight="1" android:layout_height="match_parent" android:id="@+id/alarm_cancel"></Button>
+        <Button android:text="@string/delete" android:focusable="true" android:layout_width="match_parent" android:layout_weight="1" android:layout_height="match_parent" android:id="@+id/alarm_delete"></Button>
     </LinearLayout>
+    <ScrollView android:layout_alignParentTop="true" android:id="@+id/scrollView1" android:layout_height="wrap_content" android:layout_width="wrap_content">
+        <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+		    android:layout_width="match_parent"
+		    android:layout_height="match_parent"
+		    >
+		    <EditText android:layout_height="wrap_content" android:inputType="time" android:layout_alignParentTop="true" android:layout_width="match_parent" android:id="@+id/time">
+		        <requestFocus></requestFocus>
+		    </EditText>
+		    <ImageButton android:layout_width="wrap_content" android:layout_below="@+id/time" android:layout_height="wrap_content" android:layout_alignRight="@+id/time" android:id="@+id/btnSelectedDays" android:src="@android:drawable/ic_menu_more"></ImageButton>
+		    <TextView android:layout_height="wrap_content" android:id="@+id/textView1" android:textAppearance="?android:attr/textAppearanceLarge" android:layout_toLeftOf="@+id/btnSelectedDays" android:layout_alignTop="@+id/btnSelectedDays" android:layout_alignBottom="@+id/btnSelectedDays" android:layout_width="match_parent" android:text="@string/every_day" android:gravity="center_vertical"></TextView>
+		    <EditText android:layout_below="@+id/btnSelectedDays" android:layout_height="wrap_content" android:layout_alignRight="@+id/btnSelectedDays" android:layout_width="match_parent" android:id="@+id/label"></EditText>
+		    <Spinner android:id="@+id/ringtone" android:layout_below="@+id/label" android:layout_height="wrap_content" android:layout_alignLeft="@+id/label" android:layout_width="match_parent"></Spinner>
+		    <ToggleButton android:layout_width="wrap_content" android:layout_below="@+id/ringtone" android:layout_height="wrap_content" android:text="ToggleButton" android:id="@+id/vibrate" android:layout_alignRight="@+id/ringtone"></ToggleButton>
+		    <TextView android:layout_height="wrap_content" android:id="@+id/labelEnabled" android:textAppearance="?android:attr/textAppearanceLarge" android:text="TextView" android:layout_toLeftOf="@+id/vibrate" android:layout_alignTop="@+id/vibrate" android:layout_alignBottom="@+id/vibrate" android:layout_width="match_parent" android:gravity="center_vertical"></TextView>
+		    <ToggleButton android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="ToggleButton" android:layout_below="@+id/vibrate" android:layout_alignRight="@+id/vibrate" android:id="@+id/enabled"></ToggleButton>
+		    <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:id="@+id/labeVibrate" android:textAppearance="?android:attr/textAppearanceLarge" android:text="TextView" android:layout_toLeftOf="@+id/enabled" android:layout_alignTop="@+id/enabled" android:layout_alignBottom="@+id/enabled" android:gravity="center_vertical|clip_vertical"></TextView>
+		</RelativeLayout>		    
+    </ScrollView>
+    
 
-</LinearLayout>
+</RelativeLayout>

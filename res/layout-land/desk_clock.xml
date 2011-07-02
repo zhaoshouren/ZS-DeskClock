@@ -16,7 +16,7 @@
 
 <!-- This is the alarm clock in LANDSCAPE desk dock mode.
      -->
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<merge xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     >
@@ -28,63 +28,28 @@
         android:paddingTop="25dip"
         >
 
-        <!-- Entire display region (everything but bottom buttons) -->
-        <!-- Left margin is 4 dip shy of desired to allow for the time to
-             "hang off" the left-hand side, accommodating the extra glyph
-             escapement in Clockopia and 3px of text shadow -->
-        <LinearLayout
-            android:orientation="vertical"
-            android:layout_gravity="left"
-            android:layout_weight="1"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_marginLeft="25dip"
-            android:layout_marginTop="18dip"
-            android:layout_marginRight="18dip"
-            android:layout_marginBottom="12dip"
-            >
-
             <!-- across the top: next alarm, battery, nightmode button -->
             <LinearLayout
-                android:orientation="horizontal"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_weight="0"
-                android:layout_marginBottom="6dip"
-                android:layout_marginLeft="4dip"
-                android:gravity="center_vertical"
+               	android:padding="5dip"
                 >
-                <TextView android:id="@+id/nextAlarm"
-                    android:layout_width="wrap_content"
+                
+                <include layout="@layout/desk_clock_next_alarm"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:gravity="left"
-                    android:textAppearance="?android:attr/textAppearanceMedium"
-                    android:drawablePadding="6dip"
-                    android:drawableLeft="@drawable/ic_lock_idle_alarm"
-                    android:shadowColor="#C0000000"
-                    android:shadowDx="0"
-                    android:shadowDy="0"
-                    android:shadowRadius="3.0"                        
+		        	android:layout_gravity="center_vertical"
+		        	android:layout_weight="1"
                     />
-
-                <include layout="@layout/desk_clock_battery"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginRight="8dip"
-                    android:layout_weight="0"
-                    />
+				
 
                 <ImageButton android:id="@+id/nightmode_button"
                     style="@style/RoundTouchButton"
-                    android:layout_weight="0"
-                    android:layout_height="wrap_content"
-                    android:layout_width="wrap_content"
                     android:src="@drawable/ic_round_brightness"
                     android:contentDescription="@string/nightmode_button_description"
-                    android:nextFocusDown="@+id/alarm_button"
                     />
             </LinearLayout>
+            
 
             <!-- second row: date/time on the left, weather on the right -->
             <LinearLayout
@@ -92,28 +57,27 @@
                 android:layout_weight="1"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:gravity="bottom"
+                android:paddingLeft="5dip"
+                android:paddingRight="5dip"
                 >
-
                 <include layout="@layout/desk_clock_time_date"
                     android:layout_height="wrap_content"
-                    android:layout_width="0dip"
-                    android:layout_weight="5"
+                    android:layout_width="match_parent"
+                    android:layout_weight="1"
+                    
                     />
-
                 <include layout="@layout/desk_clock_weather"
                     android:layout_height="wrap_content"
-                    android:layout_width="0dip"
-                    android:layout_marginLeft="12dip"
-                    android:layout_weight="3"
+                    android:layout_width="wrap_content"
+                    android:layout_marginLeft="15dip"
                     />
-
-
             </LinearLayout>
-
-        </LinearLayout>
-
-        <include layout="@layout/desk_clock_buttons" />
+			<include layout="@layout/desk_clock_battery"
+	            android:layout_width="match_parent"
+	            android:layout_height="wrap_content"
+	            android:layout_gravity="right"
+	            android:padding="5dip"
+	            />
 
     </LinearLayout>
 
@@ -125,4 +89,4 @@
         android:clickable="false"
         />
 
-</FrameLayout>
+</merge>

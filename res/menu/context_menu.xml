@@ -21,6 +21,8 @@
         android:title="@string/menu_edit_alarm"/>
     <item android:id="@+id/delete_alarm"
         android:title="@string/delete_alarm"/>
+    <item android:id="@+id/cancel" 
+    	android:title="@android:string/cancel"></item>
 </menu>
 
 

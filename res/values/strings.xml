@@ -17,7 +17,7 @@
 <resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
     <!-- -->
     <!-- Label shown on launcher icon -->
-    <string name="app_label">Clock</string>
+    <string name="app_label">ZS Clock</string>
 
     <!-- Title for AlarmClock activity -->
     <string name="alarm_list_title">Alarms</string>
@@ -52,8 +52,8 @@
     <!-- Setting label on Set alarm screen: Label -->
     <string name="label">Label</string>
 
-    <!-- Default label to display for an alarm -->
-    <string name="default_label">Alarm</string>
+    <!-- Default ticker text to display for an alarm -->
+    <string name="default_alarm_ticker_text">Alarm</string>
 
     <!-- Preference category on Alarm Settings screen: Set alarm -->
     <string name="set_alarm">Set alarm</string>
@@ -146,7 +146,13 @@
     <string name="clock_instructions">Select a clock to display.</string>
 
     <!-- Label for analog clock gadget, shown in list of all gadgets -->
-    <string name="analog_gadget">Analog clock</string>
+    <string name="gadget_analog">Analog clock</string>
+    
+    <!-- Label for analog clock gadget, shown in list of all gadgets -->
+    <string name="gadget_digital">Digital clock</string>
+    
+    <!-- Label for analog clock gadget, shown in list of all gadgets -->
+    <string name="appwidget_label">ZS Clock</string>
 
     <!-- Menu item title for general Alarm Clock Settings -->
     <string name="settings">Settings</string>
@@ -186,6 +192,7 @@
 
     <!-- Done button when editing an alarm. -->
     <string name="done">Done</string>
+    <string name="save">Save</string>
 
     <!-- Revert button when editing an alarm. -->
     <string name="revert">Revert</string>
@@ -251,6 +258,8 @@
     <string name="weather_fetch_failure">Weather information currently unavailable.</string>
 
     <string name="menu_item_dock_settings" msgid="9161438664257429372">Dock settings</string>
+
+    <string name="process_appwidgets">process_appwidgets</string>
 
 </resources>
 

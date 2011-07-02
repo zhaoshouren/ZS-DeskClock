@@ -18,61 +18,60 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/time_date"
     android:orientation="vertical"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    android:gravity="left|center_vertical"
-    android:layout_weight="1"
+    android:clickable="true"
+    android:longClickable="true"
+    android:focusable="true"
     >
 
-    <com.android.deskclock.DigitalClock android:id="@+id/time"
+    <com.zhaoshouren.android.apps.deskclock.ui.DigitalClockLayout android:id="@+id/time"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="8dip"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginBottom="-20dip" 
+        android:duplicateParentState="true"
         >
 
         <TextView android:id="@+id/timeDisplay"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:singleLine="true"
+            
+            android:textAppearance="?android:attr/textAppearanceLarge"
             android:ellipsize="none"
-            android:gravity="center"
-            android:textSize="106sp"
-            android:textColor="#FFFFFFFF"
+            android:textSize="100dip"
             android:shadowColor="#C0000000"
             android:shadowDx="0"
             android:shadowDy="0"
-            android:shadowRadius="3.0"
-            android:paddingBottom="3dip"
+            android:shadowRadius="4"
+            android:duplicateParentState="true"
             />
-
-
-        <TextView android:id="@+id/am_pm"
+        <TextView android:id="@+id/amPm"
             android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:gravity="bottom"
+            android:layout_height="wrap_content"
             android:textAppearance="?android:attr/textAppearanceMedium"
-            android:textStyle="bold"
             android:singleLine="true"
             android:ellipsize="none"
-            android:layout_marginLeft="4dip"
+            android:textSize="25dip"
+            android:paddingLeft="4dip"
             android:shadowColor="#C0000000"
             android:shadowDx="0"
             android:shadowDy="0"
-            android:shadowRadius="3.0"
+            android:shadowRadius="4"
+            android:duplicateParentState="true"
             />
-
-    </com.android.deskclock.DigitalClock>
+    </com.zhaoshouren.android.apps.deskclock.ui.DigitalClockLayout>
 
     <TextView android:id="@+id/date"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:gravity="left"
+        android:layout_gravity="center_horizontal"
         android:textAppearance="?android:attr/textAppearanceMedium"
+        android:textSize="25dip"
         android:shadowColor="#C0000000"
         android:shadowDx="0"
         android:shadowDy="0"
-        android:shadowRadius="3.0"
-        android:layout_marginLeft="4dip"
+        android:shadowRadius="4"
+        android:duplicateParentState="true"
         />
 
 </LinearLayout>

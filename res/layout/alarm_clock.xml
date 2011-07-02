@@ -20,32 +20,20 @@
     android:layout_height="match_parent"
     android:orientation="vertical"> 
 
-    <LinearLayout android:id="@+id/add_alarm"
-        android:clickable="true"
-        android:focusable="true"
-        android:background="@android:drawable/list_selector_background"
+    
+	<ImageView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal">
-
-        <ImageView
-            style="@style/alarm_list_left_column"
-            android:duplicateParentState="true"
-            android:gravity="center"
-            android:scaleType="center"
-            android:src="@drawable/add_alarm" />
-
-        <TextView
-            android:duplicateParentState="true"
-            android:layout_height="wrap_content"
-            android:layout_width="wrap_content"
-            android:layout_gravity="center_vertical"
-            android:textAppearance="?android:attr/textAppearanceLarge"
-            android:textColor="?android:attr/textColorPrimary"
-            android:text="@string/add_alarm" />
-
-    </LinearLayout>
-
+        android:scaleType="fitXY"
+        android:gravity="fill_horizontal"
+        android:src="@android:drawable/divider_horizontal_dark" />
+        
+    <ListView
+        android:id="@+id/alarms_list"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight="1" />
+        
     <ImageView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -53,52 +41,48 @@
         android:gravity="fill_horizontal"
         android:src="@android:drawable/divider_horizontal_dark" />
 
-    <ListView
-        android:id="@+id/alarms_list"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_weight="1" />
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal" >
-
-        <ImageButton android:id="@+id/desk_clock_button"
-            style="@style/ButtonStripLeft"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:src="@drawable/ic_clock_strip_desk_clock"
-            android:contentDescription="@string/desk_clock_button_description"/>
-
-        <com.android.deskclock.DigitalClock
-            style="@style/ButtonStripRight"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent">
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:baselineAligned="true">
-
-                <TextView android:id="@+id/timeDisplay"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:paddingRight="6dip"
-                    android:textSize="48sp"
-                    android:textColor="?android:attr/textColorPrimary" />
-
-                <TextView android:id="@+id/am_pm"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textAppearance="?android:attr/textAppearanceSmall"
-                    android:textStyle="bold"
-                    android:textColor="?android:attr/textColorPrimary" />
-
-            </LinearLayout>
-
-      </com.android.deskclock.DigitalClock>
-
-    </LinearLayout>
+	<LinearLayout
+		android:orientation="horizontal"
+	    android:layout_width="match_parent"
+	    android:layout_height="wrap_content"
+	    android:layout_weight="0"
+	    >
+	    
+	    <ImageButton android:id="@+id/desk_clock_button"
+	            style="@style/ButtonStripLeft"
+	            android:layout_width="match_parent"
+	            android:layout_height="wrap_content"
+	            android:layout_weight="3"
+	            android:src="@drawable/ic_clock_strip_desk_clock"
+	            android:contentDescription="@string/desk_clock_button_description"/>
+	            
+	    <LinearLayout android:id="@+id/add_alarm"
+	        android:clickable="true"
+	        android:focusable="true"
+	        android:background="@drawable/btn_strip_trans_right"
+	        android:layout_width="match_parent"
+	        android:layout_height="wrap_content"
+	        android:layout_weight="1"
+	        android:orientation="horizontal">
+	
+	        <ImageView
+	            style="@style/alarm_list_left_column"
+	            android:gravity="center"
+	            android:scaleType="center"
+	            android:layout_height="wrap_content"
+	            android:layout_width="wrap_content"
+	            android:src="@drawable/ic_clock_strip_alarm" />
+	
+	        <TextView
+	            android:duplicateParentState="true"
+	            android:layout_height="wrap_content"
+	            android:layout_width="wrap_content"
+	            android:layout_gravity="center_vertical"
+	            android:textAppearance="?android:attr/textAppearanceLarge"
+	            android:textColor="?android:attr/textColorPrimary"
+	            android:text="@string/add_alarm" />
+	
+	    </LinearLayout>
+	</LinearLayout>
 
 </LinearLayout>
