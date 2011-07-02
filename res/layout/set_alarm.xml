@@ -42,6 +42,4 @@
 		    <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:id="@+id/labeVibrate" android:textAppearance="?android:attr/textAppearanceLarge" android:text="TextView" android:layout_toLeftOf="@+id/enabled" android:layout_alignTop="@+id/enabled" android:layout_alignBottom="@+id/enabled" android:gravity="center_vertical|clip_vertical"></TextView>
 		</RelativeLayout>		    
     </ScrollView>
-    
-
 </RelativeLayout>
