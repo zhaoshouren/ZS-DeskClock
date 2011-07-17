@@ -28,21 +28,21 @@ import android.content.UriMatcher;
 import android.database.Cursor;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteOpenHelper;
 import android.database.sqlite.SQLiteQueryBuilder;
 import android.net.Uri;
 import android.text.TextUtils;
 import android.util.Log;
 
-import com.zhaoshouren.android.apps.deskclock.providers.AlarmDatabase.AlarmColumns;
-import com.zhaoshouren.android.apps.deskclock.providers.AlarmDatabase.AlarmTables;
+import com.zhaoshouren.android.apps.deskclock.utils.Alarm;
+import com.zhaoshouren.android.apps.deskclock.utils.Alarms;
 
-
-public class AlarmProvider extends ContentProvider implements AlarmTables, AlarmColumns{
+public class AlarmContentProvider extends ContentProvider {
     
-    public static final Uri CONTENT_URI = Uri
-            .parse("content://com.zhaoshouren.android.apps.deskclock/alarm");
+    private static final String DATABASE_NAME = "zhaoshouren.deskclock.db";
+    private static final int DATABASE_VERSION = 1; 
     
-
+    private static final String TABLE_ALARMS = "alarms";
     private static final String TYPE_ALARM_ID = "vnd.android.cursor.item/alarms";
     private static final String TYPE_ALARM = "vnd.android.cursor.dir/alarms";
     
@@ -54,14 +54,62 @@ public class AlarmProvider extends ContentProvider implements AlarmTables, Alarm
         URI_MATCHER.addURI("com.zhaoshouren.android.apps.deskclock", "alarm", ALARM);
         URI_MATCHER.addURI("com.zhaoshouren.android.apps.deskclock", "alarm/#", ALARM_ID);
     }
- 
-    private static AlarmDatabase sAlarmDatabase;
+    
+    private static class DatabaseHelper extends SQLiteOpenHelper {      
+        private static final String CREATE_TABLE_ALARMS = "CREATE TABLE alarms (" 
+                + Alarms.Columns._ID + " INTEGER PRIMARY KEY, " 
+                + Alarms.Columns.TIME + " INTEGER, " 
+                + Alarms.Columns.SELECTED_DAYS + " INTEGER, " 
+                + Alarms.Columns.ENABLED + " INTEGER, " 
+                + Alarms.Columns.VIBRATE + " INTEGER, " 
+                + Alarms.Columns.MESSAGE + " TEXT, " 
+                + Alarms.Columns.RINGTONE_URI + " TEXT, "
+                + Alarms.Columns.SORT + " INTEGER);";
+        private static final String INSERT_INTO_ALARMS = "INSERT INTO alarms (" 
+                + Alarms.Columns.TIME + ", " 
+                + Alarms.Columns.SELECTED_DAYS + ", " 
+                + Alarms.Columns.ENABLED + ", " 
+                + Alarms.Columns.VIBRATE + ", " 
+                + Alarms.Columns.MESSAGE + ", " 
+                + Alarms.Columns.RINGTONE_URI + ", "
+                + Alarms.Columns.SORT + ") ";
+
+        public DatabaseHelper(final Context context) {
+            super(context, DATABASE_NAME, null, DATABASE_VERSION);
+        }
+
+        @Override
+        public void onCreate(final SQLiteDatabase database) {
+            database.execSQL(CREATE_TABLE_ALARMS);
+
+            // insert default alarms
+            database.execSQL(INSERT_INTO_ALARMS + "VALUES (23400000, 31, 0, 1, '', '', 630);");
+            database.execSQL(INSERT_INTO_ALARMS + "VALUES (34200000, 96, 0, 1, '', '', 930);");
+        }
+
+        @Override
+        public void onUpgrade(final SQLiteDatabase database, final int oldVersion,
+                final int currentVersion) {
+            if (DEVELOPER_MODE) {
+                Log.d(TAG,
+                        "AlarmContentProvider.onUpgrade(): Upgrading alarms database from version "
+                                + oldVersion + " to " + currentVersion
+                                + ", which will destroy all old data");
+            }
+
+            // TODO migrate table rather than drop
+            database.execSQL("DROP TABLE IF EXISTS alarms");
+            onCreate(database);
+        }
+    }
+
+    private static DatabaseHelper sDatabaseHelper;
     private static ContentResolver sContentResolver;
 
     @Override
     public boolean onCreate() {
         final Context context = getContext();
-        sAlarmDatabase = new AlarmDatabase(context);
+        sDatabaseHelper = new DatabaseHelper(context);
         sContentResolver = context.getContentResolver();
         return true;
     }
@@ -77,14 +125,14 @@ public class AlarmProvider extends ContentProvider implements AlarmTables, Alarm
             break;
         case ALARM_ID:
             queryBuilder.setTables(TABLE_ALARMS);
-            queryBuilder.appendWhere(_ID + " = " + uri.getPathSegments().get(1));
+            queryBuilder.appendWhere(Alarms.Columns._ID + " = " + uri.getPathSegments().get(1));
             break;
         default:
             throw new IllegalArgumentException("Unknown URL " + uri);
         }
 
         final Cursor cursor =
-                queryBuilder.query(sAlarmDatabase.getReadableDatabase(), projectionIn, selection,
+                queryBuilder.query(sDatabaseHelper.getReadableDatabase(), projectionIn, selection,
                         selectionArguments, null, null, sort);
 
         if (cursor == null) {
@@ -120,8 +168,8 @@ public class AlarmProvider extends ContentProvider implements AlarmTables, Alarm
             final long rowId = Long.parseLong(uri.getPathSegments().get(1));
             
             count =
-                    sAlarmDatabase.getWritableDatabase().update(TABLE_ALARMS, contentValues,
-                            _ID + " = " + rowId, null);
+                    sDatabaseHelper.getWritableDatabase().update(TABLE_ALARMS, contentValues,
+                            Alarms.Columns._ID + " = " + rowId, null);
             
             if (DEVELOPER_MODE) {
                 Log.d(TAG, "AlarmContentProvider.update()"
@@ -147,7 +195,7 @@ public class AlarmProvider extends ContentProvider implements AlarmTables, Alarm
         }
 
         final long id =
-                sAlarmDatabase.getWritableDatabase().insert(TABLE_ALARMS, ALARM_LABEL,
+                sDatabaseHelper.getWritableDatabase().insert(TABLE_ALARMS, Alarms.Columns.MESSAGE,
                         new ContentValues(initialValues));
 
         if (id < 0) {
@@ -161,14 +209,14 @@ public class AlarmProvider extends ContentProvider implements AlarmTables, Alarm
                     + "\n    intialValues: " + initialValues);
         }
 
-        final Uri newUri = ContentUris.withAppendedId(CONTENT_URI, id);
+        final Uri newUri = ContentUris.withAppendedId(Alarm.CONTENT_URI, id);
         sContentResolver.notifyChange(newUri, null);
         return newUri;
     }
 
     @Override
     public int delete(final Uri uri, String where, final String[] whereArguments) {
-        final SQLiteDatabase database = sAlarmDatabase.getWritableDatabase();
+        final SQLiteDatabase database = sDatabaseHelper.getWritableDatabase();
         final int count;
         
         switch (URI_MATCHER.match(uri)) {
@@ -178,9 +226,9 @@ public class AlarmProvider extends ContentProvider implements AlarmTables, Alarm
         case ALARM_ID:
             final String id = uri.getPathSegments().get(1);
             if (TextUtils.isEmpty(where)) {
-                where = _ID + " = " + id;
+                where = Alarms.Columns._ID + " = " + id;
             } else {
-                where = _ID + " = " + id + " AND (" + where + ")";
+                where = Alarms.Columns._ID + " = " + id + " AND (" + where + ")";
             }
             count = database.delete(TABLE_ALARMS, where, whereArguments);
             break;

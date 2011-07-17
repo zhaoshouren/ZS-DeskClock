@@ -39,7 +39,7 @@ import android.telephony.TelephonyManager;
 import android.util.Log;
 
 import com.zhaoshouren.android.apps.deskclock.utils.Alarm;
-import com.zhaoshouren.android.apps.deskclock.providers.AlarmContract;
+import com.zhaoshouren.android.apps.deskclock.utils.Alarms;
 import com.zhaoshouren.android.apps.deskclock.DeskClock;
 import com.zhaoshouren.android.apps.deskclock.R;
 
@@ -155,8 +155,8 @@ public class AlarmPlayerService extends Service {
     }
 
     private void sendKillBroadcast(final Alarm alarm) {
-        sendBroadcast(new Intent(AlarmContract.ACTION_ALARM_KILLED).putExtra(Alarm.KEY_PARCEL,
-                alarm).putExtra(AlarmContract.KEY_ALARM_KILLED_TIMEOUT,
+        sendBroadcast(new Intent(Alarms.ACTION_ALARM_KILLED).putExtra(Alarm.KEY_PARCEL,
+                alarm).putExtra(Alarms.KEY_ALARM_KILLED_TIMEOUT,
                 (int) Math.round((System.currentTimeMillis() - mStartTime) / 60000.0)));
     }
 
@@ -273,7 +273,7 @@ public class AlarmPlayerService extends Service {
         if (mPlaying) {
             mPlaying = false;
 
-            sendBroadcast(new Intent(AlarmContract.ACTION_ALARM_DONE));
+            sendBroadcast(new Intent(Alarms.ACTION_ALARM_DONE));
 
             // Stop audio playing
             if (mMediaPlayer != null) {

@@ -14,47 +14,44 @@
  * limitations under the License.
  */
 
-package com.zhaoshouren.android.apps.deskclock.receivers;
+package com.zhaoshouren.android.apps.deskclock.receiver;
 
 import static com.zhaoshouren.android.apps.deskclock.DeskClock.DEVELOPER_MODE;
 import static com.zhaoshouren.android.apps.deskclock.DeskClock.TAG;
 
+import android.app.PendingIntent;
 import android.appwidget.AppWidgetManager;
 import android.appwidget.AppWidgetProvider;
 import android.content.Context;
 import android.content.Intent;
 import android.util.Log;
+import android.widget.RemoteViews;
 
-public class DigitalClockAppWidgetProvider extends AppWidgetProvider {
-    private static final Intent ACTION_DIGITAL_CLOCK = new Intent(
-            "com.zhaoshouren.android.apps.deskclock.DIGITAL_CLOCK");
+import com.zhaoshouren.android.apps.deskclock.ui.AlarmClockActivity;
+import com.zhaoshouren.android.apps.deskclock.R;
+
+import java.util.Arrays;
+
+public class AnalogClockAppWidgetProvider extends AppWidgetProvider {
 
     @Override
     public void onUpdate(final Context context, final AppWidgetManager appWidgetManager,
             final int[] appWidgetIds) {
-        ACTION_DIGITAL_CLOCK.putExtra("appWidgetIds", appWidgetIds);
-        ACTION_DIGITAL_CLOCK.putExtra("packageName", context.getPackageName());
+        final RemoteViews remoteViews =
+                new RemoteViews(context.getPackageName(), R.layout.appwidget_analog);
 
-        context.startService(ACTION_DIGITAL_CLOCK);
-    }
-
-    @Override
-    public void onEnabled(final Context context) {
-        context.startService(ACTION_DIGITAL_CLOCK);
         if (DEVELOPER_MODE) {
-            Log.d(TAG, "DigitalClockAppWidgetProvider.onEnabled()"
+            Log.d(TAG, "AnalogClockAppWidgetProvider.onUpdate():"
                     + "\n    context: " + context
-                    + "\n    startService(ACTION_DIGITAL_CLOCK)");
+                    + "\n    appWidgetIds: " + Arrays.toString(appWidgetIds)
+                    + "\n    remoteViews.getLayoutId(): " + remoteViews.getLayoutId()
+                    + "\n    R.id.appwidget_analog: " + R.id.appwidget_analog);
         }
-    }
 
-    @Override
-    public void onDisabled(final Context context) {
-        context.stopService(ACTION_DIGITAL_CLOCK);
-        if (DEVELOPER_MODE) {
-            Log.d(TAG, "DigitalClockAppWidgetProvider.onDisabled()"
-                    + "\n    context: " + context
-                    + "\n    stopService(ACTION_DIGITAL_CLOCK)");
-        }
+        remoteViews.setOnClickPendingIntent(R.id.appwidget_analog, PendingIntent.getActivity(
+                context, 0, new Intent(context, AlarmClockActivity.class).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK),
+                PendingIntent.FLAG_CANCEL_CURRENT));
+
+        appWidgetManager.updateAppWidget(appWidgetIds, remoteViews);
     }
 }

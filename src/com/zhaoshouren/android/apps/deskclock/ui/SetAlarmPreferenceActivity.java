@@ -19,7 +19,7 @@ package com.zhaoshouren.android.apps.deskclock.ui;
 
 import static com.zhaoshouren.android.apps.deskclock.DeskClock.DEVELOPER_MODE;
 import static com.zhaoshouren.android.apps.deskclock.DeskClock.TAG;
-import static com.zhaoshouren.android.apps.deskclock.utils.Alarm.INVALID_ID;
+import static com.zhaoshouren.android.apps.deskclock.util.Alarm.INVALID_ID;
 
 import android.app.AlertDialog;
 import android.app.TimePickerDialog;
@@ -40,12 +40,10 @@ import android.widget.Button;
 import android.widget.TimePicker;
 
 import com.zhaoshouren.android.apps.deskclock.R;
-import com.zhaoshouren.android.apps.deskclock.utils.Alarm;
-import com.zhaoshouren.android.apps.deskclock.utils.AlarmRingtonePreference;
-import com.zhaoshouren.android.apps.deskclock.providers.AlarmContract;
-import com.zhaoshouren.android.apps.deskclock.providers.AlarmContract.Toaster;
-import com.zhaoshouren.android.apps.deskclock.utils.SelectedDays;
-import com.zhaoshouren.android.apps.deskclock.utils.SelectedDaysPreference;
+import com.zhaoshouren.android.apps.deskclock.provider.AlarmContract;
+import com.zhaoshouren.android.apps.deskclock.provider.AlarmContract.Toaster;
+import com.zhaoshouren.android.apps.deskclock.util.Alarm;
+import com.zhaoshouren.android.apps.deskclock.util.Days;
 
 /**
  * Manages each alarm
@@ -67,7 +65,7 @@ public class SetAlarmPreferenceActivity extends PreferenceActivity implements
     private Preference mTimePreference;
     private AlarmRingtonePreference mRingtonePreference;
     private CheckBoxPreference mVibratePreference;
-    private SelectedDaysPreference mSelectedDaysPreference;
+    private DaysPreference mDaysPreference;
 
     private Alarm mAlarm;
 
@@ -89,14 +87,14 @@ public class SetAlarmPreferenceActivity extends PreferenceActivity implements
         mTimePreference = findPreference("time");
         mRingtonePreference = (AlarmRingtonePreference) findPreference("ringtone");
         mVibratePreference = (CheckBoxPreference) findPreference("vibrate");
-        mSelectedDaysPreference = (SelectedDaysPreference) findPreference("selected_days");
+        mDaysPreference = (DaysPreference) findPreference("selected_days");
 
         // Configure OnPreferenceChangeListeners
         mLabelPreference.setOnPreferenceChangeListener(this);
         mEnabledPreference.setOnPreferenceChangeListener(this);
         mRingtonePreference.setOnPreferenceChangeListener(this);
         mVibratePreference.setOnPreferenceChangeListener(this);
-        mSelectedDaysPreference.setOnPreferenceChangeListener(this);
+        mDaysPreference.setOnPreferenceChangeListener(this);
 
         final Intent intent = getIntent();
         final int alarmId = intent.getIntExtra(Alarm.KEY_ID, INVALID_ID);
@@ -196,7 +194,7 @@ public class SetAlarmPreferenceActivity extends PreferenceActivity implements
     private void setPreferences() {
         mTimePreference.setTitle(mAlarm.formattedTimeAmPm);
         setLabelPreference(mAlarm.label);
-        mSelectedDaysPreference.setSelectedDays(mAlarm.selectedDays);
+        mDaysPreference.setDays(mAlarm.days.selected);
         mRingtonePreference.setAlert(mAlarm.ringtoneUri);
         mVibratePreference.setChecked(mAlarm.vibrate);
         mEnabledPreference.setChecked(mAlarm.enabled);
@@ -270,7 +268,7 @@ public class SetAlarmPreferenceActivity extends PreferenceActivity implements
 
     private void saveAlarm() {
         mAlarm.enabled = mEnabledPreference.isChecked();
-        mAlarm.selectedDays = new SelectedDays(mSelectedDaysPreference.getSelectedDays());
+        mAlarm.days = new Days(mDaysPreference.getDays().selected);
         mAlarm.vibrate = mVibratePreference.isChecked();
         mAlarm.label = mLabelPreference.getText();
         mAlarm.ringtoneUri = mRingtonePreference.getAlert();

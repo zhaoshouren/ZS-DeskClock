@@ -260,6 +260,16 @@
     <string name="menu_item_dock_settings" msgid="9161438664257429372">Dock settings</string>
 
     <string name="process_appwidgets">process_appwidgets</string>
+    <string name="default_snooze_duration">10</string>
+    <string name="default_snooze_volume">2</string>
+    
+    <!-- from android.platform.frameworks.base/core/res/res/values/string.xml -->
+    <!-- Format string for durations like "01:23" (1 minute, 23 seconds) -->
+    <string name="elapsed_time_short_format_mm_ss"><xliff:g id="minutes" example="1">%1$02d</xliff:g>:<xliff:g id="seconds" example="23">%2$02d</xliff:g></string>
+
+    <!-- Format string for times like "1:43:33" (1 hour, 43 minutes, 33 seconds) -->
+    <string name="elapsed_time_short_format_h_mm_ss"><xliff:g id="hours" example="1">%1$d</xliff:g>:<xliff:g id="minutes" example="43">%2$02d</xliff:g>:<xliff:g id="seconds" example="33">%3$02d</xliff:g></string>
+    
 
 </resources>
 

@@ -31,10 +31,10 @@ import android.text.TextUtils;
 import android.text.format.Time;
 import android.util.Log;
 
-import com.zhaoshouren.android.apps.deskclock.providers.AlarmDatabase.AlarmColumns;
+import com.zhaoshouren.android.apps.deskclock.utils.Alarms;
 import com.zhaoshouren.android.apps.deskclock.R;
 
-public class Alarm extends FormattedTime implements Parcelable, AlarmColumns{
+public final class Alarm extends FormattedTime implements Parcelable {
     public static final int INVALID_ID = -1;
     public static final String KEY_ID = "intent.extra.com.zhaoshouren.android.apps.deskclock.utils.Alarm.id";
     /**
@@ -49,8 +49,8 @@ public class Alarm extends FormattedTime implements Parcelable, AlarmColumns{
      */
     public static final String KEY_RAW_DATA =
             "intent.extra.com.zhaoshouren.android.apps.deskclock.utils.Alarm.raw_data";
-//    public static final Uri CONTENT_URI = Uri
-//            .parse("content://com.zhaoshouren.android.apps.deskclock/alarm");
+    public static final Uri CONTENT_URI = Uri
+            .parse("content://com.zhaoshouren.android.apps.deskclock/alarm");
     /**
      * Pass to Intent.putExtra(...) when sending Alarm.id.
      */
@@ -76,7 +76,7 @@ public class Alarm extends FormattedTime implements Parcelable, AlarmColumns{
     public Alarm(final Context context) {
         super(context);
         setToNow();
-        updateScheduledTime();
+        normalize(true);
          
         id = INVALID_ID;
         second = 0;
@@ -105,15 +105,14 @@ public class Alarm extends FormattedTime implements Parcelable, AlarmColumns{
     public Alarm(final Context context, final Cursor cursor) {
         super(context);
                 
-        set(cursor.getLong(INDEX_TIME));
-        normalize(true);
+        set(cursor.getLong(Alarms.Columns.INDEX_TIME));
         
-        id = cursor.getInt(INDEX_ID);
-        enabled = cursor.getInt(INDEX_ENABLED) == 1;
-        selectedDays = new SelectedDays(cursor.getInt(INDEX_SELECTED_DAYS));
-        vibrate = cursor.getInt(INDEX_VIBRATE) == 1;
-        label = cursor.getString(INDEX_LABEL);
-        final String alert = cursor.getString(INDEX_RINGTONE_URI);
+        id = cursor.getInt(Alarms.Columns.INDEX_ID);
+        enabled = cursor.getInt(Alarms.Columns.INDEX_ENABLED) == 1;
+        selectedDays = new SelectedDays(cursor.getInt(Alarms.Columns.INDEX_SELECTED_DAYS));
+        vibrate = cursor.getInt(Alarms.Columns.INDEX_VIBRATE) == 1;
+        label = cursor.getString(Alarms.Columns.INDEX_LABEL);
+        final String alert = cursor.getString(Alarms.Columns.INDEX_RINGTONE_URI);
 
         if (alert == Alarm.SILENT) {
             ringtoneUri = Uri.EMPTY;
@@ -236,14 +235,14 @@ public class Alarm extends FormattedTime implements Parcelable, AlarmColumns{
      */
     public ContentValues toContentValues() {
         final ContentValues contentValues = new ContentValues(7);
-        contentValues.put(ALARM_ENABLED, enabled);
-        contentValues.put(ALARM_TIME, toMillis(true));
-        contentValues.put(ALARM_SELECTED_DAYS, selectedDays.toInt());
-        contentValues.put(ALARM_VIBRATE, vibrate);
-        contentValues.put(ALARM_LABEL, label);
-        contentValues.put(ALARM_RINGTONE_URI, ringtoneUri == null || ringtoneUri.equals(Uri.EMPTY)
+        contentValues.put(Alarms.Columns.ENABLED, enabled);
+        contentValues.put(Alarms.Columns.TIME, toMillis(true));
+        contentValues.put(Alarms.Columns.SELECTED_DAYS, selectedDays.toInt());
+        contentValues.put(Alarms.Columns.VIBRATE, vibrate);
+        contentValues.put(Alarms.Columns.MESSAGE, label);
+        contentValues.put(Alarms.Columns.RINGTONE_URI, ringtoneUri == null || ringtoneUri.equals(Uri.EMPTY)
                 ? SILENT : ringtoneUri.toString());
-        contentValues.put(ALARM_SORT, hour * 100 + minute);
+        contentValues.put(Alarms.Columns.SORT, hour * 100 + minute);
 
         return contentValues;
     }
@@ -259,25 +258,30 @@ public class Alarm extends FormattedTime implements Parcelable, AlarmColumns{
     public boolean isSilent() {
         return ringtoneUri == null || ringtoneUri.equals(Uri.EMPTY);
     }
-              
-    public void updateScheduledTime() {
-        final Time time = new Time();
-        time.setToNow();
+    
+    @Override
+    public long normalize(final boolean ignoreDst) {
+        setScheduledTime();
+        return super.normalize(ignoreDst);
+    }
+       
+    private void setScheduledTime() {
+        final Time today = new Time();
+        today.setToNow();
         
-        if (compare(this, time) <= 0) {
-            time.monthDay += 1;
+        if (compare(this, today) <= 0) {
+            today.monthDay += 1;
         }
         
-        time.hour = hour;
-        time.minute = minute;
-        time.second = 0;
-        time.normalize(true);
+        today.hour = hour;
+        today.minute = minute;
+        today.second = 0;
+        today.normalize(true);
         
         if (selectedDays.isRepeating()) {
-            time.monthDay += selectedDays.getDaysTillNext(time);
+            today.monthDay += selectedDays.getDaysTillNext(today);
         }
         
-        set(time.toMillis(true));
-        normalize(true);
+        set(today.toMillis(true));
     } 
 }

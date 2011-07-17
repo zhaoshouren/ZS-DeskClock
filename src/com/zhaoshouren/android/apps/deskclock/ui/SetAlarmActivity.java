@@ -17,9 +17,8 @@
 
 package com.zhaoshouren.android.apps.deskclock.ui;
 
-import static com.zhaoshouren.android.apps.deskclock.DeskClock.DEVELOPER_MODE;
 import static com.zhaoshouren.android.apps.deskclock.DeskClock.TAG;
-import static com.zhaoshouren.android.apps.deskclock.utils.Alarm.INVALID_ID;
+import static com.zhaoshouren.android.apps.deskclock.util.Alarm.INVALID_ID;
 
 import android.app.AlertDialog;
 import android.app.TimePickerDialog;
@@ -29,12 +28,6 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
-import android.preference.CheckBoxPreference;
-import android.preference.EditTextPreference;
-import android.preference.Preference;
-import android.preference.PreferenceActivity;
-import android.preference.PreferenceManager;
-import android.preference.PreferenceScreen;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
@@ -51,12 +44,10 @@ import android.widget.TimePicker;
 import android.widget.ToggleButton;
 
 import com.zhaoshouren.android.apps.deskclock.R;
-import com.zhaoshouren.android.apps.deskclock.utils.Alarm;
-import com.zhaoshouren.android.apps.deskclock.utils.AlarmRingtonePreference;
-import com.zhaoshouren.android.apps.deskclock.providers.AlarmContract;
-import com.zhaoshouren.android.apps.deskclock.providers.AlarmContract.Toaster;
-import com.zhaoshouren.android.apps.deskclock.utils.SelectedDays;
-import com.zhaoshouren.android.apps.deskclock.utils.SelectedDaysPreference;
+import com.zhaoshouren.android.apps.deskclock.provider.AlarmContract;
+import com.zhaoshouren.android.apps.deskclock.provider.AlarmContract.Toaster;
+import com.zhaoshouren.android.apps.deskclock.util.Alarm;
+import com.zhaoshouren.android.apps.deskclock.util.Days;
 
 /**
  * Manages each alarm
@@ -75,11 +66,11 @@ public class SetAlarmActivity extends FragmentActivity implements
 //    private Preference mTimePreference;
 //    private AlarmRingtonePreference mRingtonePreference;
 //    private CheckBoxPreference mVibratePreference;
-//    private SelectedDaysPreference mSelectedDaysPreference;
+//    private DaysPreference mDaysPreference;
     
     private TextView mTime;
-    private TextView mSelectedDays;
-    private ImageButton mSelectedDaysButton;
+    private TextView mDays;
+    private ImageButton mDaysButton;
     private EditText mLabel;
     private Spinner mRingtone;
     private ToggleButton mVibrate;
@@ -103,39 +94,10 @@ public class SetAlarmActivity extends FragmentActivity implements
 
         // Override the default content view.
         setContentView(R.layout.set_alarm);
-        
-//        PreferenceActivity preferenceActivity = new PreferenceActivity() {
-//            @Override
-//            public boolean onPreferenceTreeClick(final PreferenceScreen preferenceScreen,
-//                    final Preference preference) {
-//                if (preference == mTimePreference) {
-//                    showTimePicker(false);
-//                }
-//
-//                return super.onPreferenceTreeClick(preferenceScreen, preference);
-//            }            
-//        };
-//
-//        preferenceActivity.addPreferencesFromResource(R.xml.alarm_preferences);
-
-        // Get each preference so we can retrieve the value later.
-//        mLabelPreference = (EditTextPreference) preferenceActivity.findPreference("label");
-//        mEnabledPreference = (CheckBoxPreference) preferenceActivity.findPreference("enabled");
-//        mTimePreference = preferenceActivity.findPreference("time");
-//        mRingtonePreference = (AlarmRingtonePreference) preferenceActivity.findPreference("ringtone");
-//        mVibratePreference = (CheckBoxPreference) preferenceActivity.findPreference("vibrate");
-//        mSelectedDaysPreference = (SelectedDaysPreference) preferenceActivity.findPreference("selected_days");
-
-        // Configure OnPreferenceChangeListeners
-//        mLabel.setOnPreferenceChangeListener(this);
-//        mEnabled.setOnPreferenceChangeListener(this);
-//        mRingtone.setOnPreferenceChangeListener(this);
-//        mVibrate.setOnPreferenceChangeListener(this);
-//        mSelectedDays.setOnPreferenceChangeListener(this);
-        
+                
         mTime = (TextView) findViewById(R.id.time);
-        mSelectedDays = (TextView) findViewById(R.id.selectedDays);
-        mSelectedDaysButton = (ImageButton) findViewById(R.id.btnSelectedDays);
+        mDays = (TextView) findViewById(R.id.days);
+        mDaysButton = (ImageButton) findViewById(R.id.btnDays);
         mLabel = (EditText) findViewById(R.id.label);
         mRingtone = (Spinner) findViewById(R.id.ringtone);
         mVibrate = (ToggleButton) findViewById(R.id.vibrate);
@@ -144,53 +106,7 @@ public class SetAlarmActivity extends FragmentActivity implements
 
         final Intent intent = getIntent();
         final int alarmId = intent.getIntExtra(Alarm.KEY_ID, INVALID_ID);
-        final byte[] rawData = intent.getByteArrayExtra(Alarm.KEY_RAW_DATA);
-        if (DEVELOPER_MODE) {
-            Log.d(TAG,
-                    "SetAlarmPreferenceActivity.onCreate(): Alarm["
-                            + alarmId
-                            + (!TextUtils.isEmpty(mLabel.getText()) ? "|"
-                                    + mLabel.getText() : "") + "]");
-        }
-
-        // Create an Alarm
-        switch (alarmId) {
-        case INVALID_ID:
-            mAlarm = new Alarm(this);
-            break;
-        case GET_NEXT_ALARM:
-            //mAlarm = AlarmContract.getNextEnabledAlarm(this);
-            mLoaderManager.initLoader(GET_NEXT_ALARM, null, this);
-            if (mAlarm == null) {
-                Log.e(TAG,
-                        "SetAlarmPeferenceActivity.onCreate(): failed to get an Alarm from Alarms.getNextAlarm(Context)");
-                finish();
-                return;
-            }
-            break;
-        default:
-            if (rawData != null) {
-                mAlarm = new Alarm(this, rawData);
-                if (mAlarm == null) {
-                    Log.e(TAG,
-                            "SetAlarmPeferenceActivity.onCreate(): failed to get an Alarm from Alarm.createFromRawData(Context, byte[])");
-                } else {
-                    break;
-                }
-            }
-
-            //mAlarm = AlarmContract.getAlarm(this, alarmId);
-            mLoaderManager.initLoader(alarmId, null, this);
-            if (mAlarm == null) {
-                Log.e(TAG,
-                        "SetAlarmPeferenceActivity.onCreate(): failed to get an Alarm from Alarm.createFromRawData(Context, byte[])");
-                finish();
-                return;
-            }
-        }
-        setPreferences(mAlarm);
-
-
+        
         // Save Button
         mSaveButton = (Button) findViewById(R.id.alarm_save);
         mSaveButton.setEnabled(false);
@@ -222,11 +138,38 @@ public class SetAlarmActivity extends FragmentActivity implements
                 }
             });
         }
-
+        
+        // get alarm or initialize loader
+        switch (alarmId) {
+        case INVALID_ID:
+            mAlarm = new Alarm(this);
+            break;
+        case GET_NEXT_ALARM:
+            //mAlarm = AlarmContract.getNextEnabledAlarm(this);
+            mLoaderManager.initLoader(GET_NEXT_ALARM, null, this);
+            return;
+        default:
+            final byte[] rawData = intent.getByteArrayExtra(Alarm.KEY_RAW_DATA);
+            if (rawData != null) {
+                mAlarm = new Alarm(this, rawData);
+                if (mAlarm != null) {
+                    break;                    
+                } else {
+                    Log.e(TAG,
+                            "SetAlarmPeferenceActivity.onCreate(): failed to get an Alarm from Alarm.createFromRawData(Context, byte[])");
+                    //
+                    mLoaderManager.initLoader(alarmId, null, this);
+                    return;
+                }
+            }
+            
+        }
+        setPreferences(mAlarm);
+                
         // New Alarm, so show Time Picker Dialog
         if (alarmId == INVALID_ID) {
             showTimePicker(true);
-        }
+        }   
     }
 
     /**
@@ -237,8 +180,8 @@ public class SetAlarmActivity extends FragmentActivity implements
         if (alarm != null) {
             mTime.setText(alarm.formattedTimeAmPm);
             setLabelPreference(alarm.label);
-            mSelectedDays.setText(alarm.selectedDays.toString(this));
-            mSelectedDays.setTag(alarm.selectedDays.toInt());
+            mDays.setText(alarm.days.toString(this));
+            mDays.setTag(alarm.days.toInt());
             mRingtone.setSelection(getRingtoneIndex(alarm.ringtoneUri));
             mVibrate.setChecked(alarm.vibrate);
             mEnabled.setChecked(alarm.enabled);
@@ -258,8 +201,6 @@ public class SetAlarmActivity extends FragmentActivity implements
         //TODO: configure adapter
         return 0;
     }
-
-    
 
     /**
      * Display a Time Picker Dialog
@@ -310,7 +251,7 @@ public class SetAlarmActivity extends FragmentActivity implements
 
     private void saveAlarm() {
         mAlarm.enabled = mEnabled.isChecked();
-        mAlarm.selectedDays = new SelectedDays((Integer) mSelectedDays.getTag());
+        mAlarm.days.selected = (Integer) mDays.getTag();
         mAlarm.vibrate = mVibrate.isChecked();
         mAlarm.label = mLabel.getText().toString();
         mAlarm.ringtoneUri = (Uri) mRingtone.getSelectedItem();

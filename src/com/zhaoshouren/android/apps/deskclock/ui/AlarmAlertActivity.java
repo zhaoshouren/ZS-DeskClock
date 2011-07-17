@@ -29,7 +29,7 @@ import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
 
-import com.zhaoshouren.android.apps.deskclock.utils.Alarm;
+import com.zhaoshouren.android.apps.deskclock.util.Alarm;
 
 /**
  * Full screen alarm alert: pops visible indicator and plays alarm tone. This activity shows the
@@ -40,18 +40,20 @@ public class AlarmAlertActivity extends AlarmAlertFullScreenActivity {
     private static final int MAX_KEYGUARD_CHECKS = 5;
     private static final IntentFilter sIntentFilter = new IntentFilter(Intent.ACTION_SCREEN_OFF);
 
-    private final Handler mAlarmAlertHandler = new Handler() {
+    private final Handler mHandler = new Handler() {
         @Override
         public void handleMessage(final Message message) {
             handleScreenOff((KeyguardManager) message.obj);
         }
     };
-    private final BroadcastReceiver mAlarmAlertBroadcastReceiver = new BroadcastReceiver() {
+    
+    private final BroadcastReceiver mBroadcastReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(final Context context, final Intent intent) {
             handleScreenOff((KeyguardManager) context.getSystemService(Context.KEYGUARD_SERVICE));
         }
-    };  
+    };
+    
     private int mKeyguardRetryCount;
 
     @Override
@@ -60,16 +62,16 @@ public class AlarmAlertActivity extends AlarmAlertFullScreenActivity {
 
         // Listen for the screen turning off so that when the screen comes back on, the user does
         // not need to unlock the phone to dismiss the alarm.
-        registerReceiver(mAlarmAlertBroadcastReceiver, sIntentFilter);
+        registerReceiver(mBroadcastReceiver, sIntentFilter);
     }
 
     @Override
     public void onDestroy() {
-        unregisterReceiver(mAlarmAlertBroadcastReceiver);
+        super.onDestroy();
+        unregisterReceiver(mBroadcastReceiver);
 
         // Remove any of the keyguard messages just in case
-        mAlarmAlertHandler.removeMessages(0);
-        super.onDestroy();
+        mHandler.removeMessages(0);
     }
 
     @Override
@@ -88,8 +90,8 @@ public class AlarmAlertActivity extends AlarmAlertFullScreenActivity {
 
     private void handleScreenOff(final KeyguardManager keyguardManager) {
         if (!keyguardManager.inKeyguardRestrictedInputMode() && checkRetryCount()) {
-            mAlarmAlertHandler.sendMessageDelayed(
-                    mAlarmAlertHandler.obtainMessage(0, keyguardManager), 500);
+            mHandler.sendMessageDelayed(
+                    mHandler.obtainMessage(0, keyguardManager), 500);
         } else {
             // Launch the full screen activity but do not turn the screen on.
             startActivity(new Intent(this, AlarmAlertFullScreenActivity.class).putExtra(

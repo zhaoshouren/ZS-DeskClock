@@ -16,10 +16,11 @@
 	<application 
 		android:label="@string/app_label"
 		android:icon="@drawable/ic_launcher_alarmclock" 
-		android:debuggable="true">
+		android:debuggable="true"
+		>
 
 		<provider
-			android:name=".providers.AlarmProvider"
+			android:name=".provider.AlarmProvider"
 			android:authorities="com.zhaoshouren.android.apps.deskclock" />
 
 		<activity
@@ -86,47 +87,22 @@
 			android:configChanges="orientation|keyboardHidden|keyboard|navigation" />
 
 		<receiver
-			android:name=".receivers.AlarmBroadcastReceiver">
+			android:permission="android.permission.RECEIVE_BOOT_COMPLETED" android:name=".receiver.AlarmBroadcastReceiver">>
 			<intent-filter>
 				<action android:name=".ALARM_ALERT" />
-				<action android:name="alarm_killed" />
-				<action android:name="cancel_snooze" />
-			</intent-filter>
-		</receiver>
-
-		<!-- This service receives the same intent as AlarmReceiver but it does 
-			not respond to the same broadcast. The AlarmReceiver will receive the alert 
-			broadcast and will start this service with the same intent. The service plays 
-			the alarm alert and vibrates the device. This allows the alert to continue 
-			playing even if another activity causes the AlarmAlert activity to pause. -->
-		<service
-			android:name=".services.AlarmPlayerService">
-			<intent-filter>
-				<action android:name=".ALARM_ALERT" />
-			</intent-filter>
-		</service>
-
-		<receiver
-			android:name=".receivers.AlarmInitBroadcastReceiver" 
-			android:permission="android.permission.RECEIVE_BOOT_COMPLETED">
-			<intent-filter>
+				<action android:name=".ALARM_KILLED" />
+				<action android:name=".ALARM_SNOOZE_CANCEL" />
 				<action android:name="android.intent.action.BOOT_COMPLETED" />
 				<action android:name="android.intent.action.TIME_SET" />
 				<action android:name="android.intent.action.TIMEZONE_CHANGED" />
 				<action android:name="android.intent.action.LOCALE_CHANGED" />
-			</intent-filter>
-		</receiver>
-
-		<receiver
-			android:name=".receivers.DeskClockBroadcastReceiver">
-			<intent-filter>
 				<action android:name="android.intent.action.ACTION_POWER_CONNECTED" />
 				<action android:name="android.intent.action.ACTION_POWER_DISCONNECTED" />
 			</intent-filter>
 		</receiver>
 
 		<receiver
-			android:name=".receivers.AnalogClockAppWidgetProvider"
+			android:name=".receiver.AnalogClockAppWidgetProvider"
 			android:label="@string/gadget_analog" 
 			android:icon="@drawable/ic_widget_analog_clock">
 			<intent-filter>
@@ -138,7 +114,7 @@
 		</receiver>
 
 		<receiver
-			android:name=".receivers.DigitalClockAppWidgetProvider"
+			android:name=".receiver.DigitalClockAppWidgetProvider"
 			android:label="@string/gadget_digital" 
 			android:icon="@drawable/ic_widget_digital_clock">
 			<intent-filter>
@@ -150,13 +126,36 @@
 				android:name="android.appwidget.provider"
 				android:resource="@xml/appwidget_digital" />
 		</receiver>
-
+		
 		<service
-			android:name=".services.DigitalClockService">
+			android:name=".service.AlarmPlayerService">
+			<intent-filter>
+				<action android:name=".PLAY_ALARM" />
+				<action android:name=".STOP_ALARM" />
+			</intent-filter>
+		</service>
+
+		<!-- paired with DigitalClockAppWidgetProvider -->
+		<service
+			android:name=".service.DigitalClockService">
 			<intent-filter>
 				<action android:name=".DIGITAL_CLOCK" />
 			</intent-filter>
 		</service>
+		
+		<!-- TEST -->
+		<receiver
+			android:permission="android.permission.RECEIVE_BOOT_COMPLETED" android:name=".receiver.TestBroadcastReceiver">>
+			<intent-filter>
+				<action android:name="android.intent.action.BOOT_COMPLETED" />
+				<action android:name="android.intent.action.TIME_SET" />
+				<action android:name="android.intent.action.TIMEZONE_CHANGED" />
+				<action android:name="android.intent.action.LOCALE_CHANGED" />
+				<action android:name="android.intent.action.ACTION_POWER_CONNECTED" />
+				<action android:name="android.intent.action.ACTION_POWER_DISCONNECTED" />
+			</intent-filter>
+		</receiver>
+		
 	</application>
 </manifest>
 

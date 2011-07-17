@@ -37,9 +37,9 @@ import com.zhaoshouren.android.apps.deskclock.ui.AlarmAlertActivity;
 import com.zhaoshouren.android.apps.deskclock.ui.AlarmAlertFullScreenActivity;
 import com.zhaoshouren.android.apps.deskclock.ui.SetAlarmPreferenceActivity;
 import com.zhaoshouren.android.apps.deskclock.utils.Alarm;
-import com.zhaoshouren.android.apps.deskclock.providers.AlarmContract;
+import com.zhaoshouren.android.apps.deskclock.utils.Alarms;
 
-public class AlarmBroadcastReceiver extends BroadcastReceiver{
+public class AlarmBroadcastReceiver extends BroadcastReceiver {
     /**
      * If the alarm is older than STALE_WINDOW seconds, ignore. It is probably the result of a time
      * or timezone change
@@ -49,14 +49,14 @@ public class AlarmBroadcastReceiver extends BroadcastReceiver{
     @Override
     public void onReceive(final Context context, final Intent intent) {
         final String action = intent.getAction();
-        if (action == AlarmContract.ACTION_ALARM_KILLED) {
+        if (action == Alarms.ACTION_ALARM_KILLED) {
             // The alarm has been killed, update the notification
             updateNotification(context,
                     (Alarm) intent.getParcelableExtra(Alarm.KEY_PARCEL),
-                    intent.getIntExtra(AlarmContract.KEY_ALARM_KILLED_TIMEOUT, -1));
+                    intent.getIntExtra(Alarms.KEY_ALARM_KILLED_TIMEOUT, -1));
             return;
-        } else if (action == AlarmContract.CANCEL_SNOOZE) {
-            AlarmContract.saveSnoozeAlert(context, -1, -1);
+        } else if (action == Alarms.CANCEL_SNOOZE) {
+            Alarms.saveSnoozeAlert(context, -1, -1);
             return;
         }
 
@@ -92,18 +92,18 @@ public class AlarmBroadcastReceiver extends BroadcastReceiver{
 
         // Disable the snooze alert if this alarm is the snooze.
         // TODO: refactor clearSnoozePreferenceIfNeeded
-        AlarmContract.clearSnoozeAlertIfNeeded(context, alarm);
+        Alarms.clearSnoozeAlertIfNeeded(context, alarm);
         
         // Disable this alarm if it does not repeat.
         if (!alarm.selectedDays.isRepeating()) {
-            AlarmContract.toggleAlarm(context, alarm, false);
+            Alarms.toggleAlarm(context, alarm, Alarms.ALARM_DISABLED);
         } else {
             // Enable the next alert if there is one. The above call to
             // enableAlarm will call setNextAlert so avoid calling it twice.
-            AlarmContract.setNextSnoozeAlert(context);
+            Alarms.setNextSnoozeAlert(context);
         }
 
-        context.startService(new Intent(AlarmContract.ACTION_ALARM_ALERT).putExtra(
+        context.startService(new Intent(Alarms.ACTION_ALARM_ALERT).putExtra(
                 Alarm.KEY_PARCEL, alarm));
 
         final PendingIntent pendingNotify =

@@ -25,7 +25,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.util.Log;
 
-import com.zhaoshouren.android.apps.deskclock.providers.AlarmContract;
+import com.zhaoshouren.android.apps.deskclock.utils.Alarms;
 
 public class AlarmInitBroadcastReceiver extends BroadcastReceiver {
 
@@ -52,9 +52,9 @@ public class AlarmInitBroadcastReceiver extends BroadcastReceiver {
         }
         
         if (action == Intent.ACTION_BOOT_COMPLETED) {
-            AlarmContract.saveSnoozeAlert(context, -1, -1);
-            AlarmContract.disableExpiredAlarms(context);
+            Alarms.saveSnoozeAlert(context, -1, -1);
+            Alarms.disableExpiredAlarms(context);
         }
-        AlarmContract.setNextSnoozeAlert(context);
+        Alarms.setNextSnoozeAlert(context);
     }
 }

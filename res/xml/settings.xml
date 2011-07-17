@@ -35,7 +35,7 @@
         android:title="@string/snooze_duration_title"
         android:entries="@array/snooze_duration_entries"
         android:entryValues="@array/snooze_duration_values"
-        android:defaultValue="10"
+        android:defaultValue="@string/default_snooze_duration"
         android:dialogTitle="@string/snooze_duration_title" />
 
     <ListPreference
@@ -45,6 +45,6 @@
         android:entries="@array/volume_button_setting_entries"
         android:entryValues="@array/volume_button_setting_values"
         android:summary="@string/volume_button_setting_summary"
-        android:defaultValue="2" />
+        android:defaultValue="@string/default_snooze_volume" />
 
 </PreferenceScreen>

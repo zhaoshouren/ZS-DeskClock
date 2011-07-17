@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Copyright (C) 2007 The Android Open Source Project
+<!-- Copyright (C) 2011 Warren Chu
 
      Licensed under the Apache License, Version 2.0 (the "License");
      you may not use this file except in compliance with the License.
@@ -13,8 +13,51 @@
      See the License for the specific language governing permissions and
      limitations under the License.
 -->
-
 <resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
-    <!-- String matching the lock screen format for displaying the date. -->
+    <string name="format_hour_minute_24">%H:%M</string>
+    <string name="format_hour_minute_am_pm">%-l:%M %p</string>
+    <string name="format_hour_minute_cap_am_pm">%-l:%M %^p</string>
+    <string name="format_hour_minute_second_am_pm">%-l:%M:%S %p</string>
+    <string name="format_hour_minute">%-l:%M</string>
+    <string name="format_cap_am_pm">%^p</string>
+    
+    <string name="format_numeric_date">%-m/%-e/%Y</string>
+    <string name="format_date_and_time">%b %-e, %Y, %-l:%M:%S %p</string>
+    
+    <string name="format_month_day_year">%B %-e, %Y</string>
+    <string name="format_abbrev_month_day_year">%b %-e, %Y</string>
+    <string name="format_month_day">%B %-e</string>
+    <string name="format_month">%-B</string>
+    <string name="format_month_year">%B %Y</string>
+    <string name="format_abbrev_month_day">%b %-e</string>
+    <string name="format_abbrev_month">%-b</string>
+    <string name="format_abbrev_month_year">%b %Y</string>
+    
+  	<string name="format_weekday_month_day">%A, %B %-e</string>
+  	<string name="format_abbrev_weekday_month_day_year">%a, %B %-e, %Y</string>
+  	
+  	<string name="format_weekday_hour_minute_cap_am_pm">%A, %-l:%M %^p</string>
+  	<string name="format_weekday_hour_minute_24">%A, %H:%M</string>
+  	<string name="format_abbrev_weekday_hour_minute_cap_am_pm">%a, %-l:%M %^p</string>
+  	<string name="format_abbrev_weekday_hour_minute_24">%a, %H:%M</string> 
+
+
+	<!-- MAPPINGS -->
+	<string name="hour_minute_24">%H:%M</string>
+    <string name="hour_minute_ampm">%-l:%M%p</string>
+    <string name="hour_minute_cap_ampm">%-l:%M%^p</string>
+    <string name="numeric_date">%-m/%-e/%Y</string>
+    <string name="month_day_year">%B %-e, %Y</string>
+    <string name="time_of_day">%-l:%M:%S %p</string>
+    <string name="date_and_time">%b %-e, %Y, %-l:%M:%S %p</string>
+    <string name="abbrev_month_day_year">%b %-e, %Y</string>
+    <string name="month_day">%B %-e</string>
+    <string name="month">%-B</string>
+    <string name="month_year">%B %Y</string>
+    <string name="abbrev_month_day">%b %-e</string>
+    <string name="abbrev_month">%-b</string>
+    <string name="abbrev_month_year">%b %Y</string>
+    <string name="short_format_month">%b</string>
     <string name="full_wday_month_day_no_year">EEEE, MMMM d</string>
+    <string name="abbrev_wday_month_day_year">EEE, MMM d, yyyy</string>
 </resources>

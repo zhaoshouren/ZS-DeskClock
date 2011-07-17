@@ -28,6 +28,7 @@ import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
 import android.support.v4.widget.CursorAdapter;
 import android.text.TextUtils;
+import android.text.format.DateFormat;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
 import android.view.LayoutInflater;
@@ -46,18 +47,21 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import com.zhaoshouren.android.apps.deskclock.R;
-import com.zhaoshouren.android.apps.deskclock.utils.Alarm;
-import com.zhaoshouren.android.apps.deskclock.providers.AlarmContract;
-import com.zhaoshouren.android.apps.deskclock.providers.AlarmContract.Toaster;
+import com.zhaoshouren.android.apps.deskclock.provider.AlarmContract;
+import com.zhaoshouren.android.apps.deskclock.provider.AlarmContract.Toaster;
+import com.zhaoshouren.android.apps.deskclock.util.Alarm;
 
-public class AlarmClockActivity extends FragmentActivity implements OnItemClickListener, LoaderManager.LoaderCallbacks<Cursor> {
+public class AlarmClockActivity extends FragmentActivity implements OnItemClickListener,
+        LoaderManager.LoaderCallbacks<Cursor> {
 
-    private AlarmTimeAdapter mAlarmTimeAdapter;
-    private static LayoutInflater mLayoutInflator;
-    private ListView mAlarmsListView;
-    private LoaderManager mLoaderManager;
-    
-    private class AlarmTimeAdapter extends CursorAdapter{
+    private static AlarmTimeAdapter sAlarmTimeAdapter;
+    private static ListView sAlarmsListView;
+    private static LoaderManager sLoaderManager;
+    private static LayoutInflater sLayoutInflater;
+
+    private class AlarmTimeAdapter extends CursorAdapter {
+
+        private final LayoutInflater mLayoutInflater;
 
         private class Views {
             private View indicatorView;
@@ -65,65 +69,71 @@ public class AlarmClockActivity extends FragmentActivity implements OnItemClickL
             private CheckBox clockOnOffCheckBox;
             private TextView timeTextView;
             private TextView amPmTextView;
-            private TextView selectedDaysTextView;
+            private TextView daysTextView;
             private TextView labelTextView;
         }
-        
-        public AlarmTimeAdapter(Context context, Cursor c, int flags) {
-            super(context, c, flags);
+
+        public AlarmTimeAdapter(final Context context, final LayoutInflater layoutInflater,
+                final Cursor cursor, final int flags) {
+            super(context, cursor, flags);
+            mLayoutInflater = layoutInflater;
         }
 
         @Override
         public View newView(final Context context, final Cursor cursor, final ViewGroup parent) {
-            final View view = mLayoutInflator.inflate(R.layout.alarm_time, parent, false);
-            
+            final View view = mLayoutInflater.inflate(R.layout.alarm_time, parent, false);
+
             final Views views = new Views();
             views.indicatorView = view.findViewById(R.id.indicator);
             views.onOffBarImageView = (ImageView) views.indicatorView.findViewById(R.id.bar_onoff);
-            views.clockOnOffCheckBox = (CheckBox) views.indicatorView.findViewById(R.id.clock_onoff);
+            views.clockOnOffCheckBox =
+                    (CheckBox) views.indicatorView.findViewById(R.id.clock_onoff);
             views.timeTextView = (TextView) view.findViewById(R.id.time);
             views.amPmTextView = (TextView) view.findViewById(R.id.amPm);
-            views.selectedDaysTextView = (TextView) view.findViewById(R.id.selectedDays);
+            views.daysTextView = (TextView) view.findViewById(R.id.days);
             views.labelTextView = (TextView) view.findViewById(R.id.label);
-            
+
             view.setTag(views);
-            
+
             return view;
         }
-        
+
         @Override
         public void bindView(final View view, final Context context, final Cursor cursor) {
             final Alarm alarm = new Alarm(context, cursor);
 
             final Views views = (Views) view.getTag();
-                       
+
             // Set initial states
-            views.onOffBarImageView.setImageResource(alarm.enabled ? R.drawable.ic_indicator_on : R.drawable.ic_indicator_off);       
+            views.onOffBarImageView.setImageResource(alarm.enabled ? R.drawable.ic_indicator_on
+                    : R.drawable.ic_indicator_off);
             views.clockOnOffCheckBox.setChecked(alarm.enabled);
 
             // Add Listeners
             views.indicatorView.setOnClickListener(new OnClickListener() {
                 public void onClick(final View v) {
                     views.clockOnOffCheckBox.toggle();
-                    views.onOffBarImageView.setImageResource(alarm.enabled ? R.drawable.ic_indicator_off
-                            : R.drawable.ic_indicator_on);
+                    views.onOffBarImageView.setImageResource(alarm.enabled
+                            ? R.drawable.ic_indicator_off : R.drawable.ic_indicator_on);
                     toggleAlarm(alarm);
                 }
             });
-            
+
             // Set the time
             views.timeTextView.setText(alarm.formattedTime);
             views.amPmTextView.setText(alarm.formattedAmPm);
-            
+
             // Set the selected days
-            views.selectedDaysTextView.setText(alarm.selectedDays.toString(AlarmClockActivity.this));
-            
+            views.daysTextView.setText(alarm.days.toString(AlarmClockActivity.this));
+
             // Set the label
             views.labelTextView.setText(alarm.label);
-            
-            views.amPmTextView.setVisibility(TextUtils.isEmpty(alarm.formattedAmPm) ? View.GONE : View.VISIBLE);
-            views.labelTextView.setVisibility(TextUtils.isEmpty(alarm.label) ? View.GONE : View.VISIBLE);
-            views.selectedDaysTextView.setVisibility(alarm.selectedDays.toInt() == 0 ? View.GONE : View.VISIBLE);
+
+            views.amPmTextView.setVisibility(TextUtils.isEmpty(alarm.formattedAmPm) ? View.GONE
+                    : View.VISIBLE);
+            views.labelTextView.setVisibility(TextUtils.isEmpty(alarm.label) ? View.GONE
+                    : View.VISIBLE);
+            views.daysTextView.setVisibility(alarm.days.toInt() == 0 ? View.GONE : View.VISIBLE);
         }
 
     };
@@ -131,19 +141,19 @@ public class AlarmClockActivity extends FragmentActivity implements OnItemClickL
     @Override
     protected void onCreate(final Bundle icicle) {
         super.onCreate(icicle);
-          
-        mLayoutInflator = LayoutInflater.from(this);
-        mLoaderManager = getSupportLoaderManager();
-        mAlarmTimeAdapter = new AlarmTimeAdapter(this, null, 0);
-        
-        mLoaderManager.initLoader(0, null, this);
-        
+
+        sLayoutInflater = getLayoutInflater();
+        sLoaderManager = getSupportLoaderManager();
+        sAlarmTimeAdapter = new AlarmTimeAdapter(this, sLayoutInflater, null, 0);
+
+        sLoaderManager.initLoader(0, icicle, this);
+
         setContentView(R.layout.alarm_clock);
-        mAlarmsListView = (ListView) findViewById(R.id.alarms_list);
-        mAlarmsListView.setAdapter(mAlarmTimeAdapter);
-        mAlarmsListView.setVerticalScrollBarEnabled(true);
-        mAlarmsListView.setOnItemClickListener(this);
-        mAlarmsListView.setOnCreateContextMenuListener(this);
+        sAlarmsListView = (ListView) findViewById(R.id.alarms_list);
+        sAlarmsListView.setAdapter(sAlarmTimeAdapter);
+        sAlarmsListView.setVerticalScrollBarEnabled(true);
+        sAlarmsListView.setOnItemClickListener(this);
+        sAlarmsListView.setOnCreateContextMenuListener(this);
 
         final View addAlarmView = findViewById(R.id.add_alarm);
         addAlarmView.setOnClickListener(new View.OnClickListener() {
@@ -170,27 +180,25 @@ public class AlarmClockActivity extends FragmentActivity implements OnItemClickL
     public boolean onContextItemSelected(final MenuItem menuItem) {
         final AdapterContextMenuInfo adapterContextMenuInfo =
                 (AdapterContextMenuInfo) menuItem.getMenuInfo();
-        final int AlarmId = (int) adapterContextMenuInfo.id;
-        
+        final int alarmId = (int) adapterContextMenuInfo.id;
+
         switch (menuItem.getItemId()) {
         case R.id.delete_alarm:
             new AlertDialog.Builder(this).setTitle(getString(R.string.delete_alarm))
                     .setMessage(getString(R.string.delete_alarm_confirm))
                     .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
                         public void onClick(final DialogInterface d, final int w) {
-                            AlarmContract.deleteAlarm(AlarmClockActivity.this, AlarmId);
+                            AlarmContract.deleteAlarm(AlarmClockActivity.this, alarmId);
                         }
-                    })
-                    .setNegativeButton(android.R.string.cancel, null)
-                    .show();
+                    }).setNegativeButton(android.R.string.cancel, null).show();
             return true;
         case R.id.enable_alarm:
-            toggleAlarm(new Alarm(this, (Cursor) mAlarmsListView.getAdapter().getItem(
+            toggleAlarm(new Alarm(this, (Cursor) sAlarmsListView.getAdapter().getItem(
                     adapterContextMenuInfo.position)));
             return true;
         case R.id.edit_alarm:
             startActivity(new Intent(this, SetAlarmPreferenceActivity.class).putExtra(Alarm.KEY_ID,
-                    AlarmId));
+                    alarmId));
             return true;
         default:
             break;
@@ -201,7 +209,7 @@ public class AlarmClockActivity extends FragmentActivity implements OnItemClickL
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        mLoaderManager.destroyLoader(0);
+        sLoaderManager.destroyLoader(0);
         Toaster.cancelToast();
     }
 
@@ -212,20 +220,23 @@ public class AlarmClockActivity extends FragmentActivity implements OnItemClickL
         getMenuInflater().inflate(R.menu.context_menu, contextMenu);
 
         final Alarm alarm =
-                new Alarm(this, (Cursor) mAlarmsListView.getAdapter().getItem(
+                new Alarm(this, (Cursor) sAlarmsListView.getAdapter().getItem(
                         ((AdapterContextMenuInfo) contextMenuInfo).position));
 
         // Inflate the custom view and set each TextView's text.
         final View contextMenuHeaderView =
-                mLayoutInflator.inflate(R.layout.context_menu_header, null);
+                sLayoutInflater.inflate(R.layout.context_menu_header, null);
 
-        final boolean labelIsEmpty = TextUtils.isEmpty(alarm.label);
-        
-        ((TextView) contextMenuHeaderView.findViewById(R.id.header_time))
-                .setText(labelIsEmpty ? alarm.formattedDayTime :  alarm.formattedAbbreviatedDayTime);
-        
+        final boolean isLabelEmpty = TextUtils.isEmpty(alarm.label);
+        final boolean is24HourFormat = DateFormat.is24HourFormat(this);
+        ((TextView) contextMenuHeaderView.findViewById(R.id.header_time)).setText(isLabelEmpty
+                ? alarm.format(this.getString(is24HourFormat ? Alarm.FORMAT_WEEKDAY_HOUR_MINUTE_24
+                        : Alarm.FORMAT_WEEKDAY_HOUR_MINUTE_CAP_AM_PM)) : alarm.format(this
+                        .getString(is24HourFormat ? Alarm.FORMAT_ABBREV_WEEKDAY_HOUR_MINUTE_24
+                                : Alarm.FORMAT_ABBREV_WEEKDAY_HOUR_MINUTE_CAP_AM_PM)));
+
         final TextView labelView = (TextView) contextMenuHeaderView.findViewById(R.id.header_label);
-        if (labelIsEmpty) {
+        if (isLabelEmpty) {
             labelView.setVisibility(View.GONE);
         } else {
             labelView.setText(alarm.label);
@@ -276,10 +287,13 @@ public class AlarmClockActivity extends FragmentActivity implements OnItemClickL
     }
 
     private void toggleAlarm(final Alarm alarm) {
-        AlarmContract.toggleAlarm(this, alarm, !alarm.enabled);
         if (!alarm.enabled) {
+            AlarmContract.enableAlarm(this, alarm);
             Toaster.popAlarmToast(this, alarm);
+        } else {
+            AlarmContract.disableAlarm(this, alarm);
         }
+        AlarmContract.setNextAlarm(this);
     }
 
     private void addNewAlarm() {
@@ -291,10 +305,10 @@ public class AlarmClockActivity extends FragmentActivity implements OnItemClickL
     }
 
     public void onLoadFinished(Loader<Cursor> cursorLoader, Cursor cursor) {
-        mAlarmTimeAdapter.swapCursor(cursor);
+        sAlarmTimeAdapter.swapCursor(cursor);
     }
 
     public void onLoaderReset(Loader<Cursor> cursorLoader) {
-        mAlarmTimeAdapter.swapCursor(null);
+        sAlarmTimeAdapter.swapCursor(null);
     }
 }

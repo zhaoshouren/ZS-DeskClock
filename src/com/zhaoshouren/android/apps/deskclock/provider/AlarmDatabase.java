@@ -1,4 +1,4 @@
-package com.zhaoshouren.android.apps.deskclock.providers;
+package com.zhaoshouren.android.apps.deskclock.provider;
 
 import static com.zhaoshouren.android.apps.deskclock.DeskClock.DEVELOPER_MODE;
 import static com.zhaoshouren.android.apps.deskclock.DeskClock.TAG;
@@ -10,8 +10,7 @@ import android.provider.BaseColumns;
 import android.util.Log;
 
 public class AlarmDatabase extends SQLiteOpenHelper {
-    
-    
+  
     private static final String DATABASE_NAME = "zhaoshouren.deskclock.db";
     private static final int DATABASE_VERSION = 1; 
     
@@ -95,10 +94,10 @@ public class AlarmDatabase extends SQLiteOpenHelper {
                 ALARM_RINGTONE_URI 
                 };
         
-        public static final String TOKEN_IDS = "%ids%";
-        public static final String SORT_ORDER = ALARM_SORT + ", " + ALARM_TIME + " ASC";
+        public static final String SORT_BY_TIME = ALARM_TIME + " ASC";
+        public static final String SORT_BY_TIME_OF_DAY = ALARM_SORT + ", " + ALARM_TIME + " ASC";
         public static final String WHERE_ENABLED = ALARM_ENABLED + " = 1";
-        public static final String WHERE_ID_IN = _ID + "IN (" + TOKEN_IDS + ")";       
+        public static final String WHERE_ID_IN = _ID + "IN (?)";       
     
         private static final String CREATE_TABLE = "CREATE TABLE " + TABLE_ALARMS + " (" 
             + _ID + " INTEGER PRIMARY KEY, " 

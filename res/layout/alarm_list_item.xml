@@ -45,7 +45,7 @@
 <!--     		android:textAppearance="?android:attr/textAppearanceSmall"  -->
 <!--     		android:layout_width="wrap_content"  -->
 <!--     		android:layout_height="wrap_content"  -->
-<!--     		android:id="@+id/selectedDays"  -->
+<!--     		android:id="@+id/days"  -->
 <!--     		android:text="Mon, Tue"  -->
 <!--     		android:layout_below="@+id/time"/> -->
 <!--     	<TextView  -->

@@ -19,14 +19,14 @@
     <Preference 
     	android:key="time"
         android:persistent="false"/>
-    <com.zhaoshouren.android.apps.deskclock.utils.SelectedDaysPreference 
+    <com.zhaoshouren.android.apps.deskclock.ui.DaysPreference 
     	android:key="selected_days" android:persistent="false" android:summary="@string/alarm_repeat"/>
     <EditTextPreference 
     	android:key="label"
         android:persistent="false"
         android:summary="@string/label"
         android:dialogTitle="@string/label" />    
-    <com.zhaoshouren.android.apps.deskclock.utils.AlarmRingtonePreference
+    <com.zhaoshouren.android.apps.deskclock.ui.AlarmRingtonePreference
         android:showSilent="true" android:persistent="false" android:ringtoneType="alarm" android:summary="@string/alert" android:showDefault="false" android:key="ringtone"/>
     <CheckBoxPreference 
     	android:key="vibrate"

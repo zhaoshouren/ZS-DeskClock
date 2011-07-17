@@ -5,7 +5,8 @@
       android:versionName="1.0">
     <uses-sdk android:minSdkVersion="7" />
     <instrumentation android:targetPackage="com.zhaoshouren.android.apps.deskclock" android:name="android.test.InstrumentationTestRunner" />
-    <application android:icon="@drawable/icon" android:label="@string/app_name">
+    <uses-permission android:name="android.permission.CHANGE_CONFIGURATION"></uses-permission>
+    <application android:icon="@drawable/icon" android:label="@string/app_name" android:permission="android.permission.CHANGE_CONFIGURATION" >
     	<uses-library android:name="android.test.runner" />
     </application>
 </manifest>
