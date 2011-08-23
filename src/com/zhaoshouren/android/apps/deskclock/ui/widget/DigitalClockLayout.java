@@ -123,7 +123,7 @@ public class DigitalClockLayout extends LinearLayout {
         
         if (!mIsInEditMode) {
             if (mLive) {
-                mDigitalClock.setLive(getContext(), true);
+                mDigitalClock.setLive(true);
             }
     
             mDigitalClock.updateTime();
@@ -144,7 +144,7 @@ public class DigitalClockLayout extends LinearLayout {
         mAttached = false;
         
         if (mLive && !mIsInEditMode) {
-            mDigitalClock.setLive(getContext(), false);
+            mDigitalClock.setLive(false);
         }
     }
 
@@ -177,7 +177,7 @@ public class DigitalClockLayout extends LinearLayout {
 
     public void setLive(final boolean live) {
         mLive = live;
-        mDigitalClock.setLive(getContext(), live);
+        mDigitalClock.setLive(live);
     }
 
     public void updateTime(final Time time) {

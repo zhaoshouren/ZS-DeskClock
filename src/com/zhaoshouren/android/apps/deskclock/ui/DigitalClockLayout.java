@@ -28,8 +28,8 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.zhaoshouren.android.apps.deskclock.R;
-import com.zhaoshouren.android.apps.deskclock.utils.DigitalClock;
-import com.zhaoshouren.android.apps.deskclock.utils.FormattedTime;
+import com.zhaoshouren.android.apps.deskclock.util.DigitalClock;
+import com.zhaoshouren.android.apps.deskclock.util.FormattedTime;
 
 /**
  * Displays the time

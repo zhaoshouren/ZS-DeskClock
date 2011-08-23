@@ -214,15 +214,6 @@ public class Days {
     }
 
     /**
-     * Returns true if alarm is a repeating alarm, false if it's a one time alarm
-     * 
-     * @return true days are selected, false if no days are selected
-     */
-//    public boolean isRepeating() {
-//        return selected > NO_DAYS_SELECTED;
-//    }
-
-    /**
      * Returns the number of days till next selected day from today
      * 
      * @return number of days till next selected day from today
@@ -262,12 +253,12 @@ public class Days {
      * @return number of days selected
      */
     public int getCount() {
-        int daysCount = 0;
+        int count = 0;
         for (int days = selected; days > 0; days >>= 1) {
             if ((days & 1) == 1) {
-                daysCount++;
+                count++;
             }
         }
-        return daysCount;
+        return count;
     }
 }

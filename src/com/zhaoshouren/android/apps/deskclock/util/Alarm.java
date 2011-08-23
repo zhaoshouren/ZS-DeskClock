@@ -133,12 +133,6 @@ public class Alarm extends FormattedTime implements Parcelable, AlarmColumns{
         parcel.writeInt(vibrate ? 1 : 0);
         parcel.writeString(label);
         parcel.writeParcelable(ringtoneUri, flag);
-//        parcel.writeInt(is24HourFormat ? 1 : 0);
-//        parcel.writeString(sFormatCapAmPm);
-//        parcel.writeString(sFormatHourMinute);
-//        parcel.writeString(sFormatHourMinute24);
-//        parcel.writeString(sFormatHourMinuteCapAmPm);
-//        parcel.writeString(sFormatWeekdayMonthDay);
         parcel.writeLong(toMillis(true));        
         parcel.setDataPosition(0);
     }
@@ -151,12 +145,6 @@ public class Alarm extends FormattedTime implements Parcelable, AlarmColumns{
         vibrate = parcel.readInt() == 1;
         label = parcel.readString();
         ringtoneUri = (Uri) parcel.readParcelable(null);
-//        is24HourFormat = parcel.readInt() == 1;
-//        sFormatCapAmPm = parcel.readString();
-//        sFormatHourMinute = parcel.readString();
-//        sFormatHourMinute24 = parcel.readString();
-//        sFormatHourMinuteCapAmPm = parcel.readString();
-//        sFormatWeekdayMonthDay = parcel.readString();
         set(parcel.readLong());
         normalize(true);
     }
@@ -225,12 +213,6 @@ public class Alarm extends FormattedTime implements Parcelable, AlarmColumns{
         label = alarm.label;
         ringtoneUri = alarm.ringtoneUri;
         days.selected = alarm.days.selected;
-//        is24HourFormat = alarm.is24HourFormat;
-//        sFormatCapAmPm = alarm.sFormatCapAmPm;
-//        sFormatHourMinute = alarm.sFormatHourMinute;
-//        sFormatHourMinute24 = alarm.sFormatHourMinute24;
-//        sFormatHourMinuteCapAmPm = alarm.sFormatHourMinuteCapAmPm;
-//        sFormatWeekdayMonthDay = alarm.sFormatWeekdayMonthDay;
         
         super.set(alarm);
     }

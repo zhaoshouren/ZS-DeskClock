@@ -76,7 +76,7 @@ public class DigitalClockService extends Service {
                     sContext, 0, new Intent(sContext, DeskClockActivity.class).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK),
                     PendingIntent.FLAG_UPDATE_CURRENT));
     
-            mDigitalClock.setLive(sContext, true);
+            mDigitalClock.setLive(true);
             
             if (DEVELOPER_MODE) {
                 Log.d(TAG, "\n    mRemoteViews: " + mRemoteViews);
@@ -152,7 +152,7 @@ public class DigitalClockService extends Service {
         }
         
         try {
-            mDigitalClock.setLive(sContext, false);
+            mDigitalClock.setLive(false);
         } catch (NullPointerException exception) {
             Log.e(TAG, "AHHH!!!", exception);
         } 

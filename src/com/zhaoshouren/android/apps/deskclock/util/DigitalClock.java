@@ -16,6 +16,10 @@
 
 package com.zhaoshouren.android.apps.deskclock.util;
 
+
+import static com.zhaoshouren.android.apps.deskclock.DeskClock.DEVELOPER_MODE;
+import static com.zhaoshouren.android.apps.deskclock.DeskClock.TAG;
+
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -23,13 +27,17 @@ import android.content.IntentFilter;
 import android.database.ContentObserver;
 import android.os.Handler;
 import android.provider.Settings;
+import android.text.TextUtils;
 import android.text.format.Time;
+import android.util.Log;
 
 public abstract class DigitalClock {
     private final FormattedTime mFormattedTime;
     private final Context mContext;
     private final Handler mHandler;
     private boolean mLive = false;
+    private boolean mStopped = false;
+    private boolean mRegistered = false; 
     
     private static final IntentFilter sIntentFilter = new IntentFilter();
     static {
@@ -62,36 +70,58 @@ public abstract class DigitalClock {
     private final BroadcastReceiver mBroadCastReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(final Context context, final Intent intent) {
-            final String action = intent.getAction();
-            
-            if (action == Intent.ACTION_TIMEZONE_CHANGED) {
-                mFormattedTime.switchTimezone(intent.getStringExtra("time-zone"));
-            } 
+//            final String action = intent.getAction();
+//            
+//            if (action == Intent.ACTION_TIMEZONE_CHANGED) {
+//                mFormattedTime.switchTimezone(intent.getStringExtra("time-zone"));
+//            } 
+//
+//            // Post a runnable to avoid blocking the broadcast.
+//            mHandler.post(new Runnable() {
+//                public void run() {
+//                    updateTime(action != Intent.ACTION_TIME_TICK);
+//                }
+//            });         
 
-            // Post a runnable to avoid blocking the broadcast.
             mHandler.post(new Runnable() {
                 public void run() {
-                    updateTime(action != Intent.ACTION_TIME_TICK);
+                    final String action = intent.getAction();
+                    boolean updateDate = false;
+                    
+                    switch(ACTIONS.valueOf(action.substring(TextUtils.lastIndexOf(action, '.') + 1))) {
+                    case ACTION_SCREEN_OFF:
+                        mStopped = true;
+                        break;
+                    case ACTION_USER_PRESENT:
+                    case ACTION_SCREEN_ON:
+                        mStopped = false;
+                        updateDate = true;
+                        break;
+                    case ACTION_TIMEZONE_CHANGED:
+                        mFormattedTime.switchTimezone(intent.getStringExtra("time-zone"));
+                    case ACTION_DATE_CHANGED:
+                    case ACTION_TIME_CHANGED:
+                    case LOCALE_CHANGED:
+                        updateDate = true;
+                        break;
+                    case ACTION_TIME_TICK:
+                        updateDate = false;
+                        break;
+                    default:
+                        return; // unexpected action received so abort
+                    }
+                    
+                    if (!mStopped) {
+                        updateTime(updateDate);
+                    }
                 }
-            });
+            });    
+
         }
     };
 
-    private class FormatChangeObserver extends ContentObserver {
-        public FormatChangeObserver() {
-            super(mHandler);
-        }
+    private final ContentObserver mContentObserver;
 
-        @Override
-        public void onChange(final boolean selfChange) {
-            mFormattedTime.setFormats(mContext);            
-            updateTime();
-        }
-    }
-    private final ContentObserver mFormatChangeObserver = new FormatChangeObserver();
-    
-    private boolean mRegistered; 
-    
     public DigitalClock(final Context context) {
         this(context, new Handler());
     }
@@ -100,16 +130,33 @@ public abstract class DigitalClock {
         mContext = context;
         mHandler = handler; 
         mFormattedTime = new FormattedTime(context);
+        
+        mContentObserver = new ContentObserver(mHandler) {
+            @Override
+            public void onChange(boolean selfChange) {
+                super.onChange(selfChange);
+                mFormattedTime.setFormats(mContext);            
+                updateTime(true);
+            }
+        };
+    }
+    
+    public void updateTime() {
+        updateTime(true);
     }
     
     public void updateTime(final Time time) {
         mFormattedTime.set(time);
-        updateTime();
+        updateTime(true);
     }
 
     protected void updateTime(boolean updateDate) {
         if (mLive) {
             mFormattedTime.setToNow();
+        }
+        
+        if (DEVELOPER_MODE) {
+            Log.d(TAG, mFormattedTime.formattedTimeAmPm);
         }
 
         updateTimeView(mFormattedTime);
@@ -118,21 +165,18 @@ public abstract class DigitalClock {
         }
     }
     
-    public void updateTime() {
-        updateTime(true);
-    }
-
-    public void setLive(final Context context, final boolean live) {
+    
+    public void setLive(final boolean live) {
         mLive = live;
         updateTime();
         if (mLive && !mRegistered) {
             mRegistered = true;
-            context.registerReceiver(mBroadCastReceiver, sIntentFilter, null, mHandler);
-            context.getContentResolver().registerContentObserver(Settings.System.CONTENT_URI,
-                    true, mFormatChangeObserver);
+            mContext.registerReceiver(mBroadCastReceiver, sIntentFilter, null, mHandler);
+            mContext.getContentResolver().registerContentObserver(Settings.System.CONTENT_URI,
+                    true, mContentObserver);
         } else if (!mLive && mRegistered) {
-            context.unregisterReceiver(mBroadCastReceiver);
-            context.getContentResolver().unregisterContentObserver(mFormatChangeObserver);
+            mContext.unregisterReceiver(mBroadCastReceiver);
+            mContext.getContentResolver().unregisterContentObserver(mContentObserver);
         }
     }
     
