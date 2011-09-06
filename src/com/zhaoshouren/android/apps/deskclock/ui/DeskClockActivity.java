@@ -61,10 +61,9 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.zhaoshouren.android.apps.deskclock.util.Alarm;
-import com.zhaoshouren.android.apps.deskclock.ui.widget.DigitalClockLayout;
-import com.zhaoshouren.android.apps.deskclock.ui.SetAlarmPreferenceActivity;
 import com.zhaoshouren.android.apps.deskclock.R;
+import com.zhaoshouren.android.apps.deskclock.ui.widget.DigitalClockLayout;
+import com.zhaoshouren.android.apps.deskclock.util.Alarm;
 
 import java.util.Date;
 import java.util.Random;

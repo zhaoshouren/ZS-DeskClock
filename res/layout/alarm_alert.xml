@@ -34,7 +34,7 @@
             android:singleLine="true"
             android:ellipsize="end"
             android:gravity="center"
-            android:layout_width="match_parent"
+            android:layout_width="fill_parent"
             android:layout_height="wrap_content" android:text="@android:string/untitled"/>
         <ImageView
             android:layout_width="match_parent"

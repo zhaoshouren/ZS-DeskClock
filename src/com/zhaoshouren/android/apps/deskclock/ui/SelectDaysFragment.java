@@ -1,99 +1,100 @@
 package com.zhaoshouren.android.apps.deskclock.ui;
 
 import android.app.Dialog;
-import android.content.Context;
-import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
+import android.support.v4.app.FragmentActivity;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
 import android.widget.BaseAdapter;
-import android.widget.CheckBox;
+import android.widget.CheckedTextView;
 import android.widget.ListView;
 
-import java.util.List;
-import java.util.zip.Inflater;
-
-import com.zhaoshouren.android.apps.deskclock.util.Alarm;
-import com.zhaoshouren.android.apps.deskclock.util.Days;
 import com.zhaoshouren.android.apps.deskclock.R;
-
-import static com.zhaoshouren.android.apps.deskclock.util.Days.CALENDAR_DAY_STRING_VALUES;
+import com.zhaoshouren.android.apps.deskclock.util.Days;
 
 
 public class SelectDaysFragment extends DialogFragment {
     
-    private static final String[] DAYS = Days.getDays(false);
-       
-    private class SelectDaysAdapter extends BaseAdapter {
+    public static interface SelectDaysCallback {
+        public void setDays(int days);
+    }
+          
+    private static class SelectDaysAdapter extends BaseAdapter {
         
+        private static final String[] DAYS = Days.getDays(false);
         private final LayoutInflater mLayoutInflater;
         private final Days mDays;
+        private final FragmentActivity mFragmentActivity;
         
-        public SelectDaysAdapter(final Context context, final LayoutInflater layoutInfater, final Days days) {
+        public SelectDaysAdapter(final FragmentActivity fragmentActivity, final LayoutInflater layoutInfater, final int days) {
+            mFragmentActivity = fragmentActivity;
             mLayoutInflater = layoutInfater;
-            mDays = days;
+            mDays = new Days(days);
         }
 
         @Override
         public int getCount() {
-            // TODO Auto-generated method stub
-            return 0;
+            return DAYS.length;
         }
 
         @Override
-        public Object getItem(int arg0) {
-            // TODO Auto-generated method stub
-            return null;
+        public Object getItem(int position) {
+            return DAYS[position];
         }
 
         @Override
-        public long getItemId(int arg0) {
-            // TODO Auto-generated method stub
-            return 0;
+        public long getItemId(int position) {
+            return (long) position;
         }
 
         @Override
-        public View getView(int arg0, View arg1, ViewGroup arg2) {
-            // TODO Auto-generated method stub
-            return null;
+        public View getView(int position, View convertView, ViewGroup parent) {
+            if (convertView == null) {
+                convertView = mLayoutInflater.inflate(R.layout.day_list_item, null);
+            }
+            
+            CheckedTextView checkedTextView = (CheckedTextView) convertView.findViewById(R.id.day);
+            checkedTextView.setText((String) getItem(position));
+            checkedTextView.setChecked(mDays.isSet(position));
+            checkedTextView.setId(position);
+            checkedTextView.setOnClickListener(new OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    final CheckedTextView checkedTextView = (CheckedTextView) view;
+                    mDays.set(checkedTextView.getId(), checkedTextView.isChecked());
+                    ((SetAlarmActivity) mFragmentActivity).setDays(mDays.selected);
+                }
+            });
+            
+            return convertView;
         }
-       
-        
     }
     
-    public static SelectDaysFragment newInstance(int title) {
+    public static SelectDaysFragment newInstance(int days) {
         SelectDaysFragment fragment = new SelectDaysFragment();
         Bundle args = new Bundle();
-        args.putInt("title", title);
+        args.putInt("days", days);
         fragment.setArguments(args);
         return fragment;
     }
     
-    Alarm mAlarm;
-    ListView mListView;
-    SelectDaysAdapter mSelectDaysAdapter;
     
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         
-        final Intent intent = getActivity().getIntent();
-        intent.getParcelableExtra(Alarm.KEY_PARCEL);
+//        final Intent intent = getActivity().getIntent();
+//        intent.getParcelableExtra(Alarm.KEY_PARCEL);
         
         final LayoutInflater layoutInflator = getLayoutInflater(savedInstanceState);
         
         View view = layoutInflator.inflate(R.layout.select_days, null);
         
-        mSelectDaysAdapter = new SelectDaysAdapter(getActivity(), layoutInflator, null) ;
-        
-        
         ListView listView = (ListView) view.findViewById(R.id.daysList);
-        listView.setAdapter(mSelectDaysAdapter);
-        
+        listView.setAdapter(new SelectDaysAdapter(getActivity(), layoutInflator, getArguments().getInt("days")));
         
         return super.onCreateDialog(savedInstanceState);
     }
-
 }

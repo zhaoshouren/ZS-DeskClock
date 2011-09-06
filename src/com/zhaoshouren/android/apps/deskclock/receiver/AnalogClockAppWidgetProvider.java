@@ -27,8 +27,8 @@ import android.content.Intent;
 import android.util.Log;
 import android.widget.RemoteViews;
 
-import com.zhaoshouren.android.apps.deskclock.ui.AlarmClockActivity;
 import com.zhaoshouren.android.apps.deskclock.R;
+import com.zhaoshouren.android.apps.deskclock.ui.AlarmClockActivity;
 
 import java.util.Arrays;
 

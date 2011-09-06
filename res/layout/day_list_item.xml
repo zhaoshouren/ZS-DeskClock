@@ -19,5 +19,5 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent" android:gravity="fill_vertical">
-    <CheckBox android:layout_height="wrap_content" android:text="CheckBox" android:layout_alignParentLeft="true" android:layout_width="wrap_content" android:id="@+id/dayCheckBox"></CheckBox>
+    <CheckedTextView android:text="CheckedTextView" android:id="@+id/day" android:layout_height="wrap_content" android:layout_alignParentTop="true" android:layout_alignParentLeft="true" android:layout_width="match_parent"></CheckedTextView>
 </RelativeLayout>
