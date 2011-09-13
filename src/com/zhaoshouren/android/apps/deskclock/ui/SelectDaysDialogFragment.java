@@ -1,9 +1,7 @@
 package com.zhaoshouren.android.apps.deskclock.ui;
 
-import android.app.Dialog;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
-import android.support.v4.app.FragmentActivity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -16,23 +14,25 @@ import com.zhaoshouren.android.apps.deskclock.R;
 import com.zhaoshouren.android.apps.deskclock.util.Days;
 
 
-public class SelectDaysFragment extends DialogFragment {
+public class SelectDaysDialogFragment extends DialogFragment implements View.OnClickListener, SelectDaysListFragment.OnSelectDaysChangeListener {
     
-    public static interface SelectDaysCallback {
-        public void setDays(int days);
+    public static interface OnSelectDaysChangeListener {
+        public void onSelectDaysChange(int selected);
     }
           
-    private static class SelectDaysAdapter extends BaseAdapter {
+    protected static class SelectDaysAdapter extends BaseAdapter {
         
         private static final String[] DAYS = Days.getDays(false);
         private final LayoutInflater mLayoutInflater;
         private final Days mDays;
-        private final FragmentActivity mFragmentActivity;
         
-        public SelectDaysAdapter(final FragmentActivity fragmentActivity, final LayoutInflater layoutInfater, final int days) {
-            mFragmentActivity = fragmentActivity;
+        public SelectDaysAdapter(final LayoutInflater layoutInfater, final int selected) {
             mLayoutInflater = layoutInfater;
-            mDays = new Days(days);
+            mDays = new Days(selected);
+        }
+        
+        public int getSelected() {
+            return mDays.selected;
         }
 
         @Override
@@ -65,7 +65,6 @@ public class SelectDaysFragment extends DialogFragment {
                 public void onClick(View view) {
                     final CheckedTextView checkedTextView = (CheckedTextView) view;
                     mDays.set(checkedTextView.getId(), checkedTextView.isChecked());
-                    ((SetAlarmActivity) mFragmentActivity).setDays(mDays.selected);
                 }
             });
             
@@ -73,28 +72,36 @@ public class SelectDaysFragment extends DialogFragment {
         }
     }
     
-    public static SelectDaysFragment newInstance(int days) {
-        SelectDaysFragment fragment = new SelectDaysFragment();
-        Bundle args = new Bundle();
-        args.putInt("days", days);
-        fragment.setArguments(args);
+    public static SelectDaysDialogFragment newInstance(int days) {
+        SelectDaysDialogFragment fragment = new SelectDaysDialogFragment();
+        Bundle arguments = new Bundle();
+        arguments.putInt("days", days);
+        fragment.setArguments(arguments);
         return fragment;
     }
     
+    private Days mDays;
     
     @Override
-    public Dialog onCreateDialog(Bundle savedInstanceState) {
-        
-//        final Intent intent = getActivity().getIntent();
-//        intent.getParcelableExtra(Alarm.KEY_PARCEL);
-        
-        final LayoutInflater layoutInflator = getLayoutInflater(savedInstanceState);
-        
-        View view = layoutInflator.inflate(R.layout.select_days, null);
+    public View onCreateView(LayoutInflater layoutInflater, ViewGroup container, Bundle savedInstanceState) {
+        View view = layoutInflater.inflate(R.layout.select_days, null);
         
         ListView listView = (ListView) view.findViewById(R.id.daysList);
-        listView.setAdapter(new SelectDaysAdapter(getActivity(), layoutInflator, getArguments().getInt("days")));
+        listView.setAdapter(new SelectDaysAdapter(layoutInflater, getArguments().getInt("days")));
         
-        return super.onCreateDialog(savedInstanceState);
+        return view;
+    };
+    
+    @Override
+    public void onClick(View view) {
+        if (view.getId() == R.id.ok) {
+            ((OnSelectDaysChangeListener) getActivity()).onSelectDaysChange(mDays.selected);
+        }
+        dismiss();
+    }
+
+    @Override
+    public void onSelectDaysChange(int selected) {
+        mDays.selected = selected;
     }
 }

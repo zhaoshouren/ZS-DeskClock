@@ -32,19 +32,17 @@ import com.zhaoshouren.android.apps.deskclock.provider.AlarmDatabase.AlarmColumn
 
 public class Alarm extends FormattedTime implements Parcelable, AlarmColumns{
     public static final int INVALID_ID = -1;
-    public static final String KEY_ID = "intent.extra.com.zhaoshouren.android.apps.deskclock.utils.Alarm.id";
+    public static final String KEY_ID = "Alarm.id";
     /**
      * Pass to Intent.putExtra(...) when sending Parcel from Alarm.writeToParcel(Parcel)
      */
-    public static final String KEY_PARCEL =
-            "intent.extra.com.zhaoshouren.android.apps.deskclock.utils.Alarm.Parcel";
+    public static final String KEY_PARCELABLE = "Alarm.Parcelable";
     /**
      * Pass to Intent.putExtra(...) when sending byte[] from Alarm.toRawData(); Send raw data
      * instead of Parcel in cases where the Intent extras are being inflated for manipulation by a
      * remote service which may trigger a ClassNotFoundException
      */
-    public static final String KEY_RAW_DATA =
-            "intent.extra.com.zhaoshouren.android.apps.deskclock.utils.Alarm.raw_data";
+    public static final String KEY_RAW_DATA = "Alarm.raw_data";
     /**
      * Pass to Intent.putExtra(...) when sending Alarm.id.
      */
