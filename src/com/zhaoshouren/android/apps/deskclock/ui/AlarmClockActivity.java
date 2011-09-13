@@ -190,7 +190,9 @@ public class AlarmClockActivity extends FragmentActivity implements OnItemClickL
                         public void onClick(final DialogInterface d, final int w) {
                             AlarmContract.deleteAlarm(AlarmClockActivity.this, alarmId);
                         }
-                    }).setNegativeButton(android.R.string.cancel, null).show();
+                    })
+                    .setNegativeButton(android.R.string.cancel, null)
+                    .show();
             return true;
         case R.id.enable_alarm:
             toggleAlarm(new Alarm(this, (Cursor) sAlarmsListView.getAdapter().getItem(

@@ -41,7 +41,7 @@ public class AlarmFragment extends Fragment implements LoaderManager.LoaderCallb
     @Override
     public Loader<Cursor> onCreateLoader(final int id, final Bundle savedInstanceState) {
         if (id == GET_NEXT_ALARM) {
-            return AlarmContract.getEnabledAlarmsCursorLoader(getActivity());
+            return AlarmContract.getAlarmsCursorLoader(getActivity(), true);
         } else if (id >= 0) {
             return AlarmContract.getAlarmCursorLoader(getActivity(), id);
         }

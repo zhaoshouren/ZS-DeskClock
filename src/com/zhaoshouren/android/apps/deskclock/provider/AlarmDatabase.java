@@ -97,6 +97,7 @@ public class AlarmDatabase extends SQLiteOpenHelper {
         public static final String SORT_BY_TIME = ALARM_TIME + " ASC";
         public static final String SORT_BY_TIME_OF_DAY = ALARM_SORT + ", " + ALARM_TIME + " ASC";
         public static final String WHERE_ENABLED = ALARM_ENABLED + " = 1";
+        public static final String WHERE_DISABLED = ALARM_ENABLED + " = 0";
         public static final String WHERE_ID_IN = _ID + "IN (?)";       
     
         private static final String CREATE_TABLE = "CREATE TABLE " + TABLE_ALARMS + " (" 
@@ -109,7 +110,7 @@ public class AlarmDatabase extends SQLiteOpenHelper {
             + ALARM_RINGTONE_URI + " TEXT, "
             + ALARM_SORT + " INTEGER);";
             
-       private static final String INSERT_INTO_ALARMS = "INSERT INTO alarms (" 
+        private static final String INSERT_INTO_ALARMS = "INSERT INTO alarms (" 
             + ALARM_TIME + ", " 
             + ALARM_SELECTED_DAYS + ", " 
             + ALARM_ENABLED + ", " 

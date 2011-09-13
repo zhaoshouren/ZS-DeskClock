@@ -239,13 +239,21 @@ public final class AlarmContract implements AlarmColumns {
     }
 
     public static Loader<Cursor> getAlarmsCursorLoader(final Context context) {
-        return new CursorLoader(context, AlarmProvider.CONTENT_URI, Sql.SELECT, null, null,
-                Sql.SORT_BY_TIME_OF_DAY);
+        return getAlarmsCursorLoader(context, Sql.SORT_BY_TIME_OF_DAY);
     }
     
-    public static Loader<Cursor> getEnabledAlarmsCursorLoader(final Context context) {
-        return new CursorLoader(context, AlarmProvider.CONTENT_URI, Sql.SELECT, Sql.WHERE_ENABLED, null,
-                Sql.SORT_BY_TIME);
+    public static Loader<Cursor> getAlarmsCursorLoader(final Context context, String sort) {
+        return new CursorLoader(context, AlarmProvider.CONTENT_URI, Sql.SELECT, null, null,
+                sort);
+    }
+    
+    public static Loader<Cursor> getAlarmsCursorLoader(final Context context, boolean enabled) {
+        return getAlarmsCursorLoader(context, enabled, Sql.SORT_BY_TIME);
+    }
+    
+    public static Loader<Cursor> getAlarmsCursorLoader(final Context context, boolean enabled, String sort) {
+        return new CursorLoader(context, AlarmProvider.CONTENT_URI, Sql.SELECT, enabled ? Sql.WHERE_ENABLED : Sql.WHERE_DISABLED, null,
+                sort);
     }
     
     /**
@@ -372,7 +380,7 @@ public final class AlarmContract implements AlarmColumns {
      */
     public static void setNextAlarm(final Context context) {
         cleanUpAlarms(context);
-        final Alarm alarm = getNextEnabledAlarm(context);
+        final Alarm alarm = getAlarm(context, getEnableAlarmsCursor(context));
         if (alarm != null) {
             setAlarm(context, alarm);
         }
@@ -471,10 +479,7 @@ public final class AlarmContract implements AlarmColumns {
     
     /**
      * XXX
-     * XXX
-     * XXX
      */
-    
     public static void setSnooze(final Context context, final Alarm alarm) {
         final SharedPreferences preferences = context.getSharedPreferences(
                 PREFERENCES_DESKCLOCK, 0);
@@ -486,7 +491,5 @@ public final class AlarmContract implements AlarmColumns {
 
         //set Snooze Alarm
         setAlarm(context, alarm);        
-    }
-
-    
+    }    
 }
