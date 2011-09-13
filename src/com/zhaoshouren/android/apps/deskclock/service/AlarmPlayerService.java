@@ -151,7 +151,7 @@ public class AlarmPlayerService extends Service {
                 });
             }
             
-            mAlarm = intent.getParcelableExtra(Alarm.KEY_PARCEL);         
+            mAlarm = intent.getParcelableExtra(Alarm.KEY_PARCELABLE);         
             startPlaying(mAlarm);
 
 
@@ -172,7 +172,7 @@ public class AlarmPlayerService extends Service {
     }
 
     private void sendKillBroadcast(final Alarm alarm) {
-        sendBroadcast(new Intent(AlarmContract.ACTION_ALARM_KILLED).putExtra(Alarm.KEY_PARCEL,
+        sendBroadcast(new Intent(AlarmContract.ACTION_ALARM_KILLED).putExtra(Alarm.KEY_PARCELABLE,
                 alarm).putExtra(AlarmContract.KEY_ALARM_KILLED_TIMEOUT,
                 (int) Math.round((System.currentTimeMillis() - mStartTime) / 60000.0)));
     }

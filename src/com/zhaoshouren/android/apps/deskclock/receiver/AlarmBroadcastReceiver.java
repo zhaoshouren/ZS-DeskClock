@@ -118,7 +118,7 @@ public class AlarmBroadcastReceiver extends BroadcastReceiver{
             context.startActivity(new Intent(context, ((KeyguardManager) context
                     .getSystemService(Context.KEYGUARD_SERVICE)).inKeyguardRestrictedInputMode()
                     ? AlarmAlertFullScreenActivity.class : AlarmAlertActivity.class).putExtra(
-                    Alarm.KEY_PARCEL, alarm).setFlags(
+                    Alarm.KEY_PARCELABLE, alarm).setFlags(
                     Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_NO_USER_ACTION));
     
             // Disable the snooze alert if this alarm is the snooze.
@@ -131,12 +131,12 @@ public class AlarmBroadcastReceiver extends BroadcastReceiver{
             AlarmContract.setNextAlarm(context);
     
             context.startService(new Intent(AlarmContract.ACTION_PLAY_ALARM).putExtra(
-                    Alarm.KEY_PARCEL, alarm));
+                    Alarm.KEY_PARCELABLE, alarm));
     
             final Notification notification =
                     getNotification(context, alarm, context.getString(R.string.alarm_notify_text),
                             PendingIntent.getActivity(context, alarm.id, new Intent(context,
-                                    AlarmAlertActivity.class).putExtra(Alarm.KEY_PARCEL, alarm), 0));
+                                    AlarmAlertActivity.class).putExtra(Alarm.KEY_PARCELABLE, alarm), 0));
             notification.flags |= Notification.FLAG_SHOW_LIGHTS | Notification.FLAG_ONGOING_EVENT;
             notification.defaults |= Notification.DEFAULT_LIGHTS;
     
@@ -145,7 +145,7 @@ public class AlarmBroadcastReceiver extends BroadcastReceiver{
             ((NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE)).notify(alarm.id, notification);
             break;
         case ACTION_ALARM_KILLED:
-            final Alarm killedAlarm = intent.getParcelableExtra(Alarm.KEY_PARCEL);
+            final Alarm killedAlarm = intent.getParcelableExtra(Alarm.KEY_PARCELABLE);
             final NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
             // Update the notification to indicate that the alert has been
             // silenced.

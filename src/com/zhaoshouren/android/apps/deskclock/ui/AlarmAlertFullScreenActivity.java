@@ -80,7 +80,7 @@ public class AlarmAlertFullScreenActivity extends FragmentActivity implements Lo
             } else if (action == AlarmContract.ACTION_ALARM_DISMISS) {
                 dismiss();
             } else if (action == AlarmContract.ACTION_ALARM_KILLED){
-                final Alarm alarm = intent.getParcelableExtra(Alarm.KEY_PARCEL);
+                final Alarm alarm = intent.getParcelableExtra(Alarm.KEY_PARCELABLE);
                 if (alarm != null && alarm.id == mAlarm.id) {
                     //dismiss(true);
                     finish();
@@ -99,7 +99,7 @@ public class AlarmAlertFullScreenActivity extends FragmentActivity implements Lo
 
         final LoaderManager loaderManager = getSupportLoaderManager();
         final Intent intent = getIntent();
-        mAlarm = intent.getParcelableExtra(Alarm.KEY_PARCEL);
+        mAlarm = intent.getParcelableExtra(Alarm.KEY_PARCELABLE);
         mVolumeBehavior =
                 Integer.parseInt(PreferenceManager.getDefaultSharedPreferences(this).getString(
                         SettingsPreferenceActivity.KEY_VOLUME_BEHAVIOR, getString(R.string.default_snooze_volume)));
@@ -222,7 +222,7 @@ public class AlarmAlertFullScreenActivity extends FragmentActivity implements Lo
     protected void onNewIntent(final Intent intent) {
         super.onNewIntent(intent);
 
-        mAlarm = intent.getParcelableExtra(Alarm.KEY_PARCEL);
+        mAlarm = intent.getParcelableExtra(Alarm.KEY_PARCELABLE);
         
         if (DEVELOPER_MODE) {
             Log.d(TAG, "AlarmAlert.OnNewIntent()"
