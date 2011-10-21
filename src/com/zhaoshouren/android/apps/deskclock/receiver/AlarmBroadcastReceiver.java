@@ -82,9 +82,9 @@ public class AlarmBroadcastReceiver extends BroadcastReceiver{
         ACTION_POWER_CONNECTED,
         ACTION_POWER_DISCONNECTED,
         BOOT_COMPLETED,
+        LOCALE_CHANGED,
         TIME_SET,
-        TIMEZONE_CHANGED,
-        LOCALE_CHANGED
+        TIMEZONE_CHANGED
     }
 
     @Override

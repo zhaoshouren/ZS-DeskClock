@@ -70,19 +70,7 @@ public abstract class DigitalClock {
     private final BroadcastReceiver mBroadCastReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(final Context context, final Intent intent) {
-//            final String action = intent.getAction();
-//            
-//            if (action == Intent.ACTION_TIMEZONE_CHANGED) {
-//                mFormattedTime.switchTimezone(intent.getStringExtra("time-zone"));
-//            } 
-//
-//            // Post a runnable to avoid blocking the broadcast.
-//            mHandler.post(new Runnable() {
-//                public void run() {
-//                    updateTime(action != Intent.ACTION_TIME_TICK);
-//                }
-//            });         
-
+            
             mHandler.post(new Runnable() {
                 public void run() {
                     final String action = intent.getAction();
@@ -116,7 +104,6 @@ public abstract class DigitalClock {
                     }
                 }
             });    
-
         }
     };
 
