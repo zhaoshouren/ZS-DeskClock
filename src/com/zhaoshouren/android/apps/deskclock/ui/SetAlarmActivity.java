@@ -214,12 +214,6 @@ public class SetAlarmActivity extends FragmentActivity implements AlarmFragment.
             fragmentTransaction.commit();
         }
         
-//        if (savedInstanceState == null) {
-//            FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-//            DialogFragment newFragment = SelectDaysFragment.newInstance();
-//            ft.add(R.id.embedded, newFragment);
-//            ft.commit();
-//        }   
 
         mTime = (TextView) findViewById(R.id.time);
         mDays = (TextView) findViewById(R.id.days);

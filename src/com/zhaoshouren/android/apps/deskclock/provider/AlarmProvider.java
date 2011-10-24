@@ -131,7 +131,8 @@ public class AlarmProvider extends ContentProvider implements AlarmTables, Alarm
             }
             break;
         case ALARM:
-            count = sAlarmDatabase.getWritableDatabase().update(TABLE_ALARMS, contentValues, where, null);
+            count = sAlarmDatabase.getWritableDatabase().update(TABLE_ALARMS, contentValues, where, whereArguments);
+            break;
         default: 
             throw new UnsupportedOperationException("Cannot update URL: " + uri);
         }

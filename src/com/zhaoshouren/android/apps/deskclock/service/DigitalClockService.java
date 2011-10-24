@@ -47,6 +47,7 @@ public class DigitalClockService extends Service {
     private DigitalClock mDigitalClock;
     private RemoteViews mRemoteViews;
     private static Context sContext;
+    private static ComponentName sComponentName;
 
     @Override
     public IBinder onBind(final Intent intent) {
@@ -95,6 +96,7 @@ public class DigitalClockService extends Service {
         super.onCreate();
               
         sContext = getApplicationContext();
+        sComponentName = new ComponentName(sContext, DigitalClockAppWidgetProvider.class);
             
         mDigitalClock = new DigitalClock(sContext) {         
             @Override
@@ -104,7 +106,7 @@ public class DigitalClockService extends Service {
                             + "\n> DigitalClock.updateTimeView(DateTime)"
                             + "\n    time: " + formattedTime.formattedTime 
                             + "\n    amPm: " + formattedTime.formattedAmPm 
-                            + "\n    appWidgetIds: " + Arrays.toString(AppWidgetManager.getInstance(sContext).getAppWidgetIds(new ComponentName(sContext, DigitalClockAppWidgetProvider.class)))
+                            + "\n    appWidgetIds: " + Arrays.toString(AppWidgetManager.getInstance(sContext).getAppWidgetIds(sComponentName))
                             + "\n    remoteViews: " + mRemoteViews
                             + "\n    mDigitalClock: " + mDigitalClock);
                 }
@@ -119,17 +121,17 @@ public class DigitalClockService extends Service {
                         mRemoteViews.setViewVisibility(VIEW_ID_AM_PM, View.GONE);
                     }
                     
-                    AppWidgetManager.getInstance(sContext).updateAppWidget(new ComponentName(sContext, DigitalClockAppWidgetProvider.class), mRemoteViews);
+                    AppWidgetManager.getInstance(sContext).updateAppWidget(sComponentName, mRemoteViews);
                 }
             }
 
             @Override
-            protected void updateDateView(FormattedTime formattedTime) {
+            protected void updateDateView(final FormattedTime formattedTime) {
                 if (DEVELOPER_MODE) {
                     Log.d(TAG, "DigitalClockService.onCreate()"
                             + "\n> DigitalClock.updateDateView(DateTime)"
                             + "\n    date: " + formattedTime.formattedDate
-                            + "\n    appWidgetIds: " + Arrays.toString(AppWidgetManager.getInstance(sContext).getAppWidgetIds(new ComponentName(sContext, DigitalClockAppWidgetProvider.class)))
+                            + "\n    appWidgetIds: " + Arrays.toString(AppWidgetManager.getInstance(sContext).getAppWidgetIds(sComponentName))
                             + "\n    remoteViews.layoutId: " + mRemoteViews.getLayoutId()
                             + "\n    mDigitalClock: " + mDigitalClock);
                 }
@@ -137,7 +139,7 @@ public class DigitalClockService extends Service {
                 if (mRemoteViews != null) {
                     mRemoteViews.setTextViewText(VIEW_ID_DATE, formattedTime.formattedDate);
                     
-                    AppWidgetManager.getInstance(sContext).updateAppWidget(new ComponentName(sContext, DigitalClockAppWidgetProvider.class), mRemoteViews);
+                    AppWidgetManager.getInstance(sContext).updateAppWidget(sComponentName, mRemoteViews);
                 }
             }
         };
@@ -156,6 +158,5 @@ public class DigitalClockService extends Service {
         } catch (NullPointerException exception) {
             Log.e(TAG, "AHHH!!!", exception);
         } 
-    }
-
+    }  
 }

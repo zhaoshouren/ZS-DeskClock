@@ -263,10 +263,12 @@ public final class AlarmContract implements AlarmColumns {
      * @return <em>alarm</em> from database or <em>null</em> if cursor is <em>null</em> or <em>empty</em>
      */
     public static Alarm getAlarm(final Context context, final Cursor cursor) {
+        Alarm alarm = null;
         if (cursor.moveToFirst()) {
-            return new Alarm(context, cursor);
+            alarm = new Alarm(context, cursor);
         }
-        return null;
+        cursor.close();
+        return alarm;
     }
     
     /**
@@ -337,6 +339,8 @@ public final class AlarmContract implements AlarmColumns {
 
             context.getContentResolver().update(AlarmProvider.CONTENT_URI, contentValues,
                     Sql.WHERE_ID_IN, selectionArgs);
+        } else {
+        	setSettingSystemNextAlarmFormatted(context, "");
         }
         cursor.close();                                      
     }

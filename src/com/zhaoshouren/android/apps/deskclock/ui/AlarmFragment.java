@@ -42,7 +42,8 @@ public class AlarmFragment extends Fragment implements LoaderManager.LoaderCallb
     public Loader<Cursor> onCreateLoader(final int id, final Bundle savedInstanceState) {
         if (id == GET_NEXT_ALARM) {
             return AlarmContract.getAlarmsCursorLoader(getActivity(), true);
-        } else if (id >= 0) {
+        } 
+        else if (id >= 0) {
             return AlarmContract.getAlarmCursorLoader(getActivity(), id);
         }
         return null;
@@ -55,7 +56,9 @@ public class AlarmFragment extends Fragment implements LoaderManager.LoaderCallb
     }
 
     @Override
-    public void onLoaderReset(final Loader<Cursor> cursorLoader) {}
+    public void onLoaderReset(final Loader<Cursor> cursorLoader) {
+        //Don't need to do anything since we have no open cursors
+    }
     
     @Override
     public void onCreate(final Bundle savedInstanceState) {

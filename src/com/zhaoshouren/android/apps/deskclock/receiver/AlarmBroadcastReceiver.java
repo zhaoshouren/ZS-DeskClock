@@ -82,15 +82,17 @@ public class AlarmBroadcastReceiver extends BroadcastReceiver{
         ACTION_POWER_CONNECTED,
         ACTION_POWER_DISCONNECTED,
         BOOT_COMPLETED,
+        LOCALE_CHANGED,
         TIME_SET,
-        TIMEZONE_CHANGED,
-        LOCALE_CHANGED
+        TIMEZONE_CHANGED
     }
 
     @Override
     public void onReceive(final Context context, final Intent intent) {
         final String action = intent.getAction();
+        
         switch(ACTIONS.valueOf(action.substring(TextUtils.lastIndexOf(action, '.') + 1))) {
+        
         case ACTION_ALARM_ALERT:
             final Alarm alarm = new Alarm(context, intent.getByteArrayExtra(Alarm.KEY_RAW_DATA));
             final long alarmTime = alarm.toMillis(true);
@@ -144,6 +146,7 @@ public class AlarmBroadcastReceiver extends BroadcastReceiver{
             // correct notification.
             ((NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE)).notify(alarm.id, notification);
             break;
+        
         case ACTION_ALARM_KILLED:
             final Alarm killedAlarm = intent.getParcelableExtra(Alarm.KEY_PARCELABLE);
             final NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
@@ -160,18 +163,22 @@ public class AlarmBroadcastReceiver extends BroadcastReceiver{
             notificationManager.cancel(killedAlarm.id);
             notificationManager.notify(killedAlarm.id, killedAlarmNotification);
             break;
+        
         case ACTION_CANCEL_SNOOZE:
             AlarmContract.cancelSnooze(context, intent.getIntExtra(Alarm.KEY_ID, INVALID_ID));
             break;
+        
         case ACTION_POWER_CONNECTED:
             context.startActivity(new Intent(context, DeskClockActivity.class)
                         .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_FROM_BACKGROUND));
             break;
+        
         case ACTION_POWER_DISCONNECTED:
             context.startActivity(new Intent(Intent.ACTION_MAIN).addFlags(
                     Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_FROM_BACKGROUND).addCategory(
                     Intent.CATEGORY_HOME));
             break;
+        
         case BOOT_COMPLETED:
             AlarmContract.cancelSnooze(context, INVALID_ID);
             // no break because we want to fall through

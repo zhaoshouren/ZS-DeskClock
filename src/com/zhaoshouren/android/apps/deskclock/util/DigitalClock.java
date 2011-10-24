@@ -27,7 +27,6 @@ import android.content.IntentFilter;
 import android.database.ContentObserver;
 import android.os.Handler;
 import android.provider.Settings;
-import android.text.TextUtils;
 import android.text.format.Time;
 import android.util.Log;
 
@@ -53,70 +52,32 @@ public abstract class DigitalClock {
         sIntentFilter.addAction(Intent.ACTION_TIME_CHANGED);
         sIntentFilter.addAction(Intent.ACTION_LOCALE_CHANGED);
     }
-    
-    private static enum ACTIONS {       
-        ACTION_TIME_TICK,
-        ACTION_DATE_CHANGED,
-        ACTION_TIMEZONE_CHANGED,
-        
-        ACTION_USER_PRESENT,
-        ACTION_SCREEN_ON,
-        ACTION_SCREEN_OFF,
-
-        ACTION_TIME_CHANGED,
-        LOCALE_CHANGED
-    }
 
     private final BroadcastReceiver mBroadCastReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(final Context context, final Intent intent) {
-//            final String action = intent.getAction();
-//            
-//            if (action == Intent.ACTION_TIMEZONE_CHANGED) {
-//                mFormattedTime.switchTimezone(intent.getStringExtra("time-zone"));
-//            } 
-//
-//            // Post a runnable to avoid blocking the broadcast.
-//            mHandler.post(new Runnable() {
-//                public void run() {
-//                    updateTime(action != Intent.ACTION_TIME_TICK);
-//                }
-//            });         
-
+            
             mHandler.post(new Runnable() {
                 public void run() {
                     final String action = intent.getAction();
-                    boolean updateDate = false;
+                    boolean updateDate = true;             
                     
-                    switch(ACTIONS.valueOf(action.substring(TextUtils.lastIndexOf(action, '.') + 1))) {
-                    case ACTION_SCREEN_OFF:
+                    if (action == Intent.ACTION_TIME_TICK) {
+                    	updateDate = false;
+                    } else if (action == Intent.ACTION_SCREEN_OFF) {
                         mStopped = true;
-                        break;
-                    case ACTION_USER_PRESENT:
-                    case ACTION_SCREEN_ON:
-                        mStopped = false;
-                        updateDate = true;
-                        break;
-                    case ACTION_TIMEZONE_CHANGED:
-                        mFormattedTime.switchTimezone(intent.getStringExtra("time-zone"));
-                    case ACTION_DATE_CHANGED:
-                    case ACTION_TIME_CHANGED:
-                    case LOCALE_CHANGED:
-                        updateDate = true;
-                        break;
-                    case ACTION_TIME_TICK:
                         updateDate = false;
-                        break;
-                    default:
-                        return; // unexpected action received so abort
-                    }
+                    } else if (action == Intent.ACTION_USER_PRESENT || action == Intent.ACTION_SCREEN_ON) {
+                        mStopped = false;
+                    } else if (action == Intent.ACTION_TIME_CHANGED) {
+                        mFormattedTime.switchTimezone(intent.getStringExtra("time-zone"));
+                    } 
                     
                     if (!mStopped) {
                         updateTime(updateDate);
                     }
                 }
             });    
-
         }
     };
 

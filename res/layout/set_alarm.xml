@@ -18,28 +18,146 @@
 -->
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent" android:gravity="fill_vertical">
-    <LinearLayout style="@android:style/ButtonBar" android:layout_width="match_parent" android:orientation="horizontal" android:layout_height="wrap_content" android:layout_alignParentBottom="true">
-        <Button android:text="@string/save" android:focusable="true" android:layout_width="match_parent" android:layout_weight="1" android:layout_height="match_parent" android:id="@+id/alarm_save"></Button>
-        <Button android:text="@android:string/cancel" android:focusable="true" android:layout_width="match_parent" android:layout_weight="1" android:layout_height="match_parent" android:id="@+id/alarm_cancel"></Button>
-        <Button android:text="@string/delete" android:focusable="true" android:layout_width="match_parent" android:layout_weight="1" android:layout_height="match_parent" android:id="@+id/alarm_delete"></Button>
+    android:layout_height="match_parent"
+    android:gravity="fill_vertical" >
+
+    <LinearLayout
+        android:id="@+id/linearLayout1"
+        style="@android:style/ButtonBar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:orientation="horizontal" >
+
+        <Button
+            android:id="@+id/alarm_save"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:focusable="true"
+            android:text="@string/save" >
+        </Button>
+
+        <Button
+            android:id="@+id/alarm_cancel"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:focusable="true"
+            android:text="@android:string/cancel" >
+        </Button>
+
+        <Button
+            android:id="@+id/alarm_delete"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:focusable="true"
+            android:text="@string/delete" >
+        </Button>
     </LinearLayout>
-    <ScrollView android:layout_alignParentTop="true" android:id="@+id/scrollView1" android:layout_height="wrap_content" android:layout_width="wrap_content">
-        <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-		    android:layout_width="match_parent"
-		    android:layout_height="match_parent"
-		    >
-		    <EditText android:layout_height="wrap_content" android:inputType="time" android:layout_alignParentTop="true" android:layout_width="match_parent" android:id="@+id/time">
-		        <requestFocus></requestFocus>
-		    </EditText>
-		    <ImageButton android:layout_width="wrap_content" android:layout_below="@+id/time" android:layout_height="wrap_content" android:layout_alignRight="@+id/time" android:id="@+id/btnDays" android:src="@android:drawable/ic_menu_more"></ImageButton>
-		    <TextView android:layout_height="wrap_content" android:id="@+id/textView1" android:textAppearance="?android:attr/textAppearanceLarge" android:layout_toLeftOf="@+id/btnDays" android:layout_alignTop="@+id/btnDays" android:layout_alignBottom="@+id/btnDays" android:layout_width="match_parent" android:text="@string/every_day" android:gravity="center_vertical"></TextView>
-		    <EditText android:layout_below="@+id/btnDays" android:layout_height="wrap_content" android:layout_alignRight="@+id/btnDays" android:layout_width="match_parent" android:id="@+id/label"></EditText>
-		    <Spinner android:id="@+id/ringtone" android:layout_below="@+id/label" android:layout_height="wrap_content" android:layout_alignLeft="@+id/label" android:layout_width="match_parent"></Spinner>
-		    <ToggleButton android:layout_width="wrap_content" android:layout_below="@+id/ringtone" android:layout_height="wrap_content" android:text="ToggleButton" android:id="@+id/vibrate" android:layout_alignRight="@+id/ringtone"></ToggleButton>
-		    <TextView android:layout_height="wrap_content" android:id="@+id/labelEnabled" android:textAppearance="?android:attr/textAppearanceLarge" android:text="TextView" android:layout_toLeftOf="@+id/vibrate" android:layout_alignTop="@+id/vibrate" android:layout_alignBottom="@+id/vibrate" android:layout_width="match_parent" android:gravity="center_vertical"></TextView>
-		    <ToggleButton android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="ToggleButton" android:layout_below="@+id/vibrate" android:layout_alignRight="@+id/vibrate" android:id="@+id/enabled"></ToggleButton>
-		    <TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:id="@+id/labeVibrate" android:textAppearance="?android:attr/textAppearanceLarge" android:text="TextView" android:layout_toLeftOf="@+id/enabled" android:layout_alignTop="@+id/enabled" android:layout_alignBottom="@+id/enabled" android:gravity="center_vertical|clip_vertical"></TextView>
-		</RelativeLayout>		    
+
+    <ScrollView
+        android:id="@+id/scrollView1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true" >
+
+        <RelativeLayout
+            xmlns:android="http://schemas.android.com/apk/res/android"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" >
+
+            <EditText
+                android:id="@+id/time"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignParentTop="true"
+                android:inputType="time" >
+
+                <requestFocus >
+                </requestFocus>
+            </EditText>
+
+            <ImageButton
+                android:id="@+id/btnDays"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignRight="@+id/time"
+                android:layout_below="@+id/time"
+                android:src="@android:drawable/ic_menu_more" >
+            </ImageButton>
+
+            <TextView
+                android:id="@+id/textView1"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignBottom="@+id/btnDays"
+                android:layout_alignTop="@+id/btnDays"
+                android:layout_toLeftOf="@+id/btnDays"
+                android:gravity="center_vertical"
+                android:text="@string/every_day"
+                android:textAppearance="?android:attr/textAppearanceLarge" >
+            </TextView>
+
+            <EditText
+                android:id="@+id/label"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignRight="@+id/btnDays"
+                android:layout_below="@+id/btnDays" >
+            </EditText>
+
+            <Spinner
+                android:id="@+id/ringtone"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignLeft="@+id/label"
+                android:layout_below="@+id/label" >
+            </Spinner>
+
+            <ToggleButton
+                android:id="@+id/vibrate"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignRight="@+id/ringtone"
+                android:layout_below="@+id/ringtone"
+                android:text="ToggleButton" >
+            </ToggleButton>
+
+            <TextView
+                android:id="@+id/labelEnabled"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignBottom="@+id/vibrate"
+                android:layout_alignTop="@+id/vibrate"
+                android:layout_toLeftOf="@+id/vibrate"
+                android:gravity="center_vertical"
+                android:text="TextView"
+                android:textAppearance="?android:attr/textAppearanceLarge" >
+            </TextView>
+
+            <ToggleButton
+                android:id="@+id/enabled"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignRight="@+id/vibrate"
+                android:layout_below="@+id/vibrate"
+                android:text="ToggleButton" >
+            </ToggleButton>
+
+            <TextView
+                android:id="@+id/labeVibrate"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignBottom="@+id/enabled"
+                android:layout_alignTop="@+id/enabled"
+                android:layout_toLeftOf="@+id/enabled"
+                android:gravity="center_vertical|clip_vertical"
+                android:text="TextView"
+                android:textAppearance="?android:attr/textAppearanceLarge" >
+            </TextView>
+        </RelativeLayout>
     </ScrollView>
+
 </RelativeLayout>
