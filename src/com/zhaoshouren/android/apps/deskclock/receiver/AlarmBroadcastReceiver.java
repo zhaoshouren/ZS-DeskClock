@@ -42,13 +42,13 @@ import com.zhaoshouren.android.apps.deskclock.ui.SetAlarmPreferenceActivity;
 import com.zhaoshouren.android.apps.deskclock.util.Alarm;
 import com.zhaoshouren.android.apps.deskclock.util.Days;
 
-public class AlarmBroadcastReceiver extends BroadcastReceiver{
+public class AlarmBroadcastReceiver extends BroadcastReceiver {
     /**
      * If the alarm is older than STALE_WINDOW seconds, ignore. It is probably the result of a time
      * or timezone change
      */
     private static final int STALE_WINDOW = 60 * 30 * 1000;
-    
+
     /**
      * filtered Intent Actions for this receiver:
      * <dl>
@@ -72,90 +72,91 @@ public class AlarmBroadcastReceiver extends BroadcastReceiver{
      * <dd>android.intent.action.LOCALE_CHANGED
      * </dl>
      */
-    
+
     private static enum ACTIONS {
-        //deskclock
-        ACTION_ALARM_ALERT,
-        ACTION_ALARM_KILLED,
-        ACTION_CANCEL_SNOOZE,
-        //android
-        ACTION_POWER_CONNECTED,
-        ACTION_POWER_DISCONNECTED,
-        BOOT_COMPLETED,
-        LOCALE_CHANGED,
-        TIME_SET,
-        TIMEZONE_CHANGED
+        // deskclock
+        ACTION_ALARM_ALERT, ACTION_ALARM_KILLED, ACTION_CANCEL_SNOOZE,
+        // android
+        ACTION_POWER_CONNECTED, ACTION_POWER_DISCONNECTED, BOOT_COMPLETED, LOCALE_CHANGED,
+        TIME_SET, TIMEZONE_CHANGED
     }
 
     @Override
     public void onReceive(final Context context, final Intent intent) {
         final String action = intent.getAction();
-        
-        switch(ACTIONS.valueOf(action.substring(TextUtils.lastIndexOf(action, '.') + 1))) {
-        
+
+        switch (ACTIONS.valueOf(action.substring(TextUtils.lastIndexOf(action, '.') + 1))) {
+
         case ACTION_ALARM_ALERT:
-            final Alarm alarm = new Alarm(context, intent.getByteArrayExtra(Alarm.KEY_RAW_DATA));
+            final Alarm alarm = new Alarm(context, intent.getByteArrayExtra(Alarm.Keys.RAW_DATA));
             final long alarmTime = alarm.toMillis(true);
-            
+
             if (DEVELOPER_MODE) {
-                Log.d(TAG, "AlarmBroadcastReceiver.onReceive(): Alarm[" + alarm.id + (TextUtils.isEmpty(alarm.label) ? "" : "|"
-                        + alarm.label) + "] set For " + alarm.format(FORMAT_DATE_TIME));
+                Log.d(TAG,
+                        "AlarmBroadcastReceiver.onReceive(): Alarm[" + alarm.id
+                                + (TextUtils.isEmpty(alarm.label) ? "" : "|" + alarm.label)
+                                + "] set For " + alarm.format(FORMAT_DATE_TIME));
             }
-    
-            if (System.currentTimeMillis() > alarmTime + STALE_WINDOW ) {
+
+            if (System.currentTimeMillis() > alarmTime + STALE_WINDOW) {
                 if (DEVELOPER_MODE) {
                     Log.d(TAG, "AlarmBroadcastReceiver.onReceive(): Ignoring stale alarm");
                 }
                 break;
             }
-    
+
             // Maintain a CPU wake lock until the AlarmAlertActivity or AlarmPlayerService can
             // pick it up.
             DeskClock.acquireWakeLock(context);
-    
+
             context.sendBroadcast(new Intent(Intent.ACTION_CLOSE_SYSTEM_DIALOGS));
-      
+
             // Launch UI explicitly stating that this is not due to user action so that the current
             // app's notification management is not disturbed
             context.startActivity(new Intent(context, ((KeyguardManager) context
                     .getSystemService(Context.KEYGUARD_SERVICE)).inKeyguardRestrictedInputMode()
                     ? AlarmAlertFullScreenActivity.class : AlarmAlertActivity.class).putExtra(
-                    Alarm.KEY_PARCELABLE, alarm).setFlags(
+                    Alarm.Keys.PARCELABLE, alarm).setFlags(
                     Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_NO_USER_ACTION));
-    
+
             // Disable the snooze alert if this alarm is the snooze.
             AlarmContract.cancelSnooze(context, alarm.id);
-            
+
             // Disable this alarm if it does not repeat.
             if (alarm.days.selected == Days.NO_DAYS_SELECTED) {
                 AlarmContract.disableAlarm(context, alarm);
-            } 
+            }
             AlarmContract.setNextAlarm(context);
-    
-            context.startService(new Intent(AlarmContract.ACTION_PLAY_ALARM).putExtra(
-                    Alarm.KEY_PARCELABLE, alarm));
-    
+
+            context.startService(new Intent(AlarmContract.Actions.PLAY).putExtra(
+                    Alarm.Keys.PARCELABLE, alarm));
+
             final Notification notification =
                     getNotification(context, alarm, context.getString(R.string.alarm_notify_text),
                             PendingIntent.getActivity(context, alarm.id, new Intent(context,
-                                    AlarmAlertActivity.class).putExtra(Alarm.KEY_PARCELABLE, alarm), 0));
+                                    AlarmAlertActivity.class)
+                                    .putExtra(Alarm.Keys.PARCELABLE, alarm), 0));
             notification.flags |= Notification.FLAG_SHOW_LIGHTS | Notification.FLAG_ONGOING_EVENT;
             notification.defaults |= Notification.DEFAULT_LIGHTS;
-    
+
             // Send the notification using the alarm id to easily identify the
             // correct notification.
-            ((NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE)).notify(alarm.id, notification);
+            ((NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE)).notify(
+                    alarm.id, notification);
             break;
-        
+
         case ACTION_ALARM_KILLED:
-            final Alarm killedAlarm = intent.getParcelableExtra(Alarm.KEY_PARCELABLE);
-            final NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+            final Alarm killedAlarm = intent.getParcelableExtra(Alarm.Keys.PARCELABLE);
+            final NotificationManager notificationManager =
+                    (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
             // Update the notification to indicate that the alert has been
             // silenced.
             final Notification killedAlarmNotification =
                     getNotification(context, killedAlarm, context.getString(
                             R.string.alarm_alert_alert_silenced, -1), PendingIntent.getActivity(
-                            context, killedAlarm.id, new Intent(context, SetAlarmPreferenceActivity.class).putExtra(Alarm.KEY_ID, killedAlarm.id), 0));
+                            context, killedAlarm.id, new Intent(context,
+                                    SetAlarmPreferenceActivity.class).putExtra(Alarm.Keys.ID,
+                                    killedAlarm.id), 0));
             killedAlarmNotification.flags |= Notification.FLAG_AUTO_CANCEL;
             // We have to cancel the original notification since it is in the
             // ongoing section and we want the "killed" notification to be a plain
@@ -163,22 +164,22 @@ public class AlarmBroadcastReceiver extends BroadcastReceiver{
             notificationManager.cancel(killedAlarm.id);
             notificationManager.notify(killedAlarm.id, killedAlarmNotification);
             break;
-        
+
         case ACTION_CANCEL_SNOOZE:
-            AlarmContract.cancelSnooze(context, intent.getIntExtra(Alarm.KEY_ID, INVALID_ID));
+            AlarmContract.cancelSnooze(context, intent.getIntExtra(Alarm.Keys.ID, INVALID_ID));
             break;
-        
+
         case ACTION_POWER_CONNECTED:
             context.startActivity(new Intent(context, DeskClockActivity.class)
-                        .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_FROM_BACKGROUND));
+                    .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_FROM_BACKGROUND));
             break;
-        
+
         case ACTION_POWER_DISCONNECTED:
             context.startActivity(new Intent(Intent.ACTION_MAIN).addFlags(
-                    Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_FROM_BACKGROUND).addCategory(
-                    Intent.CATEGORY_HOME));
+                    Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP
+                            | Intent.FLAG_FROM_BACKGROUND).addCategory(Intent.CATEGORY_HOME));
             break;
-        
+
         case BOOT_COMPLETED:
             AlarmContract.cancelSnooze(context, INVALID_ID);
             // no break because we want to fall through
@@ -189,10 +190,12 @@ public class AlarmBroadcastReceiver extends BroadcastReceiver{
             break;
         }
     }
-    
-    private Notification getNotification(final Context context, final Alarm alarm, final CharSequence contentText, final PendingIntent pendingIntent) {
+
+    private Notification getNotification(final Context context, final Alarm alarm,
+            final CharSequence contentText, final PendingIntent pendingIntent) {
         final String tickerText = AlarmContract.getTickerText(context, alarm);
-        final Notification notification = new Notification(R.drawable.stat_notify_alarm, tickerText, alarm.toMillis(true)); 
+        final Notification notification =
+                new Notification(R.drawable.stat_notify_alarm, tickerText, alarm.toMillis(true));
         notification.setLatestEventInfo(context, tickerText, contentText, pendingIntent);
         return notification;
     }

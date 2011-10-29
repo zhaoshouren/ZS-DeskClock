@@ -11,30 +11,31 @@ import com.zhaoshouren.android.apps.deskclock.provider.AlarmContract;
 import com.zhaoshouren.android.apps.deskclock.util.Alarm;
 
 public class AlarmFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
-    
+
     public static interface OnAlarmLoadFinishedListener {
         public void onAlarmLoadFinished(Alarm alarm);
     }
-    
+
     public static AlarmFragment newInstance(final int id) {
         AlarmFragment fragment = new AlarmFragment();
         Bundle arguments = new Bundle();
-        arguments.putInt(Alarm.KEY_ID, id);
+        arguments.putInt(Alarm.Keys.ID, id);
         fragment.setArguments(arguments);
         return fragment;
     }
-    
+
     public static final int GET_NEXT_ALARM = -2;
     public static final String TAG = "Fragment.Alarm";
     private OnAlarmLoadFinishedListener mAlarmLoadFinishedListener;
-    
+
     @Override
     public void onAttach(final Activity activity) {
         super.onAttach(activity);
         try {
             mAlarmLoadFinishedListener = (OnAlarmLoadFinishedListener) activity;
         } catch (ClassCastException e) {
-            throw new ClassCastException(activity.toString() + " must implement AlarmFragment.OnAlarmLoadFinishedListener");
+            throw new ClassCastException(activity.toString()
+                    + " must implement AlarmFragment.OnAlarmLoadFinishedListener");
         }
     }
 
@@ -42,8 +43,7 @@ public class AlarmFragment extends Fragment implements LoaderManager.LoaderCallb
     public Loader<Cursor> onCreateLoader(final int id, final Bundle savedInstanceState) {
         if (id == GET_NEXT_ALARM) {
             return AlarmContract.getAlarmsCursorLoader(getActivity(), true);
-        } 
-        else if (id >= 0) {
+        } else if (id >= 0) {
             return AlarmContract.getAlarmCursorLoader(getActivity(), id);
         }
         return null;
@@ -51,19 +51,20 @@ public class AlarmFragment extends Fragment implements LoaderManager.LoaderCallb
 
     @Override
     public void onLoadFinished(final Loader<Cursor> cursorLoader, final Cursor cursor) {
-        final Alarm alarm = AlarmContract.getAlarm(getActivity(), cursor);    
-        mAlarmLoadFinishedListener.onAlarmLoadFinished(alarm != null ? alarm : new Alarm(getActivity()));
+        final Alarm alarm = AlarmContract.getAlarm(getActivity(), cursor);
+        mAlarmLoadFinishedListener.onAlarmLoadFinished(alarm != null ? alarm : new Alarm(
+                getActivity()));
     }
 
     @Override
     public void onLoaderReset(final Loader<Cursor> cursorLoader) {
-        //Don't need to do anything since we have no open cursors
+        // Don't need to do anything since we have no open cursors
     }
-    
+
     @Override
     public void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-       
+
         getLoaderManager().initLoader(getArguments().getInt("id"), savedInstanceState, this);
     }
 }

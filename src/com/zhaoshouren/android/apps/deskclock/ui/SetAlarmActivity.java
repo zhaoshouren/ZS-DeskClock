@@ -42,14 +42,15 @@ import android.widget.ToggleButton;
 
 import com.zhaoshouren.android.apps.deskclock.R;
 import com.zhaoshouren.android.apps.deskclock.provider.AlarmContract;
-import com.zhaoshouren.android.apps.deskclock.provider.AlarmContract.Toaster;
 import com.zhaoshouren.android.apps.deskclock.util.Alarm;
+import com.zhaoshouren.android.apps.deskclock.util.Toaster;
 
 /**
  * Manages each alarm
  */
-public class SetAlarmActivity extends FragmentActivity implements AlarmFragment.OnAlarmLoadFinishedListener,
-        TimePickerDialog.OnTimeSetListener, SelectDaysDialogFragment.OnSelectDaysChangeListener, View.OnClickListener{
+public class SetAlarmActivity extends FragmentActivity implements
+        AlarmFragment.OnAlarmLoadFinishedListener, TimePickerDialog.OnTimeSetListener,
+        SelectDaysDialogFragment.OnSelectDaysChangeListener, View.OnClickListener {
 
     // Alarm.NO_ALARM_ID = -1
     public static final int GET_NEXT_ALARM = -2;
@@ -66,16 +67,15 @@ public class SetAlarmActivity extends FragmentActivity implements AlarmFragment.
 
     private TextView mTime;
     private TextView mDays;
-    //private ImageButton mDaysButton;
+    // private ImageButton mDaysButton;
     private EditText mLabel;
     private Spinner mRingtone;
     private ToggleButton mVibrate;
     private ToggleButton mEnabled;
 
-    //private Button mSaveButton;
-    //private Button mDeleteButton;
+    // private Button mSaveButton;
+    // private Button mDeleteButton;
 
-   
     /*
      * (non-Javadoc)
      * 
@@ -94,8 +94,7 @@ public class SetAlarmActivity extends FragmentActivity implements AlarmFragment.
     }
 
     private void deleteAlarm() {
-        new AlertDialog.Builder(this)
-                .setTitle(getString(R.string.delete_alarm))
+        new AlertDialog.Builder(this).setTitle(getString(R.string.delete_alarm))
                 .setMessage(getString(R.string.delete_alarm_confirm))
                 .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
                     @Override
@@ -108,9 +107,7 @@ public class SetAlarmActivity extends FragmentActivity implements AlarmFragment.
                         });
                         finish();
                     }
-                })
-                .setNegativeButton(android.R.string.cancel, null)
-                .show();
+                }).setNegativeButton(android.R.string.cancel, null).show();
     }
 
     private void saveAlarm() {
@@ -127,7 +124,7 @@ public class SetAlarmActivity extends FragmentActivity implements AlarmFragment.
                 AlarmContract.saveAlarm(SetAlarmActivity.this, mAlarm);
             }
         });
-        
+
         finish();
     }
 
@@ -145,12 +142,12 @@ public class SetAlarmActivity extends FragmentActivity implements AlarmFragment.
      * 
      * @param alarm
      */
-    private void setContent(final Alarm alarm) {     
+    private void setContent(final Alarm alarm) {
         mTime.setText(alarm.formattedTimeAmPm);
         setLabelPreference(alarm.label);
         mDays.setText(alarm.days.toString(this));
         mDays.setTag(alarm.days.toInt());
-        //mRingtone.setSelection(getRingtoneIndex(alarm.ringtoneUri));
+        // mRingtone.setSelection(getRingtoneIndex(alarm.ringtoneUri));
         mVibrate.setChecked(alarm.vibrate);
         mEnabled.setChecked(alarm.enabled);
     }
@@ -194,26 +191,24 @@ public class SetAlarmActivity extends FragmentActivity implements AlarmFragment.
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        
+
         setContentView(R.layout.set_alarm);
-        
+
         final Intent intent = getIntent();
-        final int id = intent.getIntExtra(Alarm.KEY_ID, INVALID_ID);
-        final Alarm alarm = intent.getParcelableExtra(Alarm.KEY_PARCELABLE);
-        final byte[] rawData = intent.getByteArrayExtra(Alarm.KEY_RAW_DATA);
-        
+        final int id = intent.getIntExtra(Alarm.Keys.ID, INVALID_ID);
+        final Alarm alarm = intent.getParcelableExtra(Alarm.Keys.PARCELABLE);
+        final byte[] rawData = intent.getByteArrayExtra(Alarm.Keys.RAW_DATA);
+
         if (id == INVALID_ID) {
             onAlarmLoadFinished(new Alarm(this));
-        }
-        else if (alarm != null || rawData != null) {
+        } else if (alarm != null || rawData != null) {
             onAlarmLoadFinished(alarm != null ? alarm : new Alarm(this, rawData));
-        }
-        else if (savedInstanceState == null) {
-            FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
+        } else if (savedInstanceState == null) {
+            FragmentTransaction fragmentTransaction =
+                    getSupportFragmentManager().beginTransaction();
             fragmentTransaction.add(AlarmFragment.newInstance(id), AlarmFragment.TAG);
             fragmentTransaction.commit();
         }
-        
 
         mTime = (TextView) findViewById(R.id.time);
         mDays = (TextView) findViewById(R.id.days);
@@ -245,7 +240,8 @@ public class SetAlarmActivity extends FragmentActivity implements AlarmFragment.
 
     protected void showSelectDaysDialog() {
         FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
-        Fragment previousDialog = getSupportFragmentManager().findFragmentByTag("select-days-dialog");
+        Fragment previousDialog =
+                getSupportFragmentManager().findFragmentByTag("select-days-dialog");
         if (previousDialog != null) {
             fragmentTransaction.remove(previousDialog);
         }
@@ -254,7 +250,7 @@ public class SetAlarmActivity extends FragmentActivity implements AlarmFragment.
         DialogFragment newFragment = SelectDaysDialogFragment.newInstance(mAlarm.days.selected);
         newFragment.show(fragmentTransaction, "select-days-dialog");
     }
-    
+
     @Override
     public void onSelectDaysChange(int days) {
         mAlarm.days.selected = days;
@@ -278,9 +274,9 @@ public class SetAlarmActivity extends FragmentActivity implements AlarmFragment.
     @Override
     public void onAlarmLoadFinished(final Alarm alarm) {
         mAlarm = alarm != null ? alarm : new Alarm(this);
-        
+
         setContent(mAlarm);
-        
+
         if (mAlarm.id == INVALID_ID) {
             showTimePicker(true);
         }

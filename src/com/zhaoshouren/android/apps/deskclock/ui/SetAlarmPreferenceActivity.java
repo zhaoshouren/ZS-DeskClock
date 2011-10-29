@@ -41,9 +41,9 @@ import android.widget.TimePicker;
 
 import com.zhaoshouren.android.apps.deskclock.R;
 import com.zhaoshouren.android.apps.deskclock.provider.AlarmContract;
-import com.zhaoshouren.android.apps.deskclock.provider.AlarmContract.Toaster;
 import com.zhaoshouren.android.apps.deskclock.util.Alarm;
 import com.zhaoshouren.android.apps.deskclock.util.Days;
+import com.zhaoshouren.android.apps.deskclock.util.Toaster;
 
 /**
  * Manages each alarm
@@ -68,6 +68,24 @@ public class SetAlarmPreferenceActivity extends PreferenceActivity implements
     private DaysPreference mDaysPreference;
 
     private Alarm mAlarm;
+
+    private void deleteAlarm() {
+        new AlertDialog.Builder(this).setTitle(getString(R.string.delete_alarm))
+                .setMessage(getString(R.string.delete_alarm_confirm))
+                .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(final DialogInterface d, final int w) {
+                        sHandler.post(new Runnable() {
+                            @Override
+                            public void run() {
+                                AlarmContract.deleteAlarm(SetAlarmPreferenceActivity.this,
+                                        mAlarm.id);
+                            }
+                        });
+                        finish();
+                    }
+                }).setNegativeButton(android.R.string.cancel, null).show();
+    }
 
     /**
      * Set an alarm.
@@ -97,8 +115,8 @@ public class SetAlarmPreferenceActivity extends PreferenceActivity implements
         mDaysPreference.setOnPreferenceChangeListener(this);
 
         final Intent intent = getIntent();
-        final int alarmId = intent.getIntExtra(Alarm.KEY_ID, INVALID_ID);
-        final byte[] rawData = intent.getByteArrayExtra(Alarm.KEY_RAW_DATA);
+        final int alarmId = intent.getIntExtra(Alarm.Keys.ID, INVALID_ID);
+        final byte[] rawData = intent.getByteArrayExtra(Alarm.Keys.RAW_DATA);
         if (DEVELOPER_MODE) {
             Log.d(TAG,
                     "SetAlarmPreferenceActivity.onCreate(): Alarm["
@@ -148,6 +166,7 @@ public class SetAlarmPreferenceActivity extends PreferenceActivity implements
 
         // Done Button (Save)
         ((Button) findViewById(R.id.alarm_save)).setOnClickListener(new View.OnClickListener() {
+            @Override
             public void onClick(final View v) {
                 Toaster.popAlarmToast(SetAlarmPreferenceActivity.this, mAlarm);
                 saveAlarm();
@@ -158,6 +177,7 @@ public class SetAlarmPreferenceActivity extends PreferenceActivity implements
         // Revert Button
         final Button cancelButton = (Button) findViewById(R.id.alarm_cancel);
         cancelButton.setOnClickListener(new View.OnClickListener() {
+            @Override
             public void onClick(final View v) {
                 finish();
             }
@@ -169,6 +189,7 @@ public class SetAlarmPreferenceActivity extends PreferenceActivity implements
             deleteButton.setVisibility(View.GONE);
         } else {
             deleteButton.setOnClickListener(new View.OnClickListener() {
+                @Override
                 public void onClick(final View v) {
                     deleteAlarm();
                 }
@@ -181,32 +202,12 @@ public class SetAlarmPreferenceActivity extends PreferenceActivity implements
         }
     }
 
+    @Override
     public boolean onPreferenceChange(final Preference preference, final Object newValue) {
         if (preference == mLabelPreference) {
             setLabelPreference(((String) newValue).trim());
         }
         return true;
-    }
-
-    /**
-     * Set Preferences using values stored in mAlarm
-     */
-    private void setPreferences() {
-        mTimePreference.setTitle(mAlarm.formattedTimeAmPm);
-        setLabelPreference(mAlarm.label);
-        mDaysPreference.setDays(mAlarm.days.selected);
-        mRingtonePreference.setAlert(mAlarm.ringtoneUri);
-        mVibratePreference.setChecked(mAlarm.vibrate);
-        mEnabledPreference.setChecked(mAlarm.enabled);
-    }
-
-    private void setLabelPreference(final String label) {
-        mLabelPreference.setText(label);
-        if (!TextUtils.isEmpty(label)) {
-            mLabelPreference.setTitle(label);
-        } else {
-            mLabelPreference.setTitle(getString(android.R.string.untitled));
-        }
     }
 
     @Override
@@ -219,43 +220,13 @@ public class SetAlarmPreferenceActivity extends PreferenceActivity implements
         return super.onPreferenceTreeClick(preferenceScreen, preference);
     }
 
-    /**
-     * Display a Time Picker Dialog
-     * 
-     * @param finishOnCancelOrBackPressed
-     *            call finish() when cancel or back button is pressed rather than closing dialog
-     */
-    private void showTimePicker(final boolean finishOnCancelOrBackPressed) {
-        final TimePickerDialog timePickerDialog =
-                new TimePickerDialog(this, this, mAlarm.hour, mAlarm.minute,
-                        DateFormat.is24HourFormat(this)) {
-                    public void onBackPressed() {
-                        if (finishOnCancelOrBackPressed) {
-                            SetAlarmPreferenceActivity.this.finish();
-                        }
-                        super.onBackPressed();
-                    };
-                };
-        // TimePickerDialog does not support Dialog.OnCancelListener so attach an
-        // TimePickerDialog.OnClickListener on the cancel button
-        timePickerDialog.setButton(TimePickerDialog.BUTTON_NEGATIVE,
-                getString(android.R.string.cancel), new TimePickerDialog.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int which) {
-                        if (finishOnCancelOrBackPressed) {
-                            SetAlarmPreferenceActivity.this.finish();
-                        }
-                    }
-                });
-
-        timePickerDialog.show();
-    }
-
     /*
      * (non-Javadoc)
      * 
      * @see android.app.TimePickerDialog.OnTimeSetListener#onTimeSet(android.widget.TimePicker, int,
      * int)
      */
+    @Override
     public void onTimeSet(final TimePicker view, final int hour, final int minute) {
         if (hour != mAlarm.hour || minute != mAlarm.minute) {
             mAlarm.hour = hour;
@@ -275,24 +246,64 @@ public class SetAlarmPreferenceActivity extends PreferenceActivity implements
         mAlarm.normalize(true);
 
         sHandler.post(new Runnable() {
+            @Override
             public void run() {
                 AlarmContract.saveAlarm(SetAlarmPreferenceActivity.this, mAlarm);
             }
         });
     }
 
-    private void deleteAlarm() {
-        new AlertDialog.Builder(this).setTitle(getString(R.string.delete_alarm))
-                .setMessage(getString(R.string.delete_alarm_confirm))
-                .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
-                    public void onClick(final DialogInterface d, final int w) {
-                        sHandler.post(new Runnable() {
-                            public void run() {
-                                AlarmContract.deleteAlarm(SetAlarmPreferenceActivity.this, mAlarm.id);
-                            }
-                        });
-                        finish();
+    private void setLabelPreference(final String label) {
+        mLabelPreference.setText(label);
+        if (!TextUtils.isEmpty(label)) {
+            mLabelPreference.setTitle(label);
+        } else {
+            mLabelPreference.setTitle(getString(android.R.string.untitled));
+        }
+    }
+
+    /**
+     * Set Preferences using values stored in mAlarm
+     */
+    private void setPreferences() {
+        mTimePreference.setTitle(mAlarm.formattedTimeAmPm);
+        setLabelPreference(mAlarm.label);
+        mDaysPreference.setDays(mAlarm.days.selected);
+        mRingtonePreference.setAlert(mAlarm.ringtoneUri);
+        mVibratePreference.setChecked(mAlarm.vibrate);
+        mEnabledPreference.setChecked(mAlarm.enabled);
+    }
+
+    /**
+     * Display a Time Picker Dialog
+     * 
+     * @param finishOnCancelOrBackPressed
+     *            call finish() when cancel or back button is pressed rather than closing dialog
+     */
+    private void showTimePicker(final boolean finishOnCancelOrBackPressed) {
+        final TimePickerDialog timePickerDialog =
+                new TimePickerDialog(this, this, mAlarm.hour, mAlarm.minute,
+                        DateFormat.is24HourFormat(this)) {
+                    @Override
+                    public void onBackPressed() {
+                        if (finishOnCancelOrBackPressed) {
+                            SetAlarmPreferenceActivity.this.finish();
+                        }
+                        super.onBackPressed();
+                    };
+                };
+        // TimePickerDialog does not support Dialog.OnCancelListener so attach an
+        // TimePickerDialog.OnClickListener on the cancel button
+        timePickerDialog.setButton(DialogInterface.BUTTON_NEGATIVE,
+                getString(android.R.string.cancel), new TimePickerDialog.OnClickListener() {
+                    @Override
+                    public void onClick(final DialogInterface dialog, final int which) {
+                        if (finishOnCancelOrBackPressed) {
+                            SetAlarmPreferenceActivity.this.finish();
+                        }
                     }
-                }).setNegativeButton(android.R.string.cancel, null).show();
+                });
+
+        timePickerDialog.show();
     }
 }

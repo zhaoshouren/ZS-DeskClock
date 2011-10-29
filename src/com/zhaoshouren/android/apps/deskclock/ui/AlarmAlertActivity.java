@@ -46,14 +46,14 @@ public class AlarmAlertActivity extends AlarmAlertFullScreenActivity {
             handleScreenOff((KeyguardManager) message.obj);
         }
     };
-    
+
     private final BroadcastReceiver mBroadcastReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(final Context context, final Intent intent) {
             handleScreenOff((KeyguardManager) context.getSystemService(Context.KEYGUARD_SERVICE));
         }
     };
-    
+
     private int mKeyguardRetryCount;
 
     @Override
@@ -90,14 +90,13 @@ public class AlarmAlertActivity extends AlarmAlertFullScreenActivity {
 
     private void handleScreenOff(final KeyguardManager keyguardManager) {
         if (!keyguardManager.inKeyguardRestrictedInputMode() && checkRetryCount()) {
-            mHandler.sendMessageDelayed(
-                    mHandler.obtainMessage(0, keyguardManager), 500);
+            mHandler.sendMessageDelayed(mHandler.obtainMessage(0, keyguardManager), 500);
         } else {
             // Launch the full screen activity but do not turn the screen on.
             startActivity(new Intent(this, AlarmAlertFullScreenActivity.class).putExtra(
-                    Alarm.KEY_PARCELABLE, mAlarm).putExtra(SCREEN_OFF, true));
+                    Alarm.Keys.PARCELABLE, mAlarm).putExtra(SCREEN_OFF, true));
             finish();
         }
-        
+
     }
 }

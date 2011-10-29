@@ -73,41 +73,41 @@ import java.util.Random;
  */
 public class DeskClockActivity extends Activity {
     /**
-     *  Alarm action for midnight (so we can update the date display).
+     * Alarm action for midnight (so we can update the date display).
      */
     private static final String ACTION_MIDNIGHT = "com.zhaoshouren.android.apps.deskclock.MIDNIGHT";
     /**
-     *  Interval between forced polls of the weather widget.
+     * Interval between forced polls of the weather widget.
      */
     private static final long QUERY_WEATHER_DELAY = 60 * 60 * 1000; // 1 hr
     /**
-     *  Intent to broadcast for dock settings.
+     * Intent to broadcast for dock settings.
      */
     private static final String DOCK_SETTINGS_ACTION = "com.android.settings.DOCK_SETTINGS";
     /**
-     *  Delay before engaging the burn-in protection mode (green-on-black).
+     * Delay before engaging the burn-in protection mode (green-on-black).
      */
     private static final long SCREEN_SAVER_TIMEOUT = 5 * 60 * 1000; // 5 min
     /**
-     *  Repositioning delay in screen saver.
+     * Repositioning delay in screen saver.
      */
     private static final long SCREEN_SAVER_MOVE_DELAY = 60 * 1000; // 1 min
     /**
-     *  Color to use for text & graphics in screen saver mode.
+     * Color to use for text & graphics in screen saver mode.
      */
     private static final int SCREEN_SAVER_COLOR = 0xFF806530;
     /**
-     *  Color to use for text & graphics in screen saver dimmed mode.
+     * Color to use for text & graphics in screen saver dimmed mode.
      */
     private static final int SCREEN_SAVER_COLOR_DIM = 0xFF302418;
-    /** 
+    /**
      * Opacity of black layer between clock display and wallpaper.
      */
     private static final float DIM_BEHIND_AMOUNT_NORMAL = 0.4f;
-    /** 
+    /**
      * Opacity of black layer between clock display and wallpaper when dimmed.
      */
-    private static final float DIM_BEHIND_AMOUNT_DIMMED = 0.8f; 
+    private static final float DIM_BEHIND_AMOUNT_DIMMED = 0.8f;
 
     // Internal message IDs.
     private static final int QUERY_WEATHER_DATA_MSG = 0x1000;
@@ -628,7 +628,7 @@ public class DeskClockActivity extends Activity {
         if (DEVELOPER_MODE) {
             Log.d(TAG, "onResume with intent: " + getIntent());
         }
-        
+
         mTime.refresh();
 
         // reload the date format in case the user has changed settings
@@ -738,12 +738,14 @@ public class DeskClockActivity extends Activity {
         mWeatherIcon = (ImageView) findViewById(R.id.weather_icon);
 
         final View.OnClickListener alarmClickListener = new View.OnClickListener() {
+            @Override
             public void onClick(final View v) {
                 startActivity(new Intent(DeskClockActivity.this, AlarmClockActivity.class));
             }
         };
 
         final View.OnLongClickListener setAlarmClickListener = new View.OnLongClickListener() {
+            @Override
             public boolean onLongClick(final View v) {
                 startActivity(new Intent(DeskClockActivity.this, SetAlarmPreferenceActivity.class));
                 return true;
@@ -752,9 +754,11 @@ public class DeskClockActivity extends Activity {
 
         final View nextAlarm = findViewById(R.id.next_alarm);
         nextAlarm.setOnClickListener(new View.OnClickListener() {
+            @Override
             public void onClick(final View v) {
-                final Intent intent = new Intent(DeskClockActivity.this, SetAlarmPreferenceActivity.class);
-                intent.putExtra(Alarm.KEY_ID, SetAlarmPreferenceActivity.GET_NEXT_ALARM);
+                final Intent intent =
+                        new Intent(DeskClockActivity.this, SetAlarmPreferenceActivity.class);
+                intent.putExtra(Alarm.Keys.ID, SetAlarmPreferenceActivity.GET_NEXT_ALARM);
                 startActivity(intent);
             }
         });
@@ -766,6 +770,7 @@ public class DeskClockActivity extends Activity {
 
         final ImageButton nightmodeButton = (ImageButton) findViewById(R.id.nightmode_button);
         nightmodeButton.setOnClickListener(new View.OnClickListener() {
+            @Override
             public void onClick(final View v) {
                 mDimmed = !mDimmed;
                 doDim(true);
@@ -773,6 +778,7 @@ public class DeskClockActivity extends Activity {
         });
 
         nightmodeButton.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
             public boolean onLongClick(final View v) {
                 saveScreen();
                 return true;
@@ -781,6 +787,7 @@ public class DeskClockActivity extends Activity {
 
         final View weatherView = findViewById(R.id.weather);
         weatherView.setOnClickListener(new View.OnClickListener() {
+            @Override
             public void onClick(final View v) {
                 refreshWeather();
                 if (!supportsWeather()) {
@@ -797,6 +804,7 @@ public class DeskClockActivity extends Activity {
         });
 
         weatherView.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
             public boolean onLongClick(final View v) {
                 if (!supportsWeather()) {
                     return false;
@@ -817,6 +825,7 @@ public class DeskClockActivity extends Activity {
 
         final View tintView = findViewById(R.id.window_tint);
         tintView.setOnTouchListener(new View.OnTouchListener() {
+            @Override
             public boolean onTouch(final View v, final MotionEvent event) {
                 if (mDimmed && event.getAction() == MotionEvent.ACTION_DOWN) {
                     // We want to un-dim the whole screen on tap.
@@ -841,6 +850,7 @@ public class DeskClockActivity extends Activity {
         // trackball mode should be the alarms button
         final ViewTreeObserver vto = mTime.getViewTreeObserver();
         vto.addOnGlobalFocusChangeListener(new ViewTreeObserver.OnGlobalFocusChangeListener() {
+            @Override
             public void onGlobalFocusChanged(final View oldFocus, final View newFocus) {
                 if (oldFocus == null && newFocus == nightmodeButton) {
                     mTime.requestFocus();

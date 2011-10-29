@@ -39,7 +39,8 @@ import android.util.Log;
 
 import com.zhaoshouren.android.apps.deskclock.DeskClock;
 import com.zhaoshouren.android.apps.deskclock.R;
-import com.zhaoshouren.android.apps.deskclock.provider.AlarmContract;
+import com.zhaoshouren.android.apps.deskclock.provider.AlarmContract.Actions;
+import com.zhaoshouren.android.apps.deskclock.provider.AlarmContract.Keys;
 import com.zhaoshouren.android.apps.deskclock.util.Alarm;
 
 /**
@@ -72,8 +73,7 @@ public class AlarmPlayerService extends Service {
         public void handleMessage(final Message message) {
             if (message.what == KILLER) {
                 if (DEVELOPER_MODE) {
-                    Log.d(TAG,
-                            "AlarmPlayerService>Handler.handleMessage(): Alarm killer triggered");
+                    Log.d(TAG, "AlarmPlayerService>Handler.handleMessage(): Alarm killer triggered");
                 }
 
                 sendKillBroadcast((Alarm) message.obj);
@@ -128,17 +128,18 @@ public class AlarmPlayerService extends Service {
             stopSelf(startId);
             return START_NOT_STICKY;
         }
-        
+
         final String action = intent.getAction();
-        
-        if (action == AlarmContract.ACTION_PLAY_ALARM) {
+
+        if (action == Actions.PLAY) {
             if (mPlaying) {
                 stopPlaying();
             }
-            
+
             if (mMediaPlayer == null) {
-            mMediaPlayer = new MediaPlayer();
+                mMediaPlayer = new MediaPlayer();
                 mMediaPlayer.setOnErrorListener(new OnErrorListener() {
+                    @Override
                     public boolean onError(final MediaPlayer mediaPlayer, final int what,
                             final int extra) {
                         Log.e(TAG,
@@ -150,37 +151,36 @@ public class AlarmPlayerService extends Service {
                     }
                 });
             }
-            
-            mAlarm = intent.getParcelableExtra(Alarm.KEY_PARCELABLE);         
-            startPlaying(mAlarm);
 
+            mAlarm = intent.getParcelableExtra(Alarm.Keys.PARCELABLE);
+            startPlaying(mAlarm);
 
             // Record the initial call state here so that the new alarm has the
             // newest state.
             mInitialCallState = mTelephonyManager.getCallState();
 
             return START_REDELIVER_INTENT;
-            
-        } else if (action == AlarmContract.ACTION_STOP_ALARM) {
+
+        } else if (action == Actions.STOP) {
             if (mAlarm != null) {
                 sendKillBroadcast(mAlarm);
             }
         }
-        
+
         stopSelf(startId);
         return START_NOT_STICKY;
     }
 
     private void sendKillBroadcast(final Alarm alarm) {
-        sendBroadcast(new Intent(AlarmContract.ACTION_ALARM_KILLED).putExtra(Alarm.KEY_PARCELABLE,
-                alarm).putExtra(AlarmContract.KEY_ALARM_KILLED_TIMEOUT,
+        sendBroadcast(new Intent(Actions.KILLED).putExtra(Alarm.Keys.PARCELABLE, alarm).putExtra(
+                Keys.ALARM_KILLED_TIMEOUT,
                 (int) Math.round((System.currentTimeMillis() - mStartTime) / 60000.0)));
     }
 
     private void startPlaying(final Alarm alarm) {
         if (DEVELOPER_MODE) {
-            Log.d(TAG, "AlarmPlayerService.play() Alarm.id: " + alarm.id
-                    + " Alarm.alertUri: " + alarm.ringtoneUri);
+            Log.d(TAG, "AlarmPlayerService.play() Alarm.id: " + alarm.id + " Alarm.alertUri: "
+                    + alarm.ringtoneUri);
         }
 
         if (!(alarm.ringtoneUri == null || alarm.ringtoneUri == Uri.EMPTY)) {
@@ -258,7 +258,7 @@ public class AlarmPlayerService extends Service {
         if (DEVELOPER_MODE) {
             Log.d(TAG, "AlarmPlayerService.stop()");
         }
-        
+
         // Stop audio playing
         if (mMediaPlayer != null) {
             mMediaPlayer.stop();
@@ -269,8 +269,8 @@ public class AlarmPlayerService extends Service {
         // Stop vibrator
         mVibrator.cancel();
         mHandler.removeMessages(KILLER);
-        
-        sendBroadcast(new Intent(AlarmContract.ACTION_ALARM_DONE));
+
+        sendBroadcast(new Intent(Actions.DONE));
         mPlaying = false;
     }
 }
