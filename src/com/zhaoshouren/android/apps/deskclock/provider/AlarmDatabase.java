@@ -1,7 +1,6 @@
 package com.zhaoshouren.android.apps.deskclock.provider;
 
 import static com.zhaoshouren.android.apps.deskclock.DeskClock.DEVELOPER_MODE;
-import static com.zhaoshouren.android.apps.deskclock.DeskClock.TAG;
 
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
@@ -38,6 +37,7 @@ public class AlarmDatabase extends SQLiteOpenHelper {
                 + ", " + Alarms.LABEL + ", " + Alarms.RINGTONE_URI + ", " + Alarms.SORT + ") ";
     }
 
+    private static final String TAG = "ZS.AlarmDatabase";
     private static final String DATABASE_NAME = "zhaoshouren.deskclock.db";
 
     private static final int DATABASE_VERSION = 1;
@@ -59,8 +59,8 @@ public class AlarmDatabase extends SQLiteOpenHelper {
     public void onUpgrade(final SQLiteDatabase database, final int oldVersion,
             final int currentVersion) {
         if (DEVELOPER_MODE) {
-            Log.d(TAG, "AlarmContentProvider.onUpgrade(): Upgrading alarms database from version "
-                    + oldVersion + " to " + currentVersion + ", which will destroy all old data");
+            Log.d(TAG, "onUpgrade(): Upgrading alarms database from version " + oldVersion + " to "
+                    + currentVersion + ", which will destroy all old data");
         }
 
         // TODO migrate table rather than drop

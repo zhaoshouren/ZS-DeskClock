@@ -21,7 +21,6 @@ import static android.os.BatteryManager.BATTERY_STATUS_CHARGING;
 import static android.os.BatteryManager.BATTERY_STATUS_FULL;
 import static android.os.BatteryManager.BATTERY_STATUS_UNKNOWN;
 import static com.zhaoshouren.android.apps.deskclock.DeskClock.DEVELOPER_MODE;
-import static com.zhaoshouren.android.apps.deskclock.DeskClock.TAG;
 
 import android.app.Activity;
 import android.app.AlarmManager;
@@ -72,6 +71,9 @@ import java.util.Random;
  * DeskClock clock view for desk docks.
  */
 public class DeskClockActivity extends Activity {
+
+    private static final String TAG = "ZS.DeskClockActivity";
+
     /**
      * Alarm action for midnight (so we can update the date display).
      */
@@ -166,7 +168,8 @@ public class DeskClockActivity extends Activity {
         public void onReceive(final Context context, final Intent intent) {
             final String action = intent.getAction();
             if (DEVELOPER_MODE) {
-                Log.d(TAG, "mIntentReceiver.onReceive: action=" + action + ", intent=" + intent);
+                Log.d(TAG, "mIntentReceiver.onReceive()" + "\n   action = " + action
+                        + "\n   intent = " + intent);
             }
             if (action == Intent.ACTION_DATE_CHANGED || action == ACTION_MIDNIGHT) {
                 refreshDate();
@@ -208,7 +211,7 @@ public class DeskClockActivity extends Activity {
         @Override
         public void onChange(final boolean selfChange) {
             if (DEVELOPER_MODE) {
-                Log.d(TAG, "content observer notified that weather changed");
+                Log.d(TAG, "mContentObserver.onChange(): refreshWeather()");
             }
             refreshWeather();
         }
@@ -238,7 +241,7 @@ public class DeskClockActivity extends Activity {
 
         if (DEVELOPER_MODE) {
             Log.d(TAG,
-                    String.format("screen saver: %d: jumping to (%d,%d)",
+                    String.format("moveScreenSaverTo(): %d: jumping to (%d,%d)",
                             System.currentTimeMillis(), x, y));
         }
 
@@ -251,21 +254,22 @@ public class DeskClockActivity extends Activity {
 
     private void setWakeLock(final boolean hold) {
         if (DEVELOPER_MODE) {
-            Log.d(TAG, (hold ? "hold" : " releas") + "ing wake lock");
+            Log.d(TAG, "setWakeLock(): " + (hold ? "holding" : " releasing") + " wake lock"
+                    + "\n   hold = " + hold);
         }
-        final Window win = getWindow();
-        final WindowManager.LayoutParams winParams = win.getAttributes();
-        winParams.flags |=
+        final Window window = getWindow();
+        final WindowManager.LayoutParams layoutParams = window.getAttributes();
+        layoutParams.flags |=
                 WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD
                         | WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED
                         | WindowManager.LayoutParams.FLAG_ALLOW_LOCK_WHILE_SCREEN_ON
                         | WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON;
         if (hold) {
-            winParams.flags |= WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON;
+            layoutParams.flags |= WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON;
         } else {
-            winParams.flags &= ~WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON;
+            layoutParams.flags &= ~WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON;
         }
-        win.setAttributes(winParams);
+        window.setAttributes(layoutParams);
     }
 
     private void scheduleScreenSaver() {
@@ -280,7 +284,7 @@ public class DeskClockActivity extends Activity {
             return;
         }
         if (DEVELOPER_MODE) {
-            Log.d(TAG, "restoreScreen");
+            Log.d(TAG, "restoreScreen()");
         }
         mScreenSaverMode = false;
         initViews();
@@ -301,7 +305,7 @@ public class DeskClockActivity extends Activity {
             return;
         }
         if (DEVELOPER_MODE) {
-            Log.d(TAG, "saveScreen");
+            Log.d(TAG, "saveScreen()");
         }
 
         // quickly stash away the x/y of the current date
@@ -359,33 +363,40 @@ public class DeskClockActivity extends Activity {
     }
 
     // Tell the Genie widget to load new data from the network.
+    @Deprecated
     private void requestWeatherDataFetch() {
         if (DEVELOPER_MODE) {
-            Log.d(TAG, "forcing the Genie widget to update weather now...");
+            Log.d(TAG,
+                    "requestWeatherDataFetch(): sendBroadcast(new Intent(ACTION_GENIE_REFRESH).putExtra(\"requestWeather\", true)");
         }
         sendBroadcast(new Intent(ACTION_GENIE_REFRESH).putExtra("requestWeather", true));
         // we expect the result to show up in our content observer
     }
 
+    @Deprecated
     private boolean supportsWeather() {
         return mGenieResources != null;
     }
 
+    @Deprecated
     private void scheduleWeatherQueryDelayed(final long delay) {
         // cancel any existing scheduled queries
         unscheduleWeatherQuery();
 
         if (DEVELOPER_MODE) {
-            Log.d(TAG, "scheduling weather fetch message for " + delay + "ms from now");
+            Log.d(TAG, "scheduleWeatherQueryDelayed(): scheduling weather fetch message for "
+                    + delay + "ms from now");
         }
 
         mHandler.sendEmptyMessageDelayed(QUERY_WEATHER_DATA_MSG, delay);
     }
 
+    @Deprecated
     private void unscheduleWeatherQuery() {
         mHandler.removeMessages(QUERY_WEATHER_DATA_MSG);
     }
 
+    @Deprecated
     private void queryWeatherData() {
         // if we couldn't load the weather widget's resources, we simply
         // assume it's not present on the device.
@@ -399,63 +410,69 @@ public class DeskClockActivity extends Activity {
                         .appendPath(new Long(System.currentTimeMillis()).toString()).build();
 
         if (DEVELOPER_MODE) {
-            Log.d(TAG, "querying genie: " + queryUri);
+            Log.d(TAG, "queryWeatherData()" + "\n    queryUri = " + queryUri);
         }
 
-        Cursor cur;
+        Cursor cursor;
         try {
-            cur = getContentResolver().query(queryUri, WEATHER_CONTENT_COLUMNS, null, null, null);
+            cursor =
+                    getContentResolver().query(queryUri, WEATHER_CONTENT_COLUMNS, null, null, null);
         } catch (final RuntimeException e) {
             Log.e(TAG, "Weather query failed", e);
-            cur = null;
+            cursor = null;
         }
 
-        if (cur != null && cur.moveToFirst()) {
+        if (cursor != null && cursor.moveToFirst()) {
             if (DEVELOPER_MODE) {
                 final java.lang.StringBuilder sb =
                         new java.lang.StringBuilder("Weather query result: {");
-                for (int i = 0; i < cur.getColumnCount(); i++) {
+                for (int i = 0; i < cursor.getColumnCount(); i++) {
                     if (i > 0) {
                         sb.append(", ");
                     }
-                    sb.append(cur.getColumnName(i)).append("=").append(cur.getString(i));
+                    sb.append(cursor.getColumnName(i)).append("=").append(cursor.getString(i));
                 }
                 sb.append("}");
                 Log.d(TAG, sb.toString());
             }
 
             mWeatherIconDrawable =
-                    mGenieResources.getDrawable(cur.getInt(cur.getColumnIndexOrThrow("iconResId")));
+                    mGenieResources.getDrawable(cursor.getInt(cursor
+                            .getColumnIndexOrThrow("iconResId")));
 
-            mWeatherLocationString = cur.getString(cur.getColumnIndexOrThrow("location"));
+            mWeatherLocationString = cursor.getString(cursor.getColumnIndexOrThrow("location"));
 
             // any of these may be NULL
-            final int colTemp = cur.getColumnIndexOrThrow("temperature");
-            final int colHigh = cur.getColumnIndexOrThrow("highTemperature");
-            final int colLow = cur.getColumnIndexOrThrow("lowTemperature");
+            final int colTemp = cursor.getColumnIndexOrThrow("temperature");
+            final int colHigh = cursor.getColumnIndexOrThrow("highTemperature");
+            final int colLow = cursor.getColumnIndexOrThrow("lowTemperature");
 
             mWeatherCurrentTemperatureString =
-                    cur.isNull(colTemp) ? "\u2014" : String.format("%d\u00b0", cur.getInt(colTemp));
+                    cursor.isNull(colTemp) ? "\u2014" : String.format("%d\u00b0",
+                            cursor.getInt(colTemp));
             mWeatherHighTemperatureString =
-                    cur.isNull(colHigh) ? "\u2014" : String.format("%d\u00b0", cur.getInt(colHigh));
+                    cursor.isNull(colHigh) ? "\u2014" : String.format("%d\u00b0",
+                            cursor.getInt(colHigh));
             mWeatherLowTemperatureString =
-                    cur.isNull(colLow) ? "\u2014" : String.format("%d\u00b0", cur.getInt(colLow));
+                    cursor.isNull(colLow) ? "\u2014" : String.format("%d\u00b0",
+                            cursor.getInt(colLow));
         } else {
-            Log.w(TAG, "No weather information available (cur=" + cur + ")");
+            Log.w(TAG, "No weather information available (cur=" + cursor + ")");
             mWeatherIconDrawable = null;
             mWeatherLocationString = getString(R.string.weather_fetch_failure);
             mWeatherCurrentTemperatureString =
                     mWeatherHighTemperatureString = mWeatherLowTemperatureString = "";
         }
 
-        if (cur != null) {
+        if (cursor != null) {
             // clean up cursor
-            cur.close();
+            cursor.close();
         }
 
         mHandler.sendEmptyMessage(UPDATE_WEATHER_DISPLAY_MSG);
     }
 
+    @Deprecated
     private void refreshWeather() {
         if (supportsWeather()) {
             scheduleWeatherQueryDelayed(0);
@@ -463,6 +480,7 @@ public class DeskClockActivity extends Activity {
         updateWeatherDisplay(); // in case we have it cached
     }
 
+    @Deprecated
     private void updateWeatherDisplay() {
         if (mWeatherCurrentTemperature == null) {
             return;
@@ -595,7 +613,7 @@ public class DeskClockActivity extends Activity {
     public void onNewIntent(final Intent newIntent) {
         super.onNewIntent(newIntent);
         if (DEVELOPER_MODE) {
-            Log.d(TAG, "onNewIntent with intent: " + newIntent);
+            Log.d(TAG, "onNewIntent()" + "\n   newIntent = " + newIntent);
         }
 
         // update our intent so that we can consult it to determine whether or
@@ -626,7 +644,7 @@ public class DeskClockActivity extends Activity {
     public void onResume() {
         super.onResume();
         if (DEVELOPER_MODE) {
-            Log.d(TAG, "onResume with intent: " + getIntent());
+            Log.d(TAG, "onResume()" + "\n   getIntent() = " + getIntent());
         }
 
         mTime.refresh();
@@ -694,7 +712,7 @@ public class DeskClockActivity extends Activity {
     @Override
     public void onPause() {
         if (DEVELOPER_MODE) {
-            Log.d(TAG, "onPause");
+            Log.d(TAG, "onPause()");
         }
 
         // Turn off the screen saver and cancel any pending timeouts.
@@ -905,7 +923,7 @@ public class DeskClockActivity extends Activity {
             mGenieResources = getPackageManager().getResourcesForApplication(GENIE_PACKAGE_ID);
         } catch (final PackageManager.NameNotFoundException e) {
             // no weather info available
-            Log.w(TAG, "Can't find " + GENIE_PACKAGE_ID
+            Log.w(TAG, "onCreate(): Can't find " + GENIE_PACKAGE_ID
                     + ". Weather forecast will not be available.");
         }
 

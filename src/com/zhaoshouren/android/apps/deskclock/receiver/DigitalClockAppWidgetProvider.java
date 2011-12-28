@@ -17,7 +17,6 @@
 package com.zhaoshouren.android.apps.deskclock.receiver;
 
 import static com.zhaoshouren.android.apps.deskclock.DeskClock.DEVELOPER_MODE;
-import static com.zhaoshouren.android.apps.deskclock.DeskClock.TAG;
 
 import android.appwidget.AppWidgetManager;
 import android.appwidget.AppWidgetProvider;
@@ -26,6 +25,9 @@ import android.content.Intent;
 import android.util.Log;
 
 public class DigitalClockAppWidgetProvider extends AppWidgetProvider {
+
+    private static final String TAG = "ZS.DigitalClockAppWidgetProvider";
+
     private static final Intent ACTION_DIGITAL_CLOCK = new Intent(
             "com.zhaoshouren.android.apps.deskclock.DIGITAL_CLOCK");
 
@@ -42,8 +44,7 @@ public class DigitalClockAppWidgetProvider extends AppWidgetProvider {
     public void onEnabled(final Context context) {
         context.startService(ACTION_DIGITAL_CLOCK);
         if (DEVELOPER_MODE) {
-            Log.d(TAG, "DigitalClockAppWidgetProvider.onEnabled()"
-                    + "\n    context: " + context
+            Log.d(TAG, "onEnabled()" + "\n    context: " + context
                     + "\n    startService(ACTION_DIGITAL_CLOCK)");
         }
     }
@@ -52,8 +53,7 @@ public class DigitalClockAppWidgetProvider extends AppWidgetProvider {
     public void onDisabled(final Context context) {
         context.stopService(ACTION_DIGITAL_CLOCK);
         if (DEVELOPER_MODE) {
-            Log.d(TAG, "DigitalClockAppWidgetProvider.onDisabled()"
-                    + "\n    context: " + context
+            Log.d(TAG, "onDisabled()" + "\n    context: " + context
                     + "\n    stopService(ACTION_DIGITAL_CLOCK)");
         }
     }

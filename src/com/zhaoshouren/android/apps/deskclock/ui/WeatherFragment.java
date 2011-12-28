@@ -10,35 +10,29 @@ import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
 import android.util.Log;
 
-import com.zhaoshouren.android.apps.deskclock.provider.AlarmContract;
-import com.zhaoshouren.android.apps.deskclock.util.Alarm;
+public class WeatherFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
 
-public class AlarmFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
-
-    public static interface OnAlarmLoadFinishedListener {
-        public void onAlarmLoadFinished(Alarm alarm);
+    public static interface OnWeatherLoadFinishedListener {
+        public void onWeatherLoadFinished();
     }
 
-    public static AlarmFragment newInstance(final int id) {
-        AlarmFragment fragment = new AlarmFragment();
-        Bundle arguments = new Bundle();
-        arguments.putInt(Alarm.Keys.ID, id);
-        fragment.setArguments(arguments);
+    public static WeatherFragment newInstance() {
+        WeatherFragment fragment = new WeatherFragment();
+        fragment.setArguments(new Bundle());
         return fragment;
     }
 
-    public static final int GET_NEXT_ALARM = -2;
-    public static final String TAG = "ZS.AlarmFragment";
-    private OnAlarmLoadFinishedListener mAlarmLoadFinishedListener;
+    public static final String TAG = "ZS.WeatherFragment";
+    private OnWeatherLoadFinishedListener mWeatherLoadFinishedListener;
 
     @Override
     public void onAttach(final Activity activity) {
         super.onAttach(activity);
         try {
-            mAlarmLoadFinishedListener = (OnAlarmLoadFinishedListener) activity;
+            mWeatherLoadFinishedListener = (OnWeatherLoadFinishedListener) activity;
         } catch (ClassCastException e) {
             throw new ClassCastException(activity.toString()
-                    + " must implement AlarmFragment.OnAlarmLoadFinishedListener");
+                    + " must implement WeatherFragment.OnWeatherLoadFinishedListener");
         }
     }
 
@@ -46,11 +40,7 @@ public class AlarmFragment extends Fragment implements LoaderManager.LoaderCallb
     public Loader<Cursor> onCreateLoader(final int id, final Bundle savedInstanceState) {
         Loader<Cursor> cursorLoader = null;
 
-        if (id == GET_NEXT_ALARM) {
-            cursorLoader = AlarmContract.getAlarmsCursorLoader(getActivity(), true);
-        } else if (id >= 0) {
-            cursorLoader = AlarmContract.getAlarmCursorLoader(getActivity(), id);
-        }
+        // TODO
 
         if (DEVELOPER_MODE) {
             Log.d(TAG, "onCreateLoader()" + "\n   id = " + id + "\n   cursorLoader = "
@@ -67,8 +57,7 @@ public class AlarmFragment extends Fragment implements LoaderManager.LoaderCallb
             Log.d(TAG, "activity: " + getActivity());
         }
 
-        mAlarmLoadFinishedListener.onAlarmLoadFinished(AlarmContract
-                .getAlarm(getActivity(), cursor));
+        mWeatherLoadFinishedListener.onWeatherLoadFinished();
     }
 
     @Override
@@ -80,6 +69,6 @@ public class AlarmFragment extends Fragment implements LoaderManager.LoaderCallb
     public void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        getLoaderManager().initLoader(getArguments().getInt("id"), savedInstanceState, this);
+        getLoaderManager().initLoader(0, savedInstanceState, this);
     }
 }

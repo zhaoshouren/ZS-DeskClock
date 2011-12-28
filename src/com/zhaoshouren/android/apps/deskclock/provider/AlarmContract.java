@@ -19,7 +19,6 @@ package com.zhaoshouren.android.apps.deskclock.provider;
 
 import static com.zhaoshouren.android.apps.deskclock.DeskClock.DEVELOPER_MODE;
 import static com.zhaoshouren.android.apps.deskclock.DeskClock.FORMAT_DATE_TIME;
-import static com.zhaoshouren.android.apps.deskclock.DeskClock.TAG;
 import static com.zhaoshouren.android.apps.deskclock.util.Alarm.INVALID_ID;
 
 import android.app.AlarmManager;
@@ -175,6 +174,7 @@ public final class AlarmContract {
     }
 
     public static final String PREFERENCES_DESKCLOCK = "com.zhaoshouren.android.apps.deskclock";
+    private static final String TAG = "ZS.AlarmContract";
 
     public static final Handler sHandler = new Handler();
 
@@ -413,9 +413,8 @@ public final class AlarmContract {
      */
     public static void setAlarm(final Context context, final Alarm alarm) {
         if (DEVELOPER_MODE) {
-            Log.d(TAG, "Alarms.enableAlarmAlert(): Enable (Alarm)snoozeAlert[" + alarm.id
-                    + (!TextUtils.isEmpty(alarm.label) ? "|" + alarm.label : "") + "]  for "
-                    + alarm.format(FORMAT_DATE_TIME));
+            Log.d(TAG, "setAlarm()" + "\n   alarm.id = " + alarm.id + "\n   alarm.label = "
+                    + alarm.label + "\n   alarm datetime = " + alarm.format(FORMAT_DATE_TIME));
         }
 
         /**

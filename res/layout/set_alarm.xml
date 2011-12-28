@@ -89,7 +89,7 @@
             </ImageButton>
 
             <TextView
-                android:id="@+id/textView1"
+                android:id="@+id/days"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_alignBottom="@+id/btnDays"
@@ -126,14 +126,14 @@
             </ToggleButton>
 
             <TextView
-                android:id="@+id/labelEnabled"
+                android:id="@+id/labelVibrate"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_alignBottom="@+id/vibrate"
                 android:layout_alignTop="@+id/vibrate"
                 android:layout_toLeftOf="@+id/vibrate"
                 android:gravity="center_vertical"
-                android:text="TextView"
+                android:text="vibrate"
                 android:textAppearance="?android:attr/textAppearanceLarge" >
             </TextView>
 
@@ -147,14 +147,14 @@
             </ToggleButton>
 
             <TextView
-                android:id="@+id/labeVibrate"
+                android:id="@+id/labelEnabled"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_alignBottom="@+id/enabled"
                 android:layout_alignTop="@+id/enabled"
                 android:layout_toLeftOf="@+id/enabled"
                 android:gravity="center_vertical|clip_vertical"
-                android:text="TextView"
+                android:text="enabled"
                 android:textAppearance="?android:attr/textAppearanceLarge" >
             </TextView>
         </RelativeLayout>

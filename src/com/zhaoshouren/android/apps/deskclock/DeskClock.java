@@ -22,14 +22,14 @@ import android.util.Log;
 
 public class DeskClock {
     public static final boolean DEVELOPER_MODE = true; // Set to false for production
-    public static final String TAG = "ZS_DeskClock";
+    public static final String TAG = "ZS.DeskClock";
     public static final String FORMAT_DATE_TIME = "%l:%M:%S %p";
-    
+
     private static PowerManager.WakeLock sWakeLock;
 
     public static void acquireWakeLock(final Context context) {
         if (DEVELOPER_MODE) {
-            Log.d(TAG, "AlarmAlertWakeLock.acquireWakeLock(): Acquiring CPU wake lock");
+            Log.d(TAG, "acquireWakeLock(): Acquiring CPU wake lock");
         }
         if (sWakeLock != null) {
             return;
@@ -44,7 +44,7 @@ public class DeskClock {
 
     public static void releaseWakeLock() {
         if (DEVELOPER_MODE) {
-            Log.d(TAG, "AlarmAlertWakeLock.releaseWakeLock(): Releasing CPU wake lock");
+            Log.d(TAG, "releaseWakeLock(): Releasing CPU wake lock");
         }
         if (sWakeLock != null) {
             sWakeLock.release();
@@ -52,4 +52,3 @@ public class DeskClock {
         }
     }
 }
-
