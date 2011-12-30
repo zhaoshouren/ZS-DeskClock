@@ -37,7 +37,7 @@ public class Days {
     public static class Keys {
         public static final String SELECTED = "Days.Selected";
     }
-
+    
     /**
      * Bitmask of all repeating days
      * <p>

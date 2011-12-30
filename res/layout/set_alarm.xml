@@ -63,7 +63,8 @@
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
         android:layout_above="@+id/button_bar" >
-
+
+
         <RelativeLayout
             xmlns:android="http://schemas.android.com/apk/res/android"
             android:layout_width="match_parent"
@@ -106,7 +107,10 @@
                 android:gravity="center_vertical"
                 android:text="@string/repeat_every_day"
                 android:textAppearance="?android:attr/textAppearanceLarge" />
-
+
+
+
+
             <TextView
                 android:id="@+id/time"
                 android:layout_width="match_parent"
@@ -124,21 +128,29 @@
 		        android:layout_height="wrap_content"
 		        android:layout_alignParentLeft="true"
 		        android:layout_below="@+id/label" />
-		
+		
+
+
 		    <ToggleButton
 		        android:id="@+id/btn_vibrate"
 		        android:layout_width="wrap_content"
 		        android:layout_height="wrap_content"
 		        android:layout_alignParentRight="true"
 		        android:layout_below="@+id/ringtone" />
-						
+		
+		
+		
 		    <ToggleButton
 		        android:id="@+id/btn_enabled"
 		        android:layout_width="wrap_content"
 		        android:layout_height="wrap_content"
 		        android:layout_alignParentRight="true"
 		        android:layout_below="@+id/btn_vibrate" />
-						
+		
+		
+		
+
+
 		    <CheckedTextView
 		        android:id="@+id/enabled"
 		        android:layout_width="match_parent"
@@ -150,7 +162,9 @@
 		        android:gravity="center_vertical|clip_vertical"
 		        android:text="@string/label_alarm"
 		        android:textAppearance="?android:attr/textAppearanceLarge" />
-						
+		
+		
+		
 		    <TextView
 		        android:id="@+id/vibrate"
 		        android:layout_width="match_parent"
