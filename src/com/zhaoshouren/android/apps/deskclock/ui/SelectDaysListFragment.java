@@ -14,11 +14,11 @@ import com.zhaoshouren.android.apps.deskclock.R;
 import com.zhaoshouren.android.apps.deskclock.util.Days;
 
 public class SelectDaysListFragment extends ListFragment {
-    
+
     public static interface OnSelectDaysChangeListener {
         public void onSelectDaysChange(int selected);
     }
-    
+
     public static SelectDaysListFragment newInstance(int days) {
         SelectDaysListFragment fragment = new SelectDaysListFragment();
         Bundle arguments = new Bundle();
@@ -26,15 +26,16 @@ public class SelectDaysListFragment extends ListFragment {
         fragment.setArguments(arguments);
         return fragment;
     }
-          
+
     private static class SelectDaysAdapter extends BaseAdapter implements View.OnClickListener {
-        
+
         private static final String[] DAYS = Days.getDays(false);
         private final LayoutInflater mLayoutInflater;
         private final Days mDays;
         private final OnSelectDaysChangeListener mOnSelectDaysChangeListener;
-        
-        private SelectDaysAdapter(OnSelectDaysChangeListener onSelectDaysChangeListener, final LayoutInflater layoutInfater, final int selected) {
+
+        private SelectDaysAdapter(OnSelectDaysChangeListener onSelectDaysChangeListener,
+                final LayoutInflater layoutInfater, final int selected) {
             mOnSelectDaysChangeListener = onSelectDaysChangeListener;
             mLayoutInflater = layoutInfater;
             mDays = new Days(selected);
@@ -42,7 +43,7 @@ public class SelectDaysListFragment extends ListFragment {
 
         @Override
         public int getCount() {
-            return DAYS.length;
+            return Days.DAY_VALUES.length;
         }
 
         @Override
@@ -52,7 +53,7 @@ public class SelectDaysListFragment extends ListFragment {
 
         @Override
         public long getItemId(int position) {
-            return (long) position;
+            return Days.DAY_VALUES[position];
         }
 
         @Override
@@ -60,13 +61,13 @@ public class SelectDaysListFragment extends ListFragment {
             if (convertView == null) {
                 convertView = mLayoutInflater.inflate(R.layout.day_list_item, null);
             }
-            
+
             CheckedTextView checkedTextView = (CheckedTextView) convertView.findViewById(R.id.day);
             checkedTextView.setText((String) getItem(position));
             checkedTextView.setChecked(mDays.isSet(position));
             checkedTextView.setId(position);
             checkedTextView.setOnClickListener(this);
-            
+
             return convertView;
         }
 
@@ -79,19 +80,21 @@ public class SelectDaysListFragment extends ListFragment {
     }
 
     private OnSelectDaysChangeListener mOnSelectDaysChangeListener;
-    
+
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
-        setListAdapter(new SelectDaysAdapter(mOnSelectDaysChangeListener, getLayoutInflater(savedInstanceState), getArguments().getInt("days")));
+        setListAdapter(new SelectDaysAdapter(mOnSelectDaysChangeListener,
+                getLayoutInflater(savedInstanceState), getArguments().getInt("days")));
     }
-    
+
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
         try {
             mOnSelectDaysChangeListener = (OnSelectDaysChangeListener) activity;
         } catch (ClassCastException e) {
-            throw new ClassCastException(activity.toString() + " must implement SelectDaysListFragment.OnSelectDaysChangeListener");
+            throw new ClassCastException(activity.toString()
+                    + " must implement SelectDaysListFragment.OnSelectDaysChangeListener");
         }
     };
 

@@ -34,7 +34,7 @@ public class Alarm extends FormattedTime implements Parcelable {
     public static final int INVALID_ID = -1;
 
     public static class Keys {
-        public static final String ID = "Alarm.id";
+        public static final String ID = "Alarm.Id";
         /**
          * Pass to Intent.putExtra(...) when sending Parcel from Alarm.writeToParcel(Parcel)
          */
@@ -44,7 +44,7 @@ public class Alarm extends FormattedTime implements Parcelable {
          * instead of Parcel in cases where the Intent extras are being inflated for manipulation by
          * a remote service which may trigger a ClassNotFoundException
          */
-        public static final String RAW_DATA = "Alarm.raw_data";
+        public static final String RAW_DATA = "Alarm.RawData";
     }
 
     /**

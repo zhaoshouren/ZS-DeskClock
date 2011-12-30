@@ -14,77 +14,61 @@ public class Days {
     public static final int EVERY_DAY_SELECTED = 0x7f;
     public static final int NO_DAYS_SELECTED = 0;
     public static final String[] DAY_STRING_VALUES = new String[] {
-        //Integer.toString(Time.SUNDAY),
-        Integer.toString(Time.MONDAY),
-        Integer.toString(Time.TUESDAY),
-        Integer.toString(Time.WEDNESDAY),
-        Integer.toString(Time.THURSDAY),
-        Integer.toString(Time.FRIDAY),
-        Integer.toString(Time.SATURDAY),
-        Integer.toString(Time.SUNDAY),
-        };
+            // Integer.toString(Time.SUNDAY),
+            Integer.toString(Time.MONDAY), Integer.toString(Time.TUESDAY),
+            Integer.toString(Time.WEDNESDAY), Integer.toString(Time.THURSDAY),
+            Integer.toString(Time.FRIDAY), Integer.toString(Time.SATURDAY),
+            Integer.toString(Time.SUNDAY), };
     public static final int[] DAY_VALUES = new int[] {
-        //Time.SUNDAY,
-        Time.MONDAY,
-        Time.TUESDAY,
-        Time.WEDNESDAY,
-        Time.THURSDAY,
-        Time.FRIDAY,
-        Time.SATURDAY,
-        Time.SUNDAY,
-        };
+            // Time.SUNDAY,
+            Time.MONDAY, Time.TUESDAY, Time.WEDNESDAY, Time.THURSDAY, Time.FRIDAY, Time.SATURDAY,
+            Time.SUNDAY, };
     public static final String[] CALENDAR_DAY_STRING_VALUES = new String[] {
-        //Integer.toString(Calendar.SUNDAY),
-        Integer.toString(Calendar.MONDAY),
-        Integer.toString(Calendar.TUESDAY),
-        Integer.toString(Calendar.WEDNESDAY),
-        Integer.toString(Calendar.THURSDAY),
-        Integer.toString(Calendar.FRIDAY),
-        Integer.toString(Calendar.SATURDAY),
-        Integer.toString(Calendar.SUNDAY),
-        };
+            // Integer.toString(Calendar.SUNDAY),
+            Integer.toString(Calendar.MONDAY), Integer.toString(Calendar.TUESDAY),
+            Integer.toString(Calendar.WEDNESDAY), Integer.toString(Calendar.THURSDAY),
+            Integer.toString(Calendar.FRIDAY), Integer.toString(Calendar.SATURDAY),
+            Integer.toString(Calendar.SUNDAY), };
     public static final int[] CALENDAR_DAY_VALUES = new int[] {
-        //Calendar.SUNDAY,
-        Calendar.MONDAY,
-        Calendar.TUESDAY,
-        Calendar.WEDNESDAY,
-        Calendar.THURSDAY,
-        Calendar.FRIDAY,
-        Calendar.SATURDAY,
-        Calendar.SUNDAY,
-        };
+            // Calendar.SUNDAY,
+            Calendar.MONDAY, Calendar.TUESDAY, Calendar.WEDNESDAY, Calendar.THURSDAY,
+            Calendar.FRIDAY, Calendar.SATURDAY, Calendar.SUNDAY, };
+
+    public static class Keys {
+        public static final String SELECTED = "Days.Selected";
+    }
 
     /**
      * Bitmask of all repeating days
      * <p>
-     *  0 = No days selected<br>
-     *  1 = Sunday<br>
-     *  2 = Monday<br>
-     *  3 = Sunday, Monday<br>
-     *  4 = Tuesday<br>
-     *  5 = Sunday, Tuesday<br>
-     *  6 = Monday, Tuesday<br>
-     *  7 = Sunday, Monday, Tuesday<br>
-     *  8 = Wednesday<br>
-     *  ...<br>
-     *  16 = Thursday<br>
-     *  ...<br>
-     *  32 = Friday<br>
-     *  ...<br>
-     *  64 = Saturday<br>
-     *  ...<br>
-     *  </p>
+     * 0 = No days selected<br>
+     * 1 = Sunday<br>
+     * 2 = Monday<br>
+     * 3 = Sunday, Monday<br>
+     * 4 = Tuesday<br>
+     * 5 = Sunday, Tuesday<br>
+     * 6 = Monday, Tuesday<br>
+     * 7 = Sunday, Monday, Tuesday<br>
+     * 8 = Wednesday<br>
+     * ...<br>
+     * 16 = Thursday<br>
+     * ...<br>
+     * 32 = Friday<br>
+     * ...<br>
+     * 64 = Saturday<br>
+     * ...<br>
+     * </p>
      */
     public int selected;
 
     public Days() {
         selected = NO_DAYS_SELECTED;
     }
-    
+
     public Days(int days) {
         selected = days;
     }
-    
+
     @Override
     public String toString() {
         return toString(null);
@@ -95,8 +79,6 @@ public class Days {
      * 
      * @param context
      *            calling application's context used to retrieve default text
-     * @param showNever
-     *            return "never" or empty string when no days are selected
      * @return
      */
     public String toString(final Context context) {
@@ -116,8 +98,7 @@ public class Days {
         return toStringArray(this, abbreviated);
     }
 
-    private static String[]
-            toStringArray(final Days days, final boolean abbreviated) {
+    private static String[] toStringArray(final Days days, final boolean abbreviated) {
         // indexes correspond to Calendar day constants
         final DateFormatSymbols dateFormatSymbols = new DateFormatSymbols();
         final String[] weekDays =
@@ -208,7 +189,7 @@ public class Days {
     public boolean[] toBooleanArray() {
         final boolean[] booleanArray = new boolean[7];
         for (int day : DAY_VALUES) {
-            booleanArray[day]= isSet(day);
+            booleanArray[day] = isSet(day);
         }
         return booleanArray;
     }

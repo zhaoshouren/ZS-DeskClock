@@ -18,7 +18,6 @@
 package com.zhaoshouren.android.apps.deskclock.service;
 
 import static com.zhaoshouren.android.apps.deskclock.DeskClock.DEVELOPER_MODE;
-import static com.zhaoshouren.android.apps.deskclock.DeskClock.TAG;
 
 import android.app.Service;
 import android.content.Context;
@@ -49,6 +48,8 @@ import com.zhaoshouren.android.apps.deskclock.util.Alarm;
  */
 public class AlarmPlayerService extends Service {
 
+    private static final String TAG = "ZS.AlarmPlayerZervice";
+
     /** Play alarm up to 10 minutes before silencing */
     private static final int ALARM_TIMEOUT_SECONDS = 10 * 60;
 
@@ -73,7 +74,7 @@ public class AlarmPlayerService extends Service {
         public void handleMessage(final Message message) {
             if (message.what == KILLER) {
                 if (DEVELOPER_MODE) {
-                    Log.d(TAG, "AlarmPlayerService>Handler.handleMessage(): Alarm killer triggered");
+                    Log.d(TAG, "mHandler.handleMessage(): Alarm killer triggered");
                 }
 
                 sendKillBroadcast((Alarm) message.obj);
@@ -179,8 +180,8 @@ public class AlarmPlayerService extends Service {
 
     private void startPlaying(final Alarm alarm) {
         if (DEVELOPER_MODE) {
-            Log.d(TAG, "AlarmPlayerService.play() Alarm.id: " + alarm.id + " Alarm.alertUri: "
-                    + alarm.ringtoneUri);
+            Log.d(TAG, "startPlaying()" + "\n    alarm.id = " + alarm.id
+                    + "\n    alarm.ringtoneUri = " + alarm.ringtoneUri);
         }
 
         if (!(alarm.ringtoneUri == null || alarm.ringtoneUri == Uri.EMPTY)) {
@@ -189,7 +190,7 @@ public class AlarmPlayerService extends Service {
                 // resource at a low volume to not disrupt the call.
                 if (mTelephonyManager.getCallState() != TelephonyManager.CALL_STATE_IDLE) {
                     if (DEVELOPER_MODE) {
-                        Log.d(TAG, "AlarmPlayerService.play(): Using the in-call alarm");
+                        Log.d(TAG, "startPlaying(): Using the in-call alarm");
                     }
                     mMediaPlayer.setVolume(IN_CALL_VOLUME, IN_CALL_VOLUME);
                     setDataSourceFromResource(getResources(), mMediaPlayer, R.raw.in_call_alarm);
@@ -256,7 +257,7 @@ public class AlarmPlayerService extends Service {
      */
     public void stopPlaying() {
         if (DEVELOPER_MODE) {
-            Log.d(TAG, "AlarmPlayerService.stop()");
+            Log.d(TAG, "stopPlaying()");
         }
 
         // Stop audio playing

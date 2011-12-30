@@ -17,6 +17,9 @@
 
 package com.zhaoshouren.android.apps.deskclock.ui;
 
+import static com.zhaoshouren.android.apps.deskclock.DeskClock.DEVELOPER_MODE;
+import static com.zhaoshouren.android.apps.deskclock.DeskClock.TAG;
+
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -29,6 +32,7 @@ import android.support.v4.content.Loader;
 import android.support.v4.widget.CursorAdapter;
 import android.text.TextUtils;
 import android.text.format.DateFormat;
+import android.util.Log;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
 import android.view.LayoutInflater;
@@ -142,7 +146,7 @@ public class AlarmClockActivity extends FragmentActivity implements OnItemClickL
     private static LayoutInflater sLayoutInflater;;
 
     private void addNewAlarm() {
-        startActivity(new Intent(this, SetAlarmPreferenceActivity.class));
+        startActivity(new Intent(this, SetAlarmActivity.class));
     }
 
     @Override
@@ -150,6 +154,10 @@ public class AlarmClockActivity extends FragmentActivity implements OnItemClickL
         final AdapterContextMenuInfo adapterContextMenuInfo =
                 (AdapterContextMenuInfo) menuItem.getMenuInfo();
         final int alarmId = (int) adapterContextMenuInfo.id;
+
+        if (DEVELOPER_MODE) {
+            Log.d(TAG, "alarmId: " + alarmId);
+        }
 
         switch (menuItem.getItemId()) {
         case R.id.delete_alarm:
@@ -167,8 +175,7 @@ public class AlarmClockActivity extends FragmentActivity implements OnItemClickL
                     adapterContextMenuInfo.position)));
             return true;
         case R.id.edit_alarm:
-            startActivity(new Intent(this, SetAlarmPreferenceActivity.class).putExtra(
-                    Alarm.Keys.ID, alarmId));
+            startActivity(new Intent(this, SetAlarmActivity.class).putExtra(Alarm.Keys.ID, alarmId));
             return true;
         default:
             break;
@@ -277,8 +284,7 @@ public class AlarmClockActivity extends FragmentActivity implements OnItemClickL
     @Override
     public void onItemClick(final AdapterView<?> parent, final View view, final int pos,
             final long id) {
-        startActivity(new Intent(this, SetAlarmPreferenceActivity.class).putExtra(Alarm.Keys.ID,
-                (int) id));
+        startActivity(new Intent(this, SetAlarmActivity.class).putExtra(Alarm.Keys.ID, (int) id));
     }
 
     @Override

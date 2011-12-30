@@ -17,7 +17,6 @@
 package com.zhaoshouren.android.apps.deskclock.provider;
 
 import static com.zhaoshouren.android.apps.deskclock.DeskClock.DEVELOPER_MODE;
-import static com.zhaoshouren.android.apps.deskclock.DeskClock.TAG;
 
 import android.content.ContentProvider;
 import android.content.ContentResolver;
@@ -44,6 +43,7 @@ public class AlarmProvider extends ContentProvider implements AlarmTables {
 
     private static final String TYPE_ALARM_ID = "vnd.android.cursor.item/alarms";
     private static final String TYPE_ALARM = "vnd.android.cursor.dir/alarms";
+    private static final String TAG = "ZS.AlarmProvider";
 
     private static final int ALARM = 1;
     private static final int ALARM_ID = 2;
@@ -107,8 +107,8 @@ public class AlarmProvider extends ContentProvider implements AlarmTables {
         if (id < 0) throw new SQLException("Failed to insert row into " + uri);
 
         if (DEVELOPER_MODE) {
-            Log.d(TAG, "AlarmContentProvider.insert(): Added alarm" + "\n    id: " + id
-                    + "\n    uri: " + uri + "\n    intialValues: " + initialValues);
+            Log.d(TAG, "insert()" + "\n    id: " + id + "\n    uri: " + uri
+                    + "\n    intialValues: " + initialValues);
         }
 
         final Uri newUri = ContentUris.withAppendedId(CONTENT_URI, id);
@@ -127,15 +127,29 @@ public class AlarmProvider extends ContentProvider implements AlarmTables {
     @Override
     public Cursor query(final Uri uri, final String[] projectionIn, final String selection,
             final String[] selectionArguments, final String sort) {
+
+        if (DEVELOPER_MODE) {
+            Log.d(TAG, "query()" + "\n  uri = " + uri + "\n  projectionIn = " + projectionIn
+                    + "\n  selection = " + selection + "\n  selectionArguments = "
+                    + selectionArguments + "\n  sort = " + sort);
+        }
+
         final SQLiteQueryBuilder queryBuilder = new SQLiteQueryBuilder();
+
+        queryBuilder.setTables(TABLE_ALARMS);
 
         switch (URI_MATCHER.match(uri)) {
         case ALARM:
-            queryBuilder.setTables(TABLE_ALARMS);
             break;
         case ALARM_ID:
-            queryBuilder.setTables(TABLE_ALARMS);
-            queryBuilder.appendWhere(Alarms._ID + " = " + uri.getPathSegments().get(1));
+            queryBuilder.appendWhere(Alarms._ID + "='" + uri.getLastPathSegment() + "'");
+
+            if (DEVELOPER_MODE) {
+                Log.d(TAG,
+                        "query()" + "\n   where = " + Alarms._ID + " = " + uri.getLastPathSegment());
+
+            }
+
             break;
         default:
             throw new IllegalArgumentException("Unknown URL " + uri);
@@ -147,10 +161,38 @@ public class AlarmProvider extends ContentProvider implements AlarmTables {
 
         if (cursor == null) {
             if (DEVELOPER_MODE) {
-                Log.d(TAG, "AlarmContentProvider.query(): No alarms found");
+                Log.d(TAG, "query(): No alarms found");
             }
         } else {
             cursor.setNotificationUri(sContentResolver, uri);
+        }
+
+        if (DEVELOPER_MODE) {
+            switch (URI_MATCHER.match(uri)) {
+            case ALARM:
+                Log.d(TAG,
+                        "query()"
+                                + "\n   cursor.getCount = "
+                                + cursor.getCount()
+                                + "\n   query = "
+                                + SQLiteQueryBuilder.buildQueryString(false, TABLE_ALARMS,
+                                        projectionIn, selection, null, null, sort, null));
+                break;
+            case ALARM_ID:
+                Log.d(TAG,
+                        "query()"
+                                + "\n   cursor.getCount = "
+                                + cursor.getCount()
+                                + "\n   query = "
+                                + SQLiteQueryBuilder.buildQueryString(false, TABLE_ALARMS,
+                                        projectionIn,
+                                        Alarms._ID + " = '" + uri.getLastPathSegment() + "'", null,
+                                        null, sort, null));
+                break;
+            default:
+                throw new IllegalArgumentException("Unknown URL " + uri);
+            }
+
         }
 
         return cursor;
@@ -170,8 +212,8 @@ public class AlarmProvider extends ContentProvider implements AlarmTables {
                             Alarms._ID + " = " + id, null);
 
             if (DEVELOPER_MODE) {
-                Log.d(TAG, "AlarmContentProvider.update()" + "\n    uri: " + uri + "\n    id: "
-                        + id + "\n    count: " + count);
+                Log.d(TAG, "update()" + "\n    uri: " + uri + "\n    id: " + id + "\n    count: "
+                        + count);
             }
             break;
         case ALARM:

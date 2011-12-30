@@ -17,7 +17,6 @@
 package com.zhaoshouren.android.apps.deskclock.receiver;
 
 import static com.zhaoshouren.android.apps.deskclock.DeskClock.DEVELOPER_MODE;
-import static com.zhaoshouren.android.apps.deskclock.DeskClock.TAG;
 
 import android.app.PendingIntent;
 import android.appwidget.AppWidgetManager;
@@ -34,6 +33,8 @@ import java.util.Arrays;
 
 public class AnalogClockAppWidgetProvider extends AppWidgetProvider {
 
+    private static final String TAG = "ZS.AnalogClockAppWidgetProvider";
+
     @Override
     public void onUpdate(final Context context, final AppWidgetManager appWidgetManager,
             final int[] appWidgetIds) {
@@ -41,16 +42,18 @@ public class AnalogClockAppWidgetProvider extends AppWidgetProvider {
                 new RemoteViews(context.getPackageName(), R.layout.appwidget_analog);
 
         if (DEVELOPER_MODE) {
-            Log.d(TAG, "AnalogClockAppWidgetProvider.onUpdate():"
-                    + "\n    context: " + context
-                    + "\n    appWidgetIds: " + Arrays.toString(appWidgetIds)
-                    + "\n    remoteViews.getLayoutId(): " + remoteViews.getLayoutId()
-                    + "\n    R.id.appwidget_analog: " + R.id.appwidget_analog);
+            Log.d(TAG,
+                    "onUpdate()" + "\n    context: " + context + "\n    appWidgetIds: "
+                            + Arrays.toString(appWidgetIds) + "\n    remoteViews.getLayoutId(): "
+                            + remoteViews.getLayoutId() + "\n    R.id.appwidget_analog: "
+                            + R.id.appwidget_analog);
         }
 
-        remoteViews.setOnClickPendingIntent(R.id.appwidget_analog, PendingIntent.getActivity(
-                context, 0, new Intent(context, AlarmClockActivity.class).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK),
-                PendingIntent.FLAG_CANCEL_CURRENT));
+        remoteViews
+                .setOnClickPendingIntent(R.id.appwidget_analog, PendingIntent.getActivity(context,
+                        0, new Intent(context, AlarmClockActivity.class)
+                                .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK),
+                        PendingIntent.FLAG_CANCEL_CURRENT));
 
         appWidgetManager.updateAppWidget(appWidgetIds, remoteViews);
     }

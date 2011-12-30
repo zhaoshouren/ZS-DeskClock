@@ -270,6 +270,20 @@
     <!-- Format string for times like "1:43:33" (1 hour, 43 minutes, 33 seconds) -->
     <string name="elapsed_time_short_format_h_mm_ss"><xliff:g id="hours" example="1">%1$d</xliff:g>:<xliff:g id="minutes" example="43">%2$02d</xliff:g>:<xliff:g id="seconds" example="33">%3$02d</xliff:g></string>
     
+    <!-- Day of the Week -->
+    <string name="day_of_week">Day of Week</string>
+    
+    <!-- Alarm Repeat labels -->
+    <string name="repeat_never">do not repeat</string>
+    <string name="repeat_every_day">repeat every day</string>
+    
+    <!-- Labels -->
+    <string name="label_alarm">alarm</string>
+    <string name="label_vibrate">vibrate</string>
+    
+    <!-- Content Descriptions for Accessibility -->
+    <string name="description_edit_time">Edit the alarm time</string>
+    <string name="description_select_days">Select the days for alarm to repeat on</string>
 
 </resources>
 

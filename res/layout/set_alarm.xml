@@ -22,7 +22,7 @@
     android:gravity="fill_vertical" >
 
     <LinearLayout
-        android:id="@+id/linearLayout1"
+        android:id="@+id/button_bar"
         style="@android:style/ButtonBar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -58,106 +58,111 @@
     </LinearLayout>
 
     <ScrollView
-        android:id="@+id/scrollView1"
+        android:id="@+id/scroll_view"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentTop="true" >
-
+        android:layout_alignParentTop="true"
+        android:layout_above="@+id/button_bar" >
+
         <RelativeLayout
             xmlns:android="http://schemas.android.com/apk/res/android"
             android:layout_width="match_parent"
-            android:layout_height="match_parent" >
-
-            <EditText
-                android:id="@+id/time"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_alignParentTop="true"
-                android:inputType="time" >
-
-                <requestFocus >
-                </requestFocus>
-            </EditText>
+            android:layout_height="wrap_content" >
 
             <ImageButton
-                android:id="@+id/btnDays"
+                android:id="@+id/btn_time"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_alignRight="@+id/time"
-                android:layout_below="@+id/time"
-                android:src="@android:drawable/ic_menu_more" >
-            </ImageButton>
+                android:layout_alignParentRight="true"
+                android:layout_alignParentTop="true"
+                android:src="@drawable/ic_dialog_time" 
+                android:contentDescription="@string/description_edit_time" />
 
-            <TextView
-                android:id="@+id/textView1"
-                android:layout_width="match_parent"
+            <ImageButton
+                android:id="@+id/btn_days"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_alignBottom="@+id/btnDays"
-                android:layout_alignTop="@+id/btnDays"
-                android:layout_toLeftOf="@+id/btnDays"
-                android:gravity="center_vertical"
-                android:text="@string/every_day"
-                android:textAppearance="?android:attr/textAppearanceLarge" >
-            </TextView>
+                android:layout_alignParentRight="true"
+                android:layout_below="@+id/btn_time"
+                android:src="@drawable/ic_dialog_menu_generic"
+                android:contentDescription="@string/description_select_days" />
 
             <EditText
                 android:id="@+id/label"
+                android:hint="@android:string/untitled"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_alignRight="@+id/btnDays"
-                android:layout_below="@+id/btnDays" >
+                android:layout_alignParentLeft="true"
+                android:layout_below="@+id/btn_days" >
             </EditText>
-
-            <Spinner
-                android:id="@+id/ringtone"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_alignLeft="@+id/label"
-                android:layout_below="@+id/label" >
-            </Spinner>
-
-            <ToggleButton
-                android:id="@+id/vibrate"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignRight="@+id/ringtone"
-                android:layout_below="@+id/ringtone"
-                android:text="ToggleButton" >
-            </ToggleButton>
-
             <TextView
-                android:id="@+id/labelEnabled"
+                android:id="@+id/days"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_alignBottom="@+id/vibrate"
-                android:layout_alignTop="@+id/vibrate"
-                android:layout_toLeftOf="@+id/vibrate"
+                android:layout_alignBottom="@+id/btn_days"
+                android:layout_alignParentLeft="true"
+                android:layout_alignTop="@+id/btn_days"
+                android:layout_toLeftOf="@+id/btn_days"
                 android:gravity="center_vertical"
-                android:text="TextView"
-                android:textAppearance="?android:attr/textAppearanceLarge" >
-            </TextView>
-
-            <ToggleButton
-                android:id="@+id/enabled"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignRight="@+id/vibrate"
-                android:layout_below="@+id/vibrate"
-                android:text="ToggleButton" >
-            </ToggleButton>
-
+                android:text="@string/repeat_every_day"
+                android:textAppearance="?android:attr/textAppearanceLarge" />
+
             <TextView
-                android:id="@+id/labeVibrate"
+                android:id="@+id/time"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_alignBottom="@+id/enabled"
-                android:layout_alignTop="@+id/enabled"
-                android:layout_toLeftOf="@+id/enabled"
-                android:gravity="center_vertical|clip_vertical"
-                android:text="TextView"
-                android:textAppearance="?android:attr/textAppearanceLarge" >
-            </TextView>
-        </RelativeLayout>
-    </ScrollView>
+                android:layout_alignBottom="@+id/btn_time"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentTop="true"
+                android:layout_toLeftOf="@+id/btn_time"
+                android:gravity="center_vertical"
+                android:textAppearance="?android:attr/textAppearanceLarge" />
 
+		    <Spinner
+		        android:id="@+id/ringtone"
+		        android:layout_width="match_parent"
+		        android:layout_height="wrap_content"
+		        android:layout_alignParentLeft="true"
+		        android:layout_below="@+id/label" />
+		
+		    <ToggleButton
+		        android:id="@+id/btn_vibrate"
+		        android:layout_width="wrap_content"
+		        android:layout_height="wrap_content"
+		        android:layout_alignParentRight="true"
+		        android:layout_below="@+id/ringtone" />
+						
+		    <ToggleButton
+		        android:id="@+id/btn_enabled"
+		        android:layout_width="wrap_content"
+		        android:layout_height="wrap_content"
+		        android:layout_alignParentRight="true"
+		        android:layout_below="@+id/btn_vibrate" />
+						
+		    <CheckedTextView
+		        android:id="@+id/enabled"
+		        android:layout_width="match_parent"
+		        android:layout_height="wrap_content"
+		        android:layout_alignBottom="@+id/btn_enabled"
+		        android:layout_alignParentLeft="true"
+		        android:layout_alignTop="@+id/btn_enabled"
+		        android:layout_toLeftOf="@+id/btn_enabled"
+		        android:gravity="center_vertical|clip_vertical"
+		        android:text="@string/label_alarm"
+		        android:textAppearance="?android:attr/textAppearanceLarge" />
+						
+		    <TextView
+		        android:id="@+id/vibrate"
+		        android:layout_width="match_parent"
+		        android:layout_height="wrap_content"
+		        android:layout_alignBottom="@+id/btn_vibrate"
+		        android:layout_alignParentLeft="true"
+		        android:layout_alignTop="@+id/btn_vibrate"
+		        android:layout_toLeftOf="@+id/btn_vibrate"
+		        android:gravity="center_vertical"
+		        android:text="@string/label_vibrate"
+		        android:textAppearance="?android:attr/textAppearanceLarge" />
+    
+    	</RelativeLayout>
+    </ScrollView>
 </RelativeLayout>

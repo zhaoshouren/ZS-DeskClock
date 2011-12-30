@@ -19,7 +19,6 @@ package com.zhaoshouren.android.apps.deskclock.receiver;
 
 import static com.zhaoshouren.android.apps.deskclock.DeskClock.DEVELOPER_MODE;
 import static com.zhaoshouren.android.apps.deskclock.DeskClock.FORMAT_DATE_TIME;
-import static com.zhaoshouren.android.apps.deskclock.DeskClock.TAG;
 import static com.zhaoshouren.android.apps.deskclock.util.Alarm.INVALID_ID;
 
 import android.app.KeyguardManager;
@@ -48,6 +47,8 @@ public class AlarmBroadcastReceiver extends BroadcastReceiver {
      * or timezone change
      */
     private static final int STALE_WINDOW = 60 * 30 * 1000;
+
+    private static final String TAG = "ZS.AlarmBroadcastReceiver";
 
     /**
      * filtered Intent Actions for this receiver:
@@ -93,14 +94,14 @@ public class AlarmBroadcastReceiver extends BroadcastReceiver {
 
             if (DEVELOPER_MODE) {
                 Log.d(TAG,
-                        "AlarmBroadcastReceiver.onReceive(): Alarm[" + alarm.id
-                                + (TextUtils.isEmpty(alarm.label) ? "" : "|" + alarm.label)
-                                + "] set For " + alarm.format(FORMAT_DATE_TIME));
+                        "onReceive(): ACTION_ALARM_ALERT" + "\n   alarm.id = " + alarm.id
+                                + "\n   alarm.label = " + alarm.label + "\n   alarm datetime = "
+                                + alarm.format(FORMAT_DATE_TIME));
             }
 
             if (System.currentTimeMillis() > alarmTime + STALE_WINDOW) {
                 if (DEVELOPER_MODE) {
-                    Log.d(TAG, "AlarmBroadcastReceiver.onReceive(): Ignoring stale alarm");
+                    Log.d(TAG, "onReceive(): Ignoring stale alarm");
                 }
                 break;
             }

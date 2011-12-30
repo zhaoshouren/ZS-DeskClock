@@ -17,6 +17,7 @@
 
 package com.zhaoshouren.android.apps.deskclock.ui;
 
+import static com.zhaoshouren.android.apps.deskclock.DeskClock.DEVELOPER_MODE;
 import static com.zhaoshouren.android.apps.deskclock.util.Alarm.INVALID_ID;
 
 import android.app.AlertDialog;
@@ -32,6 +33,7 @@ import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentTransaction;
 import android.text.TextUtils;
 import android.text.format.DateFormat;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -43,6 +45,8 @@ import android.widget.ToggleButton;
 import com.zhaoshouren.android.apps.deskclock.R;
 import com.zhaoshouren.android.apps.deskclock.provider.AlarmContract;
 import com.zhaoshouren.android.apps.deskclock.util.Alarm;
+import com.zhaoshouren.android.apps.deskclock.util.Alarm.Keys;
+import com.zhaoshouren.android.apps.deskclock.util.Days;
 import com.zhaoshouren.android.apps.deskclock.util.Toaster;
 
 /**
@@ -52,29 +56,18 @@ public class SetAlarmActivity extends FragmentActivity implements
         AlarmFragment.OnAlarmLoadFinishedListener, TimePickerDialog.OnTimeSetListener,
         SelectDaysDialogFragment.OnSelectDaysChangeListener, View.OnClickListener {
 
-    // Alarm.NO_ALARM_ID = -1
-    public static final int GET_NEXT_ALARM = -2;
-
-    private static final Handler sHandler = new Handler();
+    private static final String TAG = "ZS.SetAlarmActivity";
+    private static final String TAG_SELECT_DAYS_DIALOG_FRAGMENT = "ZS.SelectDaysDialogFragment";
 
     private Alarm mAlarm;
-    // private EditTextPreference mLabelPreference;
-    // private CheckBoxPreference mEnabledPreference;
-    // private Preference mTimePreference;
-    // private AlarmRingtonePreference mRingtonePreference;
-    // private CheckBoxPreference mVibratePreference;
-    // private DaysPreference mDaysPreference;
 
     private TextView mTime;
     private TextView mDays;
-    // private ImageButton mDaysButton;
     private EditText mLabel;
     private Spinner mRingtone;
     private ToggleButton mVibrate;
     private ToggleButton mEnabled;
-
-    // private Button mSaveButton;
-    // private Button mDeleteButton;
+    private Button mSave;
 
     /*
      * (non-Javadoc)
@@ -99,7 +92,7 @@ public class SetAlarmActivity extends FragmentActivity implements
                 .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(final DialogInterface d, final int w) {
-                        sHandler.post(new Runnable() {
+                        new Handler().post(new Runnable() {
                             @Override
                             public void run() {
                                 AlarmContract.deleteAlarm(SetAlarmActivity.this, mAlarm.id);
@@ -118,7 +111,7 @@ public class SetAlarmActivity extends FragmentActivity implements
         mAlarm.ringtoneUri = (Uri) mRingtone.getSelectedItem();
         mAlarm.normalize(true);
 
-        sHandler.post(new Runnable() {
+        new Handler().post(new Runnable() {
             @Override
             public void run() {
                 AlarmContract.saveAlarm(SetAlarmActivity.this, mAlarm);
@@ -128,28 +121,45 @@ public class SetAlarmActivity extends FragmentActivity implements
         finish();
     }
 
-    private void setLabelPreference(final String label) {
-        mLabel.setText(label);
+    /**
+     * Update views using values stored in mAlarm
+     */
+    private void updateViews() {
+        // Time
+        mTime.setText(mAlarm.formattedTimeAmPm);
+
+        // Repeat Schedule
+        switch (mAlarm.days.selected) {
+        case Days.NO_DAYS_SELECTED:
+            mDays.setText(R.string.repeat_never);
+            break;
+        case Days.EVERY_DAY_SELECTED:
+            mDays.setText(R.string.repeat_every_day);
+            break;
+        default:
+            mDays.setText(mAlarm.days.toString(this));
+        }
+        mDays.setTag(mAlarm.days.toInt());
+
+        // Label
+        final String label = mAlarm.label;
         if (!TextUtils.isEmpty(label)) {
             mLabel.setText(label);
         } else {
-            mLabel.setText(getString(android.R.string.untitled));
+            mLabel.setHint(getString(android.R.string.untitled));
         }
-    }
 
-    /**
-     * Set Preferences using values stored in alarm
-     * 
-     * @param alarm
-     */
-    private void setContent(final Alarm alarm) {
-        mTime.setText(alarm.formattedTimeAmPm);
-        setLabelPreference(alarm.label);
-        mDays.setText(alarm.days.toString(this));
-        mDays.setTag(alarm.days.toInt());
+        // Ringtone
         // mRingtone.setSelection(getRingtoneIndex(alarm.ringtoneUri));
-        mVibrate.setChecked(alarm.vibrate);
-        mEnabled.setChecked(alarm.enabled);
+
+        // Vibrate
+        mVibrate.setChecked(mAlarm.vibrate);
+
+        // Enabled
+        mEnabled.setChecked(mAlarm.enabled);
+
+        // Enable Save Button
+        mSave.setEnabled(true);
     }
 
     /**
@@ -192,17 +202,51 @@ public class SetAlarmActivity extends FragmentActivity implements
     protected void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        final Intent intent = getIntent();
+        final int id = intent.getIntExtra(Keys.ID, INVALID_ID);
+        final Alarm alarm = intent.getParcelableExtra(Keys.PARCELABLE);
+        final byte[] rawData = intent.getByteArrayExtra(Keys.RAW_DATA);
+
+        if (DEVELOPER_MODE) {
+            Log.d(TAG, "onCreate()" + "\n   id = " + id);
+        }
+
         setContentView(R.layout.set_alarm);
 
-        final Intent intent = getIntent();
-        final int id = intent.getIntExtra(Alarm.Keys.ID, INVALID_ID);
-        final Alarm alarm = intent.getParcelableExtra(Alarm.Keys.PARCELABLE);
-        final byte[] rawData = intent.getByteArrayExtra(Alarm.Keys.RAW_DATA);
+        mTime = (TextView) findViewById(R.id.time);
+        mTime.setOnClickListener(this);
+        findViewById(R.id.btn_time).setOnClickListener(this);
+
+        mDays = (TextView) findViewById(R.id.days);
+        mDays.setOnClickListener(this);
+        // Select Days ImageButton
+        findViewById(R.id.btn_days).setOnClickListener(this);
+
+        mLabel = (EditText) findViewById(R.id.label);
+        mRingtone = (Spinner) findViewById(R.id.ringtone);
+        mVibrate = (ToggleButton) findViewById(R.id.btn_vibrate);
+        findViewById(R.id.enabled).setOnClickListener(this);
+        mEnabled = (ToggleButton) findViewById(R.id.btn_enabled);
+        findViewById(R.id.vibrate).setOnClickListener(this);
+
+        // Save Button
+        mSave = (Button) findViewById(R.id.alarm_save);
+        mSave.setOnClickListener(this);
+
+        // Cancel Button
+        findViewById(R.id.alarm_cancel).setOnClickListener(this);
+
+        // Delete Button
+        final Button deleteButton = (Button) findViewById(R.id.alarm_delete);
+        deleteButton.setOnClickListener(this);
 
         if (id == INVALID_ID) {
+            deleteButton.setVisibility(View.GONE);
             onAlarmLoadFinished(new Alarm(this));
-        } else if (alarm != null || rawData != null) {
-            onAlarmLoadFinished(alarm != null ? alarm : new Alarm(this, rawData));
+        } else if (alarm != null) {
+            onAlarmLoadFinished(alarm);
+        } else if (rawData != null) {
+            onAlarmLoadFinished(new Alarm(this, rawData));
         } else if (savedInstanceState == null) {
             FragmentTransaction fragmentTransaction =
                     getSupportFragmentManager().beginTransaction();
@@ -210,72 +254,73 @@ public class SetAlarmActivity extends FragmentActivity implements
             fragmentTransaction.commit();
         }
 
-        mTime = (TextView) findViewById(R.id.time);
-        mDays = (TextView) findViewById(R.id.days);
-        // Select Days ImageButton
-        findViewById(R.id.btnDays).setOnClickListener(this);
-
-        mLabel = (EditText) findViewById(R.id.label);
-        mRingtone = (Spinner) findViewById(R.id.ringtone);
-        mVibrate = (ToggleButton) findViewById(R.id.vibrate);
-        mEnabled = (ToggleButton) findViewById(R.id.enabled);
-
-        // Save Button
-        final Button saveButton = (Button) findViewById(R.id.alarm_save);
-        saveButton.setEnabled(false);
-        saveButton.setOnClickListener(this);
-
-        // Cancel Button
-        findViewById(R.id.alarm_cancel).setOnClickListener(this);
-
-        // Delete Button
-        final Button deleteButton = (Button) findViewById(R.id.alarm_delete);
-        if (id == INVALID_ID) {
-            deleteButton.setVisibility(View.GONE);
-        } else {
-            deleteButton.setEnabled(false);
-            deleteButton.setOnClickListener(this);
-        }
     }
 
     protected void showSelectDaysDialog() {
         FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
         Fragment previousDialog =
-                getSupportFragmentManager().findFragmentByTag("select-days-dialog");
+                getSupportFragmentManager().findFragmentByTag(TAG_SELECT_DAYS_DIALOG_FRAGMENT);
         if (previousDialog != null) {
             fragmentTransaction.remove(previousDialog);
         }
         fragmentTransaction.addToBackStack(null);
 
         DialogFragment newFragment = SelectDaysDialogFragment.newInstance(mAlarm.days.selected);
-        newFragment.show(fragmentTransaction, "select-days-dialog");
+
+        newFragment.show(fragmentTransaction, TAG_SELECT_DAYS_DIALOG_FRAGMENT);
     }
 
     @Override
     public void onSelectDaysChange(int days) {
         mAlarm.days.selected = days;
+        updateViews();
     }
 
     @Override
     public void onClick(View view) {
         switch (view.getId()) {
+        // Save Button
         case R.id.alarm_save:
             Toaster.popAlarmToast(SetAlarmActivity.this, mAlarm);
             saveAlarm();
+            finish();
             break;
+        // Delete Button
         case R.id.alarm_delete:
             deleteAlarm();
+            finish();
             break;
-        case R.id.btnDays:
+        // Repeat Schedule
+        case R.id.btn_days:
+        case R.id.days:
             showSelectDaysDialog();
+            break;
+        // Cancel Button
+        case R.id.alarm_cancel:
+            finish();
+            break;
+        // Time
+        case R.id.btn_time:
+        case R.id.time:
+            showTimePicker(false);
+            break;
+        // Enabled
+        case R.id.enabled:
+            mEnabled.performClick();
+            break;
+        // Vibrate
+        case R.id.vibrate:
+            mVibrate.performClick();
+            break;
         }
     }
 
     @Override
     public void onAlarmLoadFinished(final Alarm alarm) {
-        mAlarm = alarm != null ? alarm : new Alarm(this);
+        mAlarm = alarm; // != null ? alarm : new Alarm(this);
 
-        setContent(mAlarm);
+        updateViews();
+        mSave.setEnabled(false);
 
         if (mAlarm.id == INVALID_ID) {
             showTimePicker(true);

@@ -17,7 +17,6 @@
 package com.zhaoshouren.android.apps.deskclock.ui;
 
 import static com.zhaoshouren.android.apps.deskclock.DeskClock.DEVELOPER_MODE;
-import static com.zhaoshouren.android.apps.deskclock.DeskClock.TAG;
 
 import android.content.Context;
 import android.graphics.Typeface;
@@ -35,6 +34,8 @@ import com.zhaoshouren.android.apps.deskclock.util.FormattedTime;
  * Displays the time
  */
 public class DigitalClockLayout extends LinearLayout {
+
+    private static final String TAG = "ZS.DigitalClockLayout";
 
     public static final Typeface TYPEFACE_TIME_DEFAULT = Typeface.DEFAULT_BOLD;
     public static final int TYPEFACE_TIME_DEFAULT_STYLE = Typeface.BOLD;
@@ -54,7 +55,7 @@ public class DigitalClockLayout extends LinearLayout {
     public DigitalClockLayout(final Context context) {
         this(context, null);
     }
-    
+
     // TODO: refactor to leverage Attibuteset for configuration/customization
     public DigitalClockLayout(final Context context, final AttributeSet attrs) {
         super(context, attrs);
@@ -90,7 +91,7 @@ public class DigitalClockLayout extends LinearLayout {
         super.onAttachedToWindow();
 
         if (DEVELOPER_MODE) {
-            Log.d(TAG, "DigitalClockLayout.onAttachedToWindow(): id: " + getId());
+            Log.d(TAG, "onAttachedToWindow()" + "\n    getId() = " + getId());
         }
 
         if (mAttached) {
@@ -110,7 +111,7 @@ public class DigitalClockLayout extends LinearLayout {
         super.onDetachedFromWindow();
 
         if (DEVELOPER_MODE) {
-            Log.d(TAG, "DigitalClockLayout.onDetachedFromWindow(): id: " + getId());
+            Log.d(TAG, "onDetachedFromWindow()" + "\n    getId() = " + getId());
         }
 
         if (!mAttached) {
@@ -153,14 +154,13 @@ public class DigitalClockLayout extends LinearLayout {
     public void refresh() {
         mDigitalClock.updateTime();
     }
-    
+
     @Override
     protected void onWindowVisibilityChanged(int visibility) {
         // TODO Auto-generated method stub
         super.onWindowVisibilityChanged(visibility);
         if (DEVELOPER_MODE) {
-            Log.d(TAG, "DigitalClockLayout.onWindowVisibilityChanged(visibility)" 
-                    +"\n    visibility: " + visibility);
+            Log.d(TAG, "onWindowVisibilityChanged(visibility)" + "\n    visibility: " + visibility);
         }
     }
 }
