@@ -23,7 +23,7 @@
     android:focusable="true"
     >
 
-    <com.zhaoshouren.android.apps.deskclock.ui.widget.DigitalClockLayout android:id="@+id/time"
+    <com.zhaoshouren.android.apps.clock.ui.widget.DigitalClockLayout android:id="@+id/time"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
@@ -31,7 +31,7 @@
         android:duplicateParentState="true"
         >
 
-        <TextView android:id="@+id/timeDisplay"
+        <TextView android:id="@+id/time_display"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:singleLine="true"
@@ -59,7 +59,7 @@
             android:shadowRadius="4"
             android:duplicateParentState="true"
             />
-    </com.zhaoshouren.android.apps.deskclock.ui.widget.DigitalClockLayout>
+    </com.zhaoshouren.android.apps.clock.ui.widget.DigitalClockLayout>
 
     <TextView android:id="@+id/date"
         android:layout_width="wrap_content"

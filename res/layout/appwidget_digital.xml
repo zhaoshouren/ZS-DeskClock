@@ -32,7 +32,7 @@
         android:duplicateParentState="true"
         >
 
-        <TextView android:id="@+id/timeDisplay"
+        <TextView android:id="@+id/time_display"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:singleLine="true"

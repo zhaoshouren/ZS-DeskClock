@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-	package="com.zhaoshouren.android.apps.deskclock" android:installLocation="internalOnly">
+	package="com.zhaoshouren.android.apps.clock" android:installLocation="internalOnly">
 
 	<uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
 	<uses-permission android:name="android.permission.WAKE_LOCK" />
@@ -17,7 +17,7 @@
 		android:label="@string/app_label"
 		android:icon="@drawable/ic_launcher_alarmclock" 
 		android:debuggable="true"
-		>
+		android:hasCode="true">
 
 		<provider
 			android:name=".provider.AlarmProvider"
@@ -40,32 +40,31 @@
 		</activity>
 
 		<activity
-			android:name=".ui.AlarmClockActivity"
+			android:name=".ui.AlarmListActivity"
 			android:label="@string/alarm_list_title" 
 			android:taskAffinity=""
 			android:excludeFromRecents="true"
 			android:configChanges="orientation|keyboardHidden|keyboard|navigation"
-			android:exported="true" />
-
-		<activity
+			android:exported="true" android:launchMode="singleInstance">
+			<intent-filter>
+				<action android:name="zs.clock.intent.action.ALARM_LIST" />
+				<category android:name="android.intent.category.DEFAULT" />
+			</intent-filter>
+		</activity>
+		
+		<activity android:name=".ui.SetAlarmActivity" android:label="@string/set_alarm" android:configChanges="orientation|keyboardHidden|keyboard|navigation">
+			<intent-filter>
+				<action android:name="zs.clock.intent.action.ALARM_SET" />
+				<category android:name="android.intent.category.DEFAULT" />
+			</intent-filter>
+		</activity><activity
 			android:name=".ui.SettingsPreferenceActivity"
 			android:label="@string/settings" 
 			android:taskAffinity=""
 			android:excludeFromRecents="true">
-			<intent-filter>
-				<action android:name="android.intent.action.MAIN" />
-			</intent-filter>
 		</activity>
 
-		<activity 
-			android:name=".ui.SetAlarmActivity"
-			android:label="@string/set_alarm" 
-			android:configChanges="orientation|keyboardHidden|keyboard|navigation" />
-			
-		<activity 
-			android:name=".ui.SetAlarmPreferenceActivity"
-			android:label="@string/set_alarm" 
-			android:configChanges="orientation|keyboardHidden|keyboard|navigation" />
+		
 
 		<activity 
 			android:name=".ui.AlarmAlertActivity"
@@ -89,9 +88,10 @@
 		<receiver
 			android:permission="android.permission.RECEIVE_BOOT_COMPLETED" android:name=".receiver.AlarmBroadcastReceiver">>
 			<intent-filter>
-				<action android:name=".ALARM_ALERT" />
-				<action android:name=".ALARM_KILLED" />
-				<action android:name=".ALARM_SNOOZE_CANCEL" />
+				<action android:name=".intent.action.ALARM_ALERT" />
+				<action android:name=".intent.action.ALARM_KILLED" />
+				<action android:name=".intent.action.ALARM_SNOOZE_CANCEL" />
+				
 				<action android:name="android.intent.action.BOOT_COMPLETED" />
 				<action android:name="android.intent.action.TIME_SET" />
 				<action android:name="android.intent.action.TIMEZONE_CHANGED" />
@@ -139,7 +139,7 @@
 		<service
 			android:name=".service.DigitalClockService">
 			<intent-filter>
-				<action android:name=".DIGITAL_CLOCK" />
+				<action android:name="com.zhaoshouren.android.apps.deskclock.DIGITAL_CLOCK" />
 			</intent-filter>
 		</service>
 		

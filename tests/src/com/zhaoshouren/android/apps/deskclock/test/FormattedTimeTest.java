@@ -5,7 +5,7 @@ import android.content.res.Configuration;
 import android.test.AndroidTestCase;
 import android.util.Log;
 
-import com.zhaoshouren.android.apps.deskclock.R;
+import com.zhaoshouren.android.apps.clock.R;
 import com.zhaoshouren.android.apps.deskclock.util.Alarm;
 
 import java.util.Locale;
