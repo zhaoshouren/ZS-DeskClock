@@ -139,7 +139,7 @@
 		<service
 			android:name=".service.DigitalClockService">
 			<intent-filter>
-				<action android:name="com.zhaoshouren.android.apps.deskclock.DIGITAL_CLOCK" />
+				<action android:name="com.zhaoshouren.android.apps.clock.DIGITAL_CLOCK" />
 			</intent-filter>
 		</service>
 		

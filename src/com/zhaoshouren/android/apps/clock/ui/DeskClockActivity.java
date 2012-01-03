@@ -80,7 +80,7 @@ public class DeskClockActivity extends Activity {
     /**
      * Alarm action for midnight (so we can update the date display).
      */
-    private static final String ACTION_MIDNIGHT = "com.zhaoshouren.android.apps.deskclock.MIDNIGHT";
+    private static final String ACTION_MIDNIGHT = "com.zhaoshouren.android.apps.clock.MIDNIGHT";
     /**
      * Interval between forced polls of the weather widget.
      */

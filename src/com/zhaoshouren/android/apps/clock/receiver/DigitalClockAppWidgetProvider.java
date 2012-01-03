@@ -32,7 +32,7 @@ public class DigitalClockAppWidgetProvider extends AppWidgetProvider {
     private static final String TAG = "ZS.DigitalClockAppWidgetProvider";
 
     private static final Intent ACTION_DIGITAL_CLOCK = new Intent(
-            "com.zhaoshouren.android.apps.deskclock.DIGITAL_CLOCK");
+            "com.zhaoshouren.android.apps.clock.DIGITAL_CLOCK");
 
     @Override
     public void onUpdate(final Context context, final AppWidgetManager appWidgetManager,

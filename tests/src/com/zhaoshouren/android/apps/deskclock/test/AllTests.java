@@ -1,4 +1,4 @@
-package com.zhaoshouren.android.apps.deskclock.test;
+package com.zhaoshouren.android.apps.clock.test;
 
 import junit.framework.Test;
 import junit.framework.TestSuite;

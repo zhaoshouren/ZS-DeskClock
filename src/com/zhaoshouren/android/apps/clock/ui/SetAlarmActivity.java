@@ -42,14 +42,12 @@ import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.ToggleButton;
 
-
-
+import com.zhaoshouren.android.apps.clock.R;
 import com.zhaoshouren.android.apps.clock.provider.AlarmContract;
 import com.zhaoshouren.android.apps.clock.util.Alarm;
+import com.zhaoshouren.android.apps.clock.util.Alarm.Keys;
 import com.zhaoshouren.android.apps.clock.util.Days;
 import com.zhaoshouren.android.apps.clock.util.Toaster;
-import com.zhaoshouren.android.apps.clock.util.Alarm.Keys;
-import com.zhaoshouren.android.apps.clock.R;
 
 /**
  * Manages each alarm
@@ -85,6 +83,7 @@ public class SetAlarmActivity extends FragmentActivity implements
             mAlarm.normalize(true);
 
             mTime.setText(mAlarm.formattedTimeAmPm);
+            mSave.setEnabled(true);
         }
     }
 
@@ -159,9 +158,6 @@ public class SetAlarmActivity extends FragmentActivity implements
 
         // Enabled
         mEnabled.setChecked(mAlarm.enabled);
-
-        // Enable Save Button
-        mSave.setEnabled(true);
     }
 
     /**
@@ -227,8 +223,10 @@ public class SetAlarmActivity extends FragmentActivity implements
         mLabel = (EditText) findViewById(R.id.label);
         mRingtone = (Spinner) findViewById(R.id.ringtone);
         mVibrate = (ToggleButton) findViewById(R.id.btn_vibrate);
+        mVibrate.setOnClickListener(this);
         findViewById(R.id.enabled).setOnClickListener(this);
         mEnabled = (ToggleButton) findViewById(R.id.btn_enabled);
+        mEnabled.setOnClickListener(this);
         findViewById(R.id.vibrate).setOnClickListener(this);
 
         // Save Button
@@ -276,6 +274,7 @@ public class SetAlarmActivity extends FragmentActivity implements
     public void onSelectDaysChange(int days) {
         mAlarm.days.selected = days;
         updateViews();
+        mSave.setEnabled(true);
     }
 
     @Override
@@ -309,22 +308,29 @@ public class SetAlarmActivity extends FragmentActivity implements
         // Enabled
         case R.id.enabled:
             mEnabled.performClick();
+        case R.id.btn_enabled:
+            mSave.setEnabled(true);
             break;
         // Vibrate
         case R.id.vibrate:
             mVibrate.performClick();
+        case R.id.btn_vibrate:
+            mSave.setEnabled(true);
             break;
         }
     }
 
     @Override
     public void onAlarmLoadFinished(final Alarm alarm) {
-        mAlarm = alarm; // != null ? alarm : new Alarm(this);
+        mAlarm = alarm;
 
         updateViews();
         mSave.setEnabled(false);
 
         if (mAlarm.id == INVALID_ID) {
+            mTime.setText("");
+            mAlarm.hour = 0;
+            mAlarm.minute = 0;
             showTimePicker(true);
         }
     }

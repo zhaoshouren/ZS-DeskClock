@@ -18,7 +18,6 @@
 package com.zhaoshouren.android.apps.clock.ui;
 
 import static com.zhaoshouren.android.apps.clock.DeskClock.DEVELOPER_MODE;
-import static com.zhaoshouren.android.apps.clock.DeskClock.TAG;
 
 import android.app.AlertDialog;
 import android.content.Context;
@@ -50,13 +49,12 @@ import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 
-
-
+import com.zhaoshouren.android.apps.clock.R;
 import com.zhaoshouren.android.apps.clock.provider.AlarmContract;
+import com.zhaoshouren.android.apps.clock.util.Action;
 import com.zhaoshouren.android.apps.clock.util.Alarm;
 import com.zhaoshouren.android.apps.clock.util.FormattedTime;
 import com.zhaoshouren.android.apps.clock.util.Toaster;
-import com.zhaoshouren.android.apps.clock.R;
 
 public class AlarmListActivity extends FragmentActivity implements OnItemClickListener,
         LoaderManager.LoaderCallbacks<Cursor> {
@@ -138,8 +136,9 @@ public class AlarmListActivity extends FragmentActivity implements OnItemClickLi
 
             return view;
         }
-
     }
+
+    private static final String TAG = "ZS.AlarmListActivity";
 
     private static AlarmTimeAdapter sAlarmTimeAdapter;
     private static ListView sAlarmsListView;
@@ -158,7 +157,7 @@ public class AlarmListActivity extends FragmentActivity implements OnItemClickLi
         final int alarmId = (int) adapterContextMenuInfo.id;
 
         if (DEVELOPER_MODE) {
-            Log.d(TAG, "alarmId: " + alarmId);
+            Log.d(TAG, "onContextItemSelected()" + "\n     alarmId: " + alarmId);
         }
 
         switch (menuItem.getItemId()) {
@@ -177,7 +176,7 @@ public class AlarmListActivity extends FragmentActivity implements OnItemClickLi
                     adapterContextMenuInfo.position)));
             return true;
         case R.id.edit_alarm:
-            startActivity(new Intent(this, SetAlarmActivity.class).putExtra(Alarm.Keys.ID, alarmId));
+            startActivity(new Intent(Action.SET_ALARM).putExtra(Alarm.Keys.ID, alarmId));
             return true;
         default:
             break;
@@ -286,7 +285,7 @@ public class AlarmListActivity extends FragmentActivity implements OnItemClickLi
     @Override
     public void onItemClick(final AdapterView<?> parent, final View view, final int pos,
             final long id) {
-        startActivity(new Intent(this, SetAlarmActivity.class).putExtra(Alarm.Keys.ID, (int) id));
+        startActivity(new Intent(Action.SET_ALARM).putExtra(Alarm.Keys.ID, (int) id));
     }
 
     @Override
@@ -306,7 +305,7 @@ public class AlarmListActivity extends FragmentActivity implements OnItemClickLi
             startActivity(new Intent(this, SettingsPreferenceActivity.class));
             return true;
         case R.id.menu_item_desk_clock:
-            startActivity(new Intent(this, DeskClockActivity.class));
+            startActivity(new Intent(Intent.ACTION_MAIN));
             return true;
         case R.id.menu_item_add_alarm:
             addNewAlarm();

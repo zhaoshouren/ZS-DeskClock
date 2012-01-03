@@ -19,7 +19,6 @@ package com.zhaoshouren.android.apps.clock.provider;
 
 import static com.zhaoshouren.android.apps.clock.DeskClock.DEVELOPER_MODE;
 import static com.zhaoshouren.android.apps.clock.DeskClock.FORMAT_DATE_TIME;
-import static com.zhaoshouren.android.apps.clock.util.Alarm.INVALID_ID;
 
 import android.app.AlarmManager;
 import android.app.NotificationManager;
@@ -38,21 +37,22 @@ import android.support.v4.content.Loader;
 import android.text.TextUtils;
 import android.util.Log;
 
+import com.zhaoshouren.android.apps.clock.R;
 import com.zhaoshouren.android.apps.clock.provider.AlarmDatabase.Sql;
 import com.zhaoshouren.android.apps.clock.util.Action;
 import com.zhaoshouren.android.apps.clock.util.Alarm;
 import com.zhaoshouren.android.apps.clock.util.Days;
 import com.zhaoshouren.android.apps.clock.util.FormattedTime;
-import com.zhaoshouren.android.apps.clock.R;
 
 import java.util.Arrays;
 
 public final class AlarmContract {
-    
+
     /**
      * Column references for alarms database
+     * 
      * @author Warren Chu
-     *
+     * 
      */
     public static interface Alarms extends BaseColumns {
         /**
@@ -127,12 +127,10 @@ public final class AlarmContract {
          * This intent is sent from the notification when the user cancels the snooze alert.
          */
         public static final String ALARM_KILLED_TIMEOUT = "zs.key.alarm_killed_timeout";
-        
-        
+
         public static final String PREFERENCES_DESKCLOCK = "zs.clock";
     }
 
-    
     private static final String TAG = "ZS.AlarmContract";
 
     public static final Handler sHandler = new Handler();
@@ -156,9 +154,9 @@ public final class AlarmContract {
     public static void cancelSnooze(final Context context, final int alarmId) {
         final SharedPreferences sharedPreferences =
                 context.getSharedPreferences(Key.PREFERENCES_DESKCLOCK, Context.MODE_PRIVATE);
-        final int snoozeAlarmId = sharedPreferences.getInt(Key.SNOOZE_ALARM_ID, INVALID_ID);
+        final int snoozeAlarmId = sharedPreferences.getInt(Key.SNOOZE_ALARM_ID, Alarm.INVALID_ID);
 
-        if (alarmId == INVALID_ID || snoozeAlarmId == alarmId) {
+        if (alarmId == Alarm.INVALID_ID || snoozeAlarmId == alarmId) {
             ((NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE))
                     .cancel(snoozeAlarmId);
 
@@ -336,7 +334,7 @@ public final class AlarmContract {
      * @param alarm
      */
     public static void saveAlarm(final Context context, final Alarm alarm) {
-        if (alarm.id == INVALID_ID) {
+        if (alarm.id == Alarm.INVALID_ID) {
             ContentUris.parseId(context.getContentResolver().insert(AlarmProvider.CONTENT_URI,
                     alarm.toContentValues()));
         } else {
@@ -350,7 +348,7 @@ public final class AlarmContract {
                 Log.e(TAG, "Alarms.saveAlarm(Context, Alarm): Failed to update Alarm[" + alarm.id
                         + (TextUtils.isEmpty(alarm.label) ? "" : "|" + alarm.label)
                         + "], alarm doesn't exist in database");
-                alarm.id = INVALID_ID;
+                alarm.id = Alarm.INVALID_ID;
                 saveAlarm(context, alarm);
                 return;
             }

@@ -53,11 +53,11 @@ public class AlarmBroadcastReceiver extends BroadcastReceiver {
      * filtered Intent Actions for this receiver:
      * <dl>
      * <dt>ACTION_ALARM_KILLED
-     * <dd>com.zhaoshouren.android.apps.deskclock.ACTION_ALARM_KILLED
+     * <dd>com.zhaoshouren.android.apps.clock.ACTION_ALARM_KILLED
      * <dt>ACTION_CANCEL_SNOOZE
-     * <dd>com.zhaoshouren.android.apps.deskclock.ACTION_CANCEL_SNOOZE
+     * <dd>com.zhaoshouren.android.apps.clock.ACTION_CANCEL_SNOOZE
      * <dt>ACTION_ALARM_ALERT
-     * <dd>com.zhaoshouren.android.apps.deskclock.ACTION_ALARM_ALERT
+     * <dd>com.zhaoshouren.android.apps.clock.ACTION_ALARM_ALERT
      * <dt>ACTION_POWER_CONNECTED
      * <dd>android.intent.action.ACTION_POWER_CONNECTED
      * <dt>ACTION_POWER_DISCONNECTED

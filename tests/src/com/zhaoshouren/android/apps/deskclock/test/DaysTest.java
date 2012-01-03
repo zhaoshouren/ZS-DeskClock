@@ -1,9 +1,9 @@
-package com.zhaoshouren.android.apps.deskclock.test;
+package com.zhaoshouren.android.apps.clock.test;
 
 import android.test.AndroidTestCase;
 import android.text.format.Time;
 
-import com.zhaoshouren.android.apps.deskclock.util.Days;
+import com.zhaoshouren.android.apps.clock.util.Days;
 
 public class DaysTest extends AndroidTestCase {
     private Time mTime;

@@ -40,7 +40,7 @@ public class AlarmDatabase extends SQLiteOpenHelper {
     }
 
     private static final String TAG = "ZS.AlarmDatabase";
-    private static final String DATABASE_NAME = "zhaoshouren.deskclock.db";
+    private static final String DATABASE_NAME = "zhaoshouren.clock.db";
 
     private static final int DATABASE_VERSION = 1;
 

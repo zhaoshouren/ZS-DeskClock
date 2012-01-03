@@ -1,4 +1,4 @@
-package com.zhaoshouren.android.apps.deskclock.test;
+package com.zhaoshouren.android.apps.clock.test;
 
 import android.content.Context;
 import android.content.res.Configuration;
@@ -6,7 +6,7 @@ import android.test.AndroidTestCase;
 import android.util.Log;
 
 import com.zhaoshouren.android.apps.clock.R;
-import com.zhaoshouren.android.apps.deskclock.util.Alarm;
+import com.zhaoshouren.android.apps.clock.util.Alarm;
 
 import java.util.Locale;
 
