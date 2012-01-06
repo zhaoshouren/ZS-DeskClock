@@ -29,20 +29,18 @@ import android.util.Log;
 import android.view.View;
 import android.widget.RemoteViews;
 
-
-
+import com.zhaoshouren.android.apps.clock.R;
 import com.zhaoshouren.android.apps.clock.receiver.DigitalClockAppWidgetProvider;
-import com.zhaoshouren.android.apps.clock.ui.DeskClockActivity;
+import com.zhaoshouren.android.apps.clock.util.Action;
 import com.zhaoshouren.android.apps.clock.util.DigitalClock;
 import com.zhaoshouren.android.apps.clock.util.FormattedTime;
-import com.zhaoshouren.android.apps.clock.R;
 
 import java.util.Arrays;
 
 public class DigitalClockService extends Service {
-    
+
     private static final String TAG = "ZS.DigitalClockService";
-    
+
     private static final int LAYOUT_ID_APP_WIDGET_DIGITAL = R.layout.appwidget_digital;
     private static final int VIEW_ID_AM_PM = R.id.amPm;
     private static final int VIEW_ID_TIME_DISPLAY = R.id.time_display;
@@ -64,103 +62,111 @@ public class DigitalClockService extends Service {
     @Override
     public int onStartCommand(final Intent intent, final int flags, final int startId) {
         if (DEVELOPER_MODE) {
-            Log.d(TAG, "onStartCommand()" 
-                    + "\n    intent: " + intent
-                    + "\n    flags: " + flags
-                    + "\n    startId: " + startId
-                    + "\n    appWidgetIds: " + Arrays.toString(intent.getIntArrayExtra("appWidgetIds"))
-                    + "\n    packageName(intent): " + intent.getStringExtra("packageName")
-                    + "\n    packageName(context): " + sContext.getPackageName()
-                    + "\n    mDigitalClock: " + mDigitalClock);
+            Log.d(TAG,
+                    "onStartCommand()" + "\n    intent: " + intent + "\n    flags: " + flags
+                            + "\n    startId: " + startId + "\n    appWidgetIds: "
+                            + Arrays.toString(intent.getIntArrayExtra("appWidgetIds"))
+                            + "\n    packageName(intent): " + intent.getStringExtra("packageName")
+                            + "\n    packageName(context): " + sContext.getPackageName()
+                            + "\n    mDigitalClock: " + mDigitalClock);
         }
-        
+
         if (intent.getIntArrayExtra("appWidgetIds") != null) {
-            mRemoteViews =
-                    new RemoteViews(sContext.getPackageName(), LAYOUT_ID_APP_WIDGET_DIGITAL);
+            mRemoteViews = new RemoteViews(sContext.getPackageName(), LAYOUT_ID_APP_WIDGET_DIGITAL);
             mRemoteViews.setOnClickPendingIntent(VIEW_ID_TIME_DISPLAY, PendingIntent.getActivity(
-                    sContext, 0, new Intent(sContext, DeskClockActivity.class).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK),
+                    sContext, 0, new Intent(Action.HOME).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK),
                     PendingIntent.FLAG_UPDATE_CURRENT));
-    
+
             mDigitalClock.setLive(true);
-            
+
             if (DEVELOPER_MODE) {
                 Log.d(TAG, "\n    mRemoteViews: " + mRemoteViews);
             }
-    
+
             return START_REDELIVER_INTENT;
-        } else { 
+        } else {
             stopSelf(startId);
         }
-            
-        return START_NOT_STICKY;        
+
+        return START_NOT_STICKY;
     }
 
     @Override
     public void onCreate() {
         super.onCreate();
-              
+
         sContext = getApplicationContext();
         sComponentName = new ComponentName(sContext, DigitalClockAppWidgetProvider.class);
-            
-        mDigitalClock = new DigitalClock(sContext) {         
+
+        mDigitalClock = new DigitalClock(sContext) {
             @Override
             protected void updateTimeView(final FormattedTime formattedTime) {
                 if (DEVELOPER_MODE) {
-                    Log.d(TAG, "onCreate()"
-                            + "\n> DigitalClock.updateTimeView(DateTime)"
-                            + "\n    time: " + formattedTime.formattedTime 
-                            + "\n    amPm: " + formattedTime.formattedAmPm 
-                            + "\n    appWidgetIds: " + Arrays.toString(AppWidgetManager.getInstance(sContext).getAppWidgetIds(sComponentName))
-                            + "\n    remoteViews: " + mRemoteViews
-                            + "\n    mDigitalClock: " + mDigitalClock);
+                    Log.d(TAG,
+                            "onCreate()"
+                                    + "\n> DigitalClock.updateTimeView(DateTime)"
+                                    + "\n    time: "
+                                    + formattedTime.formattedTime
+                                    + "\n    amPm: "
+                                    + formattedTime.formattedAmPm
+                                    + "\n    appWidgetIds: "
+                                    + Arrays.toString(AppWidgetManager.getInstance(sContext)
+                                            .getAppWidgetIds(sComponentName))
+                                    + "\n    remoteViews: " + mRemoteViews
+                                    + "\n    mDigitalClock: " + mDigitalClock);
                 }
-                
+
                 if (mRemoteViews != null) {
                     mRemoteViews.setTextViewText(VIEW_ID_TIME_DISPLAY, formattedTime.formattedTime);
-    
+
                     if (formattedTime.formattedAmPm.length() > 0) {
                         mRemoteViews.setTextViewText(VIEW_ID_AM_PM, formattedTime.formattedAmPm);
                         mRemoteViews.setViewVisibility(VIEW_ID_AM_PM, View.VISIBLE);
                     } else {
                         mRemoteViews.setViewVisibility(VIEW_ID_AM_PM, View.GONE);
                     }
-                    
-                    AppWidgetManager.getInstance(sContext).updateAppWidget(sComponentName, mRemoteViews);
+
+                    AppWidgetManager.getInstance(sContext).updateAppWidget(sComponentName,
+                            mRemoteViews);
                 }
             }
 
             @Override
             protected void updateDateView(final FormattedTime formattedTime) {
                 if (DEVELOPER_MODE) {
-                    Log.d(TAG, "onCreate()"
-                            + "\n> DigitalClock.updateDateView(DateTime)"
-                            + "\n    date: " + formattedTime.formattedDate
-                            + "\n    appWidgetIds: " + Arrays.toString(AppWidgetManager.getInstance(sContext).getAppWidgetIds(sComponentName))
-                            + "\n    remoteViews.layoutId: " + mRemoteViews.getLayoutId()
-                            + "\n    mDigitalClock: " + mDigitalClock);
+                    Log.d(TAG,
+                            "onCreate()"
+                                    + "\n> DigitalClock.updateDateView(DateTime)"
+                                    + "\n    date: "
+                                    + formattedTime.formattedDate
+                                    + "\n    appWidgetIds: "
+                                    + Arrays.toString(AppWidgetManager.getInstance(sContext)
+                                            .getAppWidgetIds(sComponentName))
+                                    + "\n    remoteViews.layoutId: " + mRemoteViews.getLayoutId()
+                                    + "\n    mDigitalClock: " + mDigitalClock);
                 }
-                
+
                 if (mRemoteViews != null) {
                     mRemoteViews.setTextViewText(VIEW_ID_DATE, formattedTime.formattedDate);
-                    
-                    AppWidgetManager.getInstance(sContext).updateAppWidget(sComponentName, mRemoteViews);
+
+                    AppWidgetManager.getInstance(sContext).updateAppWidget(sComponentName,
+                            mRemoteViews);
                 }
             }
         };
     }
-    
+
     @Override
     public void onDestroy() {
         super.onDestroy();
         if (DEVELOPER_MODE) {
-            Log.d(TAG, "onDestroy()"
-                    + "\n    mDigitalClock: " + mDigitalClock);
+            Log.d(TAG, "onDestroy()" + "\n    mDigitalClock: " + mDigitalClock);
         }
-        
+
         try {
             mDigitalClock.setLive(false);
         } catch (NullPointerException exception) {
             Log.e(TAG, "AHHH!!!", exception);
-        } 
-    }  
+        }
+    }
 }

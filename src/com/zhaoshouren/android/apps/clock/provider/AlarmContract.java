@@ -171,23 +171,24 @@ public final class AlarmContract {
      * 
      * @param context
      */
-    public static void cleanUpAlarms(final Context context) {
+    private static void cleanUpAlarms(final Context context) {
         final Cursor cursor = getEnableAlarmsCursor(context);
 
         if (cursor.moveToFirst()) {
             final long currentTime = System.currentTimeMillis();
             final int[] expiredAlarmIds = new int[cursor.getCount()];
             int index = 0;
+
             do {
                 if (cursor.getLong(cursor.getColumnIndex(Alarms.TIME)) < currentTime) {
                     if (cursor.getInt(cursor.getColumnIndex(Alarms.SELECTED_DAYS)) == Days.NO_DAYS_SELECTED) {
                         expiredAlarmIds[index++] =
                                 cursor.getInt(cursor.getColumnIndex(BaseColumns._ID));
-                    } else {
-                        final Alarm alarm = new Alarm(context, cursor);
-                        alarm.updateScheduledTime();
-                        saveAlarm(context, alarm);
                     }
+
+                    final Alarm alarm = new Alarm(context, cursor);
+                    alarm.updateScheduledTime();
+                    saveAlarm(context, alarm);
                 }
             } while (cursor.moveToNext());
 
@@ -221,10 +222,12 @@ public final class AlarmContract {
         setNextAlarm(context);
     }
 
+    @Deprecated
     public static void disableAlarm(final Context context, final Alarm alarm) {
         updateAlarm(context, alarm, false);
     }
 
+    @Deprecated
     public static void enableAlarm(final Context context, final Alarm alarm) {
         updateAlarm(context, alarm, true);
     }
@@ -334,6 +337,8 @@ public final class AlarmContract {
      * @param alarm
      */
     public static void saveAlarm(final Context context, final Alarm alarm) {
+        alarm.updateScheduledTime();
+
         if (alarm.id == Alarm.INVALID_ID) {
             ContentUris.parseId(context.getContentResolver().insert(AlarmProvider.CONTENT_URI,
                     alarm.toContentValues()));
@@ -464,15 +469,15 @@ public final class AlarmContract {
      * @param enable
      *            set to <em>true</em> to enable alarm; set to <em>false</em> to disable it.
      */
+    @Deprecated
     private static void updateAlarm(final Context context, final Alarm alarm, final boolean enable) {
         final ContentValues contentValues = new ContentValues(2);
-        contentValues.put(Alarms.ENABLED, enable);
 
-        // update scheduled time when enabling alarm
-        if (enable) {
-            alarm.updateScheduledTime();
-            contentValues.put(Alarms.TIME, alarm.toMillis(true));
-        } else {
+        alarm.updateScheduledTime();
+        contentValues.put(Alarms.ENABLED, enable);
+        contentValues.put(Alarms.TIME, alarm.toMillis(true));
+
+        if (!enable) {
             cancelSnooze(context, alarm.id);
         }
 

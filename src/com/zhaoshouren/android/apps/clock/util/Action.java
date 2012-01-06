@@ -1,6 +1,5 @@
 package com.zhaoshouren.android.apps.clock.util;
 
-
 public class Action {
     /**
      * This action triggers the AlarmBroadcastReceiver as well as the AlarmPlayerService. It is a
@@ -42,6 +41,7 @@ public class Action {
     public static final String PLAY = "zs.clock.intent.action.ALARM_PLAY";
     public static final String STOP = "zs.clock.intent.action.ALARM_STOP";
 
+    public static final String HOME = "zs.clock.intent.action.HOME";
     public static final String SET_ALARM = "zs.clock.intent.action.ALARM_SET";
     public static final String LIST_ALARMS = "zs.clock.intent.action.ALARM_LIST";
 }

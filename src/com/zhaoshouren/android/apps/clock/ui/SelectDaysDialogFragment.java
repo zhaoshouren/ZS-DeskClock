@@ -14,10 +14,8 @@ import android.widget.BaseAdapter;
 import android.widget.CheckBox;
 import android.widget.ListView;
 
-
-
-import com.zhaoshouren.android.apps.clock.util.Days;
 import com.zhaoshouren.android.apps.clock.R;
+import com.zhaoshouren.android.apps.clock.util.Days;
 
 public class SelectDaysDialogFragment extends DialogFragment {
 
@@ -62,7 +60,7 @@ public class SelectDaysDialogFragment extends DialogFragment {
         @Override
         public View getView(int position, View convertView, ViewGroup parent) {
             if (convertView == null) {
-                convertView = mLayoutInflater.inflate(R.layout.day_list_item, null);
+                convertView = mLayoutInflater.inflate(R.layout.select_days_list_item, null);
             }
 
             CheckBox checkBox = (CheckBox) convertView.findViewById(R.id.day);
@@ -115,7 +113,7 @@ public class SelectDaysDialogFragment extends DialogFragment {
         sSelectedDaysAdapter =
                 new SelectDaysAdapter(layoutInflater, getArguments().getInt(Days.Keys.SELECTED));
 
-        View view = layoutInflater.inflate(R.layout.select_days, null);
+        View view = layoutInflater.inflate(R.layout.select_days_list, null);
 
         ListView listView = (ListView) view.findViewById(R.id.daysList);
         listView.setAdapter(sSelectedDaysAdapter);

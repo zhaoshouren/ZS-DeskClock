@@ -27,15 +27,15 @@ import android.os.Parcelable;
 import android.text.TextUtils;
 import android.text.format.Time;
 
-import com.zhaoshouren.android.apps.clock.provider.AlarmContract.Alarms;
 import com.zhaoshouren.android.apps.clock.R;
+import com.zhaoshouren.android.apps.clock.provider.AlarmContract.Alarms;
 
 public class Alarm extends FormattedTime implements Parcelable {
     public static final int INVALID_ID = -1;
     public static final int GET_NEXT_ALARM = -2;
 
     public static class Keys {
-        
+
         public static final String ID = "Alarm.Id";
         /**
          * Pass to Intent.putExtra(...) when sending Parcel from Alarm.writeToParcel(Parcel)
@@ -156,6 +156,8 @@ public class Alarm extends FormattedTime implements Parcelable {
     }
 
     public void set(final Alarm alarm) {
+        super.set(alarm);
+
         id = INVALID_ID;
         enabled = alarm.enabled;
         vibrate = alarm.vibrate;
@@ -163,7 +165,9 @@ public class Alarm extends FormattedTime implements Parcelable {
         ringtoneUri = alarm.ringtoneUri;
         days.selected = alarm.days.selected;
 
-        super.set(alarm);
+        if (enabled) {
+            updateScheduledTime();
+        }
     }
 
     /**
@@ -201,21 +205,27 @@ public class Alarm extends FormattedTime implements Parcelable {
         final Time time = new Time();
         time.setToNow();
 
-        if (compare(this, time) <= 0) {
-            time.monthDay += 1;
-        }
-
-        time.hour = hour;
-        time.minute = minute;
-        time.second = 0;
-        time.normalize(true);
-
-        if (days.selected != Days.NO_DAYS_SELECTED) {
-            time.monthDay += days.getDaysTillNext(time);
-        }
-
-        set(time.toMillis(true));
+        monthDay += days.getDaysTillNext(this);
         normalize(true);
+
+        if (compare(this, time) <= 0) {
+            month = time.month;
+            monthDay = time.monthDay;
+            year = time.year;
+            normalize(true);
+
+            if (compare(this, time) <= 0) {
+                monthDay += 1;
+                normalize(true);
+
+                int daysTillNext = days.getDaysTillNext(this);
+
+                if (daysTillNext >= 0) {
+                    monthDay += daysTillNext;
+                    normalize(true);
+                }
+            }
+        }
     }
 
     @Override
@@ -228,5 +238,9 @@ public class Alarm extends FormattedTime implements Parcelable {
         parcel.writeParcelable(ringtoneUri, flag);
         parcel.writeLong(toMillis(true));
         parcel.setDataPosition(0);
+    }
+
+    public void toggle() {
+        enabled = !enabled;
     }
 }

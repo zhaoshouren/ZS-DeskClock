@@ -10,8 +10,8 @@ import android.widget.BaseAdapter;
 import android.widget.CheckedTextView;
 import android.widget.ListView;
 
-import com.zhaoshouren.android.apps.clock.util.Days;
 import com.zhaoshouren.android.apps.clock.R;
+import com.zhaoshouren.android.apps.clock.util.Days;
 
 public class SelectDaysListFragment extends ListFragment {
 
@@ -59,7 +59,7 @@ public class SelectDaysListFragment extends ListFragment {
         @Override
         public View getView(int position, View convertView, ViewGroup parent) {
             if (convertView == null) {
-                convertView = mLayoutInflater.inflate(R.layout.day_list_item, null);
+                convertView = mLayoutInflater.inflate(R.layout.select_days_list_item, null);
             }
 
             CheckedTextView checkedTextView = (CheckedTextView) convertView.findViewById(R.id.day);

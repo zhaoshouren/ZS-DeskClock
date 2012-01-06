@@ -26,10 +26,8 @@ import android.content.Intent;
 import android.util.Log;
 import android.widget.RemoteViews;
 
-
-
-import com.zhaoshouren.android.apps.clock.ui.AlarmListActivity;
 import com.zhaoshouren.android.apps.clock.R;
+import com.zhaoshouren.android.apps.clock.util.Action;
 
 import java.util.Arrays;
 
@@ -51,11 +49,9 @@ public class AnalogClockAppWidgetProvider extends AppWidgetProvider {
                             + R.id.appwidget_analog);
         }
 
-        remoteViews
-                .setOnClickPendingIntent(R.id.appwidget_analog, PendingIntent.getActivity(context,
-                        0, new Intent(context, AlarmListActivity.class)
-                                .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK),
-                        PendingIntent.FLAG_CANCEL_CURRENT));
+        remoteViews.setOnClickPendingIntent(R.id.appwidget_analog, PendingIntent.getActivity(
+                context, 0, new Intent(Action.LIST_ALARMS).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK),
+                PendingIntent.FLAG_CANCEL_CURRENT));
 
         appWidgetManager.updateAppWidget(appWidgetIds, remoteViews);
     }

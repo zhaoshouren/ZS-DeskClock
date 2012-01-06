@@ -32,13 +32,11 @@ import android.text.TextUtils;
 import android.util.Log;
 
 import com.zhaoshouren.android.apps.clock.DeskClock;
-
-
+import com.zhaoshouren.android.apps.clock.R;
 import com.zhaoshouren.android.apps.clock.provider.AlarmContract;
 import com.zhaoshouren.android.apps.clock.util.Action;
 import com.zhaoshouren.android.apps.clock.util.Alarm;
 import com.zhaoshouren.android.apps.clock.util.Days;
-import com.zhaoshouren.android.apps.clock.R;
 
 public class AlarmBroadcastReceiver extends BroadcastReceiver {
     /**
@@ -115,8 +113,8 @@ public class AlarmBroadcastReceiver extends BroadcastReceiver {
             // app's notification management is not disturbed
             context.startActivity(new Intent(((KeyguardManager) context
                     .getSystemService(Context.KEYGUARD_SERVICE)).inKeyguardRestrictedInputMode()
-                    ? Action.ALERT_FULL_SCREEN : Action.ALERT).putExtra(
-                    Alarm.Keys.PARCELABLE, alarm).setFlags(
+                    ? Action.ALERT_FULL_SCREEN : Action.ALERT).putExtra(Alarm.Keys.PARCELABLE,
+                    alarm).setFlags(
                     Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_NO_USER_ACTION));
 
             // Disable the snooze alert if this alarm is the snooze.
@@ -124,17 +122,23 @@ public class AlarmBroadcastReceiver extends BroadcastReceiver {
 
             // Disable this alarm if it does not repeat.
             if (alarm.days.selected == Days.NO_DAYS_SELECTED) {
-                AlarmContract.disableAlarm(context, alarm);
+                alarm.enabled = false;
+                AlarmContract.saveAlarm(context, alarm);
             }
             AlarmContract.setNextAlarm(context);
 
-            context.startService(new Intent(Action.PLAY).putExtra(
-                    Alarm.Keys.PARCELABLE, alarm));
+            context.startService(new Intent(Action.PLAY).putExtra(Alarm.Keys.PARCELABLE, alarm));
 
             final Notification notification =
-                    getNotification(context, alarm, context.getString(R.string.alarm_notify_text),
-                            PendingIntent.getActivity(context, alarm.id, new Intent(Action.ALERT)
-                                    .putExtra(Alarm.Keys.PARCELABLE, alarm), 0));
+                    getNotification(
+                            context,
+                            alarm,
+                            context.getString(R.string.alarm_notify_text),
+                            PendingIntent.getActivity(
+                                    context,
+                                    alarm.id,
+                                    new Intent(Action.ALERT).putExtra(Alarm.Keys.PARCELABLE, alarm),
+                                    0));
             notification.flags |= Notification.FLAG_SHOW_LIGHTS | Notification.FLAG_ONGOING_EVENT;
             notification.defaults |= Notification.DEFAULT_LIGHTS;
 
@@ -152,9 +156,9 @@ public class AlarmBroadcastReceiver extends BroadcastReceiver {
             // silenced.
             final Notification killedAlarmNotification =
                     getNotification(context, killedAlarm, context.getString(
-                            R.string.alarm_alert_alert_silenced, -1), PendingIntent.getActivity(
-                            context, killedAlarm.id, new Intent(Action.SET_ALARM).putExtra(Alarm.Keys.ID,
-                                    killedAlarm.id), 0));
+                            R.string.alarm_alert_alert_silenced, -1),
+                            PendingIntent.getActivity(context, killedAlarm.id, new Intent(
+                                    Action.SET_ALARM).putExtra(Alarm.Keys.ID, killedAlarm.id), 0));
             killedAlarmNotification.flags |= Notification.FLAG_AUTO_CANCEL;
             // We have to cancel the original notification since it is in the
             // ongoing section and we want the "killed" notification to be a plain
@@ -168,12 +172,12 @@ public class AlarmBroadcastReceiver extends BroadcastReceiver {
             break;
 
         case ACTION_POWER_CONNECTED:
-            context.startActivity(new Intent(Intent.ACTION_MAIN)
-                    .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_FROM_BACKGROUND));
+            context.startActivity(new Intent(Action.HOME).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK
+                    | Intent.FLAG_FROM_BACKGROUND));
             break;
 
         case ACTION_POWER_DISCONNECTED:
-            context.startActivity(new Intent(Intent.ACTION_MAIN).addFlags(
+            context.startActivity(new Intent(Action.HOME).addFlags(
                     Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP
                             | Intent.FLAG_FROM_BACKGROUND).addCategory(Intent.CATEGORY_HOME));
             break;

@@ -38,16 +38,14 @@ import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.AdapterView.AdapterContextMenuInfo;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.CheckBox;
-import android.widget.ImageButton;
-import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.ToggleButton;
 
 import com.zhaoshouren.android.apps.clock.R;
 import com.zhaoshouren.android.apps.clock.provider.AlarmContract;
@@ -56,15 +54,14 @@ import com.zhaoshouren.android.apps.clock.util.Alarm;
 import com.zhaoshouren.android.apps.clock.util.FormattedTime;
 import com.zhaoshouren.android.apps.clock.util.Toaster;
 
-public class AlarmListActivity extends FragmentActivity implements OnItemClickListener,
+public class AlarmListActivityNew extends FragmentActivity implements OnItemClickListener,
         LoaderManager.LoaderCallbacks<Cursor> {
 
     private class AlarmTimeAdapter extends CursorAdapter {
 
         private class Views {
-            private View indicatorView;
-            private ImageView onOffBarImageView;
-            private CheckBox clockOnOffCheckBox;
+            private ToggleButton alarmToggleButton;
+            private CheckBox alarmCheckBox;
             private TextView timeTextView;
             private TextView amPmTextView;
             private TextView daysTextView;
@@ -82,53 +79,45 @@ public class AlarmListActivity extends FragmentActivity implements OnItemClickLi
         @Override
         public void bindView(final View view, final Context context, final Cursor cursor) {
             final Alarm alarm = new Alarm(context, cursor);
-
             final Views views = (Views) view.getTag();
 
-            // Set initial states
-            views.onOffBarImageView.setImageResource(alarm.enabled ? R.drawable.ic_indicator_on
-                    : R.drawable.ic_indicator_off);
-            views.clockOnOffCheckBox.setChecked(alarm.enabled);
-
-            // Add Listeners
-            views.indicatorView.setOnClickListener(new OnClickListener() {
-                @Override
-                public void onClick(final View v) {
-                    views.clockOnOffCheckBox.toggle();
-                    views.onOffBarImageView.setImageResource(alarm.enabled
-                            ? R.drawable.ic_indicator_off : R.drawable.ic_indicator_on);
-                    toggleAlarm(alarm);
-                }
-            });
+            // Set toggle state and assign OnClickListener
+            views.alarmCheckBox.setChecked(alarm.enabled);
+            // views.alarmToggleButton.setChecked(alarm.enabled);
+            // views.alarmToggleButton.setOnClickListener(new OnClickListener() {
+            // @Override
+            // public void onClick(final View v) {
+            // toggleAlarm(alarm);
+            // }
+            // });
 
             // Set the time
             views.timeTextView.setText(alarm.formattedTime);
             views.amPmTextView.setText(alarm.formattedAmPm);
 
             // Set the selected days
-            views.daysTextView.setText(alarm.days.toString(AlarmListActivity.this));
+            views.daysTextView.setText(alarm.days.toString(AlarmListActivityNew.this));
 
             // Set the label
             views.labelTextView.setText(alarm.label);
 
+            // Set visibility
             views.amPmTextView.setVisibility(TextUtils.isEmpty(alarm.formattedAmPm) ? View.GONE
                     : View.VISIBLE);
-            views.labelTextView.setVisibility(TextUtils.isEmpty(alarm.label) ? View.GONE
-                    : View.VISIBLE);
+            // views.labelTextView.setVisibility(TextUtils.isEmpty(alarm.label) ? View.GONE
+            // : View.VISIBLE);
             views.daysTextView.setVisibility(alarm.days.toInt() == 0 ? View.GONE : View.VISIBLE);
         }
 
         @Override
         public View newView(final Context context, final Cursor cursor, final ViewGroup parent) {
             final View view = mLayoutInflater.inflate(R.layout.alarm_time, parent, false);
-
             final Views views = new Views();
-            views.indicatorView = view.findViewById(R.id.indicator);
-            views.onOffBarImageView = (ImageView) views.indicatorView.findViewById(R.id.bar_onoff);
-            views.clockOnOffCheckBox =
-                    (CheckBox) views.indicatorView.findViewById(R.id.clock_onoff);
+
+            // views.alarmToggleButton = (ToggleButton) view.findViewById(R.id.alarm_on_off);
+            views.alarmCheckBox = (CheckBox) view.findViewById(R.id.alarm_on_off);
             views.timeTextView = (TextView) view.findViewById(R.id.time);
-            views.amPmTextView = (TextView) view.findViewById(R.id.amPm);
+            views.amPmTextView = (TextView) view.findViewById(R.id.am_pm);
             views.daysTextView = (TextView) view.findViewById(R.id.days);
             views.labelTextView = (TextView) view.findViewById(R.id.label);
 
@@ -143,11 +132,10 @@ public class AlarmListActivity extends FragmentActivity implements OnItemClickLi
     private static AlarmTimeAdapter sAlarmTimeAdapter;
     private static ListView sAlarmsListView;
     private static LoaderManager sLoaderManager;
-
     private static LayoutInflater sLayoutInflater;;
 
     private void addNewAlarm() {
-        startActivity(new Intent(this, SetAlarmActivity.class));
+        startActivity(new Intent(Action.SET_ALARM));
     }
 
     @Override
@@ -167,7 +155,7 @@ public class AlarmListActivity extends FragmentActivity implements OnItemClickLi
                     .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(final DialogInterface d, final int w) {
-                            AlarmContract.deleteAlarm(AlarmListActivity.this, alarmId);
+                            AlarmContract.deleteAlarm(AlarmListActivityNew.this, alarmId);
                         }
                     }).setNegativeButton(android.R.string.cancel, null).show();
             return true;
@@ -201,28 +189,26 @@ public class AlarmListActivity extends FragmentActivity implements OnItemClickLi
         sAlarmsListView.setOnItemClickListener(this);
         sAlarmsListView.setOnCreateContextMenuListener(this);
 
-        final View addAlarmView = findViewById(R.id.add_alarm);
-        addAlarmView.setOnClickListener(new View.OnClickListener() {
+        findViewById(R.id.add_alarm).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(final View v) {
                 addNewAlarm();
             }
         });
-        // Make the entire view selected when focused.
-        addAlarmView.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+        // // Make the entire view selected when focused.
+        // addAlarmView.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+        // @Override
+        // public void onFocusChange(final View view, final boolean hasFocus) {
+        // view.setSelected(hasFocus);
+        // }
+        // });
+
+        findViewById(R.id.desk_clock_button).setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onFocusChange(final View view, final boolean hasFocus) {
-                view.setSelected(hasFocus);
+            public void onClick(final View v) {
+                startActivity(new Intent(Action.HOME));
             }
         });
-
-        ((ImageButton) findViewById(R.id.desk_clock_button))
-                .setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(final View v) {
-                        startActivity(new Intent(AlarmListActivity.this, DeskClockActivity.class));
-                    }
-                });
     }
 
     @Override
@@ -305,7 +291,7 @@ public class AlarmListActivity extends FragmentActivity implements OnItemClickLi
             startActivity(new Intent(this, SettingsPreferenceActivity.class));
             return true;
         case R.id.menu_item_desk_clock:
-            startActivity(new Intent(Intent.ACTION_MAIN));
+            startActivity(new Intent(Action.HOME));
             return true;
         case R.id.menu_item_add_alarm:
             addNewAlarm();
@@ -323,12 +309,10 @@ public class AlarmListActivity extends FragmentActivity implements OnItemClickLi
     }
 
     private void toggleAlarm(final Alarm alarm) {
-        if (!alarm.enabled) {
-            AlarmContract.enableAlarm(this, alarm);
+        alarm.toggle();
+        AlarmContract.saveAlarm(this, alarm);
+        if (alarm.enabled) {
             Toaster.popAlarmToast(this, alarm);
-        } else {
-            AlarmContract.disableAlarm(this, alarm);
         }
-        AlarmContract.setNextAlarm(this);
     }
 }

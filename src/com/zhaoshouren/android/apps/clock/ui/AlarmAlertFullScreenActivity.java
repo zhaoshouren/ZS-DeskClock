@@ -43,13 +43,11 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
-
-
+import com.zhaoshouren.android.apps.clock.R;
 import com.zhaoshouren.android.apps.clock.provider.AlarmContract;
 import com.zhaoshouren.android.apps.clock.receiver.AlarmBroadcastReceiver;
 import com.zhaoshouren.android.apps.clock.util.Action;
 import com.zhaoshouren.android.apps.clock.util.Alarm;
-import com.zhaoshouren.android.apps.clock.R;
 
 /**
  * Alarm Clock alarm alert: pops visible indicator and plays alarm tone. This activity is the full

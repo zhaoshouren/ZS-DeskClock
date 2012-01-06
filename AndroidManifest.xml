@@ -37,6 +37,10 @@
 				<category android:name="android.intent.category.LAUNCHER" />
 				<category android:name="android.intent.category.DESK_DOCK" />
 			</intent-filter>
+			<intent-filter>
+				<action android:name="zs.clock.intent.action.HOME" />
+				<category android:name="android.intent.category.DEFAULT" />
+			</intent-filter>
 		</activity>
 
 		<activity
@@ -130,8 +134,8 @@
 		<service
 			android:name=".service.AlarmPlayerService">
 			<intent-filter>
-				<action android:name=".PLAY_ALARM" />
-				<action android:name=".STOP_ALARM" />
+				<action android:name="zs.clock.intent.action.PLAY_ALARM" />
+				<action android:name="zs.clock.intent.action.STOP_ALARM" />
 			</intent-filter>
 		</service>
 

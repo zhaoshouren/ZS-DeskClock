@@ -60,12 +60,10 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-
-
+import com.zhaoshouren.android.apps.clock.R;
 import com.zhaoshouren.android.apps.clock.ui.widget.DigitalClockLayout;
 import com.zhaoshouren.android.apps.clock.util.Action;
 import com.zhaoshouren.android.apps.clock.util.Alarm;
-import com.zhaoshouren.android.apps.clock.R;
 
 import java.util.Date;
 import java.util.Random;
@@ -777,8 +775,7 @@ public class DeskClockActivity extends Activity {
         nextAlarm.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(final View v) {
-                final Intent intent =
-                        new Intent(Action.SET_ALARM);
+                final Intent intent = new Intent(Action.SET_ALARM);
                 intent.putExtra(Alarm.Keys.ID, Alarm.GET_NEXT_ALARM);
                 startActivity(intent);
             }
