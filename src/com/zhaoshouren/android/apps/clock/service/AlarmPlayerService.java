@@ -50,7 +50,7 @@ import com.zhaoshouren.android.apps.clock.R;
  */
 public class AlarmPlayerService extends Service {
 
-    private static final String TAG = "ZS.AlarmPlayerZervice";
+    public static final String TAG = "ZS.AlarmPlayerZervice";
 
     /** Play alarm up to 10 minutes before silencing */
     private static final int ALARM_TIMEOUT_SECONDS = 10 * 60;

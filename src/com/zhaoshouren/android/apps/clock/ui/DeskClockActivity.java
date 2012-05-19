@@ -73,7 +73,7 @@ import java.util.Random;
  */
 public class DeskClockActivity extends Activity {
 
-    private static final String TAG = "ZS.DeskClockActivity";
+    public static final String TAG = "ZS.DeskClockActivity";
 
     /**
      * Alarm action for midnight (so we can update the date display).

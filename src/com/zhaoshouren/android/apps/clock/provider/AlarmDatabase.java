@@ -39,7 +39,7 @@ public class AlarmDatabase extends SQLiteOpenHelper {
                 + ", " + Alarms.LABEL + ", " + Alarms.RINGTONE_URI + ", " + Alarms.SORT + ") ";
     }
 
-    private static final String TAG = "ZS.AlarmDatabase";
+    public static final String TAG = "ZS.AlarmDatabase";
     private static final String DATABASE_NAME = "zhaoshouren.clock.db";
 
     private static final int DATABASE_VERSION = 1;

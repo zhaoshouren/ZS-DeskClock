@@ -42,11 +42,6 @@
         android:layout_height="wrap_content"
         android:layout_centerVertical="true" 
         android:layout_toRightOf="@+id/divider" >
-<!--     <RelativeLayout -->
-<!--         android:id="@+id/alarm_info" -->
-<!--         android:layout_width="fill_parent" -->
-<!--         android:layout_height="wrap_content" -->
-<!--         android:layout_centerVertical="true" > -->
         <TextView
             android:id="@+id/label"
             android:layout_width="fill_parent"

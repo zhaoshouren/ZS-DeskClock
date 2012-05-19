@@ -29,7 +29,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
-import android.os.Handler;
 import android.provider.BaseColumns;
 import android.provider.Settings;
 import android.support.v4.content.CursorLoader;
@@ -42,7 +41,6 @@ import com.zhaoshouren.android.apps.clock.provider.AlarmDatabase.Sql;
 import com.zhaoshouren.android.apps.clock.util.Action;
 import com.zhaoshouren.android.apps.clock.util.Alarm;
 import com.zhaoshouren.android.apps.clock.util.Days;
-import com.zhaoshouren.android.apps.clock.util.FormattedTime;
 
 import java.util.Arrays;
 
@@ -131,9 +129,7 @@ public final class AlarmContract {
         public static final String PREFERENCES_DESKCLOCK = "zs.clock";
     }
 
-    private static final String TAG = "ZS.AlarmContract";
-
-    public static final Handler sHandler = new Handler();
+    public static final String TAG = "ZS.AlarmContract";
 
     public static void cancelAlarm(final Context context) {
         // Cancel alarm via AlarmManager
@@ -166,12 +162,12 @@ public final class AlarmContract {
     }
 
     /**
-     * Cleans up {@link Alarm} database by disabling expired alarms and updating times for expired
+     * Updates {@link Alarm} database by disabling expired alarms and updating times for expired
      * recurring to next recurrence
      * 
      * @param context
      */
-    private static void cleanUpAlarms(final Context context) {
+    private static void updateAlarms(final Context context) {
         final Cursor cursor = getEnableAlarmsCursor(context);
 
         if (cursor.moveToFirst()) {
@@ -186,7 +182,7 @@ public final class AlarmContract {
                                 cursor.getInt(cursor.getColumnIndex(BaseColumns._ID));
                     }
 
-                    final Alarm alarm = new Alarm(context, cursor);
+                    final Alarm alarm = Alarm.getFrom(context, cursor);
                     alarm.updateScheduledTime();
                     saveAlarm(context, alarm);
                 }
@@ -219,60 +215,7 @@ public final class AlarmContract {
         context.getContentResolver().delete(
                 ContentUris.withAppendedId(AlarmProvider.CONTENT_URI, alarmId), "", null);
 
-        setNextAlarm(context);
-    }
-
-    @Deprecated
-    public static void disableAlarm(final Context context, final Alarm alarm) {
-        updateAlarm(context, alarm, false);
-    }
-
-    @Deprecated
-    public static void enableAlarm(final Context context, final Alarm alarm) {
-        updateAlarm(context, alarm, true);
-    }
-
-    /**
-     * Gets alarm from cursor
-     * 
-     * @param context
-     *            use Activity context (<em>this</em> reference)
-     * @param cursor
-     *            preferably from a {@link CursorLoader}
-     * @return <em>alarm</em> from database or <em>null</em> if cursor is <em>null</em> or
-     *         <em>empty</em>
-     */
-    public static Alarm getAlarm(final Context context, final Cursor cursor) {
-        Alarm alarm = null;
-        if (cursor.moveToFirst()) {
-            alarm = new Alarm(context, cursor);
-        } else {
-            Log.e(TAG, "could not find alarm.");
-            // TODO send to Google Analytics
-
-            // create blank alarm to return to prevent null pointer exceptions
-            alarm = new Alarm(context);
-        }
-        cursor.close();
-        return alarm;
-    }
-
-    /**
-     * Gets Alarm from the database, UI blocking operation
-     * 
-     * @param context
-     * @param alarmId
-     * @return
-     */
-    @Deprecated
-    public static Alarm getAlarm(final Context context, final int alarmId) {
-        final Cursor cursor =
-                context.getContentResolver().query(
-                        ContentUris.withAppendedId(AlarmProvider.CONTENT_URI, alarmId), Sql.SELECT,
-                        null, null, null);
-        final Alarm alarm = getAlarm(context, cursor);
-        cursor.close();
-        return alarm;
+        enableNextAlarm(context);
     }
 
     public static Loader<Cursor> getAlarmCursorLoader(final Context context, final int alarmId) {
@@ -310,21 +253,6 @@ public final class AlarmContract {
                 Sql.WHERE_ENABLED, null, Sql.SORT_BY_TIME);
     }
 
-    /**
-     * Gets Alarm from the database, UI blocking operation
-     * 
-     * @param context
-     * @param alarmId
-     * @return
-     */
-    @Deprecated
-    public static Alarm getNextEnabledAlarm(final Context context) {
-        final Cursor cursor = getEnableAlarmsCursor(context);
-        final Alarm alarm = getAlarm(context, cursor);
-        cursor.close();
-        return alarm;
-    }
-
     public static String getTickerText(final Context context, final Alarm alarm) {
         return !TextUtils.isEmpty(alarm.label) ? alarm.label : context
                 .getString(R.string.default_alarm_ticker_text);
@@ -336,17 +264,17 @@ public final class AlarmContract {
      * @param context
      * @param alarm
      */
-    public static void saveAlarm(final Context context, final Alarm alarm) {
+    private static void saveAlarm(final Context context, final Alarm alarm) {
         alarm.updateScheduledTime();
 
         if (alarm.id == Alarm.INVALID_ID) {
             ContentUris.parseId(context.getContentResolver().insert(AlarmProvider.CONTENT_URI,
-                    alarm.toContentValues()));
+                    alarm.writeToContentValues()));
         } else {
             final int rowsUpdated =
                     context.getContentResolver().update(
                             ContentUris.withAppendedId(AlarmProvider.CONTENT_URI, alarm.id),
-                            alarm.toContentValues(), null, null);
+                            alarm.writeToContentValues(), null, null);
 
             // TODO: do we really need to check?
             if (rowsUpdated == 0) {
@@ -366,8 +294,11 @@ public final class AlarmContract {
                 cancelSnooze(context, alarm.id);
             }
         }
-
-        setNextAlarm(context);
+    }
+    
+    public static void updateAlarm(Context context, Alarm alarm) {
+        saveAlarm(context, alarm);
+        enableNextAlarm(context);
     }
 
     /**
@@ -379,7 +310,7 @@ public final class AlarmContract {
      * @param atTimeInMillis
      *            milliseconds since epoch
      */
-    public static void setAlarm(final Context context, final Alarm alarm) {
+    private static void setAlarm(final Context context, final Alarm alarm) {
         if (DEVELOPER_MODE) {
             Log.d(TAG, "setAlarm()" + "\n   alarm.id = " + alarm.id + "\n   alarm.label = "
                     + alarm.label + "\n   alarm datetime = " + alarm.format(FORMAT_DATE_TIME));
@@ -395,23 +326,23 @@ public final class AlarmContract {
         ((AlarmManager) context.getSystemService(Context.ALARM_SERVICE)).set(
                 AlarmManager.RTC_WAKEUP, alarm.toMillis(true), PendingIntent.getBroadcast(context,
                         0,
-                        new Intent(Action.ALERT).putExtra(Alarm.Keys.RAW_DATA, alarm.toRawData()),
+                        new Intent(Action.ALERT).putExtra(Alarm.Keys.RAW_DATA, alarm.writeToRawData()),
                         PendingIntent.FLAG_CANCEL_CURRENT));
 
         setStatusBarIcon(context, true);
         setSettingSystemNextAlarmFormatted(context, alarm.format(context
-                .getString(FormattedTime.is24HourFormat
-                        ? FormattedTime.FORMAT_ABBREV_WEEKDAY_HOUR_MINUTE_24
-                        : FormattedTime.FORMAT_ABBREV_WEEKDAY_HOUR_MINUTE_CAP_AM_PM)));
+                .getString(alarm.is24HourFormat
+                        ? Alarm.Format.ABBREV_WEEKDAY_HOUR_MINUTE_24
+                        : Alarm.Format.ABBREV_WEEKDAY_HOUR_MINUTE_CAP_AM_PM)));
     }
 
     /**
      * Called at system startup, on time/timezone change, and whenever the user changes alarm
      * settings. Activates snooze if set, otherwise loads all alarms, activates next alert.
      */
-    public static void setNextAlarm(final Context context) {
-        cleanUpAlarms(context);
-        final Alarm alarm = getAlarm(context, getEnableAlarmsCursor(context));
+    public static void enableNextAlarm(final Context context) {
+        updateAlarms(context);
+        final Alarm alarm = Alarm.getFrom(context, getEnableAlarmsCursor(context));
         if (alarm != null) {
             setAlarm(context, alarm);
         }
@@ -458,32 +389,6 @@ public final class AlarmContract {
          */
         context.sendBroadcast(new Intent("android.intent.action.ALARM_CHANGED").putExtra(
                 "alarmSet", enabled));
-    }
-
-    /**
-     * update alarm's enabled state and time accordingly.
-     * 
-     * @param context
-     * @param alarm
-     *            to update in the database
-     * @param enable
-     *            set to <em>true</em> to enable alarm; set to <em>false</em> to disable it.
-     */
-    @Deprecated
-    private static void updateAlarm(final Context context, final Alarm alarm, final boolean enable) {
-        final ContentValues contentValues = new ContentValues(2);
-
-        alarm.updateScheduledTime();
-        contentValues.put(Alarms.ENABLED, enable);
-        contentValues.put(Alarms.TIME, alarm.toMillis(true));
-
-        if (!enable) {
-            cancelSnooze(context, alarm.id);
-        }
-
-        context.getContentResolver().update(
-                ContentUris.withAppendedId(AlarmProvider.CONTENT_URI, alarm.id), contentValues,
-                null, null);
     }
 
     /**

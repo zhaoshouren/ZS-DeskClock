@@ -45,7 +45,7 @@ public class AlarmProvider extends ContentProvider implements AlarmTables {
 
     private static final String TYPE_ALARM_ID = "vnd.android.cursor.item/alarms";
     private static final String TYPE_ALARM = "vnd.android.cursor.dir/alarms";
-    private static final String TAG = "ZS.AlarmProvider";
+    public static final String TAG = "ZS.AlarmProvider";
 
     private static final int ALARM = 1;
     private static final int ALARM_ID = 2;

@@ -39,7 +39,7 @@ import java.util.Arrays;
 
 public class DigitalClockService extends Service {
 
-    private static final String TAG = "ZS.DigitalClockService";
+    public static final String TAG = "ZS.DigitalClockService";
 
     private static final int LAYOUT_ID_APP_WIDGET_DIGITAL = R.layout.appwidget_digital;
     private static final int VIEW_ID_AM_PM = R.id.amPm;

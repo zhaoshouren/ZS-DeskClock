@@ -29,23 +29,23 @@ import android.util.Log;
 
 public class DigitalClockAppWidgetProvider extends AppWidgetProvider {
 
-    private static final String TAG = "ZS.DigitalClockAppWidgetProvider";
+    public static final String TAG = "ZS.DigitalClockAppWidgetProvider";
 
-    private static final Intent ACTION_DIGITAL_CLOCK = new Intent(
+    private static final Intent sIntent = new Intent(
             "com.zhaoshouren.android.apps.clock.DIGITAL_CLOCK");
 
     @Override
     public void onUpdate(final Context context, final AppWidgetManager appWidgetManager,
             final int[] appWidgetIds) {
-        ACTION_DIGITAL_CLOCK.putExtra("appWidgetIds", appWidgetIds);
-        ACTION_DIGITAL_CLOCK.putExtra("packageName", context.getPackageName());
+        sIntent.putExtra("appWidgetIds", appWidgetIds);
+        sIntent.putExtra("packageName", context.getPackageName());
 
-        context.startService(ACTION_DIGITAL_CLOCK);
+        context.startService(sIntent);
     }
 
     @Override
     public void onEnabled(final Context context) {
-        context.startService(ACTION_DIGITAL_CLOCK);
+        context.startService(sIntent);
         if (DEVELOPER_MODE) {
             Log.d(TAG, "onEnabled()" + "\n    context: " + context
                     + "\n    startService(ACTION_DIGITAL_CLOCK)");
@@ -54,7 +54,7 @@ public class DigitalClockAppWidgetProvider extends AppWidgetProvider {
 
     @Override
     public void onDisabled(final Context context) {
-        context.stopService(ACTION_DIGITAL_CLOCK);
+        context.stopService(sIntent);
         if (DEVELOPER_MODE) {
             Log.d(TAG, "onDisabled()" + "\n    context: " + context
                     + "\n    stopService(ACTION_DIGITAL_CLOCK)");

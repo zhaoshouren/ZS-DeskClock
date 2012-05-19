@@ -38,6 +38,7 @@ import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.AdapterView.AdapterContextMenuInfo;
@@ -78,18 +79,17 @@ public class AlarmListActivityNew extends FragmentActivity implements OnItemClic
 
         @Override
         public void bindView(final View view, final Context context, final Cursor cursor) {
-            final Alarm alarm = new Alarm(context, cursor);
+            final Alarm alarm = Alarm.getFrom(context, cursor);
             final Views views = (Views) view.getTag();
 
             // Set toggle state and assign OnClickListener
             views.alarmCheckBox.setChecked(alarm.enabled);
-            // views.alarmToggleButton.setChecked(alarm.enabled);
-            // views.alarmToggleButton.setOnClickListener(new OnClickListener() {
-            // @Override
-            // public void onClick(final View v) {
-            // toggleAlarm(alarm);
-            // }
-            // });
+            views.alarmCheckBox.setOnClickListener(new OnClickListener() {
+                @Override
+                public void onClick(final View v) {
+                    toggleAlarm(alarm);
+                }
+            });
 
             // Set the time
             views.timeTextView.setText(alarm.formattedTime);
@@ -111,7 +111,7 @@ public class AlarmListActivityNew extends FragmentActivity implements OnItemClic
 
         @Override
         public View newView(final Context context, final Cursor cursor, final ViewGroup parent) {
-            final View view = mLayoutInflater.inflate(R.layout.alarm_time, parent, false);
+            final View view = mLayoutInflater.inflate(R.layout.alarm_list_item, parent, false);
             final Views views = new Views();
 
             // views.alarmToggleButton = (ToggleButton) view.findViewById(R.id.alarm_on_off);
@@ -127,7 +127,7 @@ public class AlarmListActivityNew extends FragmentActivity implements OnItemClic
         }
     }
 
-    private static final String TAG = "ZS.AlarmListActivity";
+    public static final String TAG = "ZS.AlarmListActivity";
 
     private static AlarmTimeAdapter sAlarmTimeAdapter;
     private static ListView sAlarmsListView;
@@ -160,7 +160,7 @@ public class AlarmListActivityNew extends FragmentActivity implements OnItemClic
                     }).setNegativeButton(android.R.string.cancel, null).show();
             return true;
         case R.id.enable_alarm:
-            toggleAlarm(new Alarm(this, (Cursor) sAlarmsListView.getAdapter().getItem(
+            toggleAlarm(Alarm.getFrom(this, (Cursor) sAlarmsListView.getAdapter().getItem(
                     adapterContextMenuInfo.position)));
             return true;
         case R.id.edit_alarm:
@@ -218,7 +218,7 @@ public class AlarmListActivityNew extends FragmentActivity implements OnItemClic
         getMenuInflater().inflate(R.menu.context_menu, contextMenu);
 
         final Alarm alarm =
-                new Alarm(this, (Cursor) sAlarmsListView.getAdapter().getItem(
+                Alarm.getFrom(this, (Cursor) sAlarmsListView.getAdapter().getItem(
                         ((AdapterContextMenuInfo) contextMenuInfo).position));
 
         // Inflate the custom view and set each TextView's text.
@@ -226,14 +226,13 @@ public class AlarmListActivityNew extends FragmentActivity implements OnItemClic
                 sLayoutInflater.inflate(R.layout.context_menu_header, null);
 
         final boolean isLabelEmpty = TextUtils.isEmpty(alarm.label);
-        final boolean is24HourFormat = DateFormat.is24HourFormat(this);
         ((TextView) contextMenuHeaderView.findViewById(R.id.header_time)).setText(isLabelEmpty
-                ? alarm.format(this.getString(is24HourFormat
-                        ? FormattedTime.FORMAT_WEEKDAY_HOUR_MINUTE_24
-                        : FormattedTime.FORMAT_WEEKDAY_HOUR_MINUTE_CAP_AM_PM)) : alarm.format(this
-                        .getString(is24HourFormat
-                                ? FormattedTime.FORMAT_ABBREV_WEEKDAY_HOUR_MINUTE_24
-                                : FormattedTime.FORMAT_ABBREV_WEEKDAY_HOUR_MINUTE_CAP_AM_PM)));
+                ? alarm.format(this.getString(alarm.is24HourFormat
+                        ? Alarm.Format.WEEKDAY_HOUR_MINUTE_24
+                        : Alarm.Format.WEEKDAY_HOUR_MINUTE_CAP_AM_PM)) : alarm.format(this
+                        .getString(alarm.is24HourFormat
+                                ? Alarm.Format.ABBREV_WEEKDAY_HOUR_MINUTE_24
+                                : Alarm.Format.ABBREV_WEEKDAY_HOUR_MINUTE_CAP_AM_PM)));
 
         final TextView labelView = (TextView) contextMenuHeaderView.findViewById(R.id.header_label);
         if (isLabelEmpty) {
@@ -310,7 +309,7 @@ public class AlarmListActivityNew extends FragmentActivity implements OnItemClic
 
     private void toggleAlarm(final Alarm alarm) {
         alarm.toggle();
-        AlarmContract.saveAlarm(this, alarm);
+        AlarmContract.updateAlarm(this, alarm);
         if (alarm.enabled) {
             Toaster.popAlarmToast(this, alarm);
         }
