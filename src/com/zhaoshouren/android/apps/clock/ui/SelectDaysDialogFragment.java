@@ -90,7 +90,7 @@ public class SelectDaysDialogFragment extends DialogFragment {
         return fragment;
     }
 
-    private static final String TAG = "SelectDaysDialogFragment";
+    public static final String TAG = "SelectDaysDialogFragment";
     private static SelectDaysAdapter sSelectedDaysAdapter;
     private static OnSelectDaysChangeListener mOnSelectDaysListener;
 

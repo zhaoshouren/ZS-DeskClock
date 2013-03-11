@@ -33,7 +33,7 @@ import java.util.Arrays;
 
 public class AnalogClockAppWidgetProvider extends AppWidgetProvider {
 
-    private static final String TAG = "ZS.AnalogClockAppWidgetProvider";
+    public static final String TAG = "ZS.AnalogClockAppWidgetProvider";
 
     @Override
     public void onUpdate(final Context context, final AppWidgetManager appWidgetManager,

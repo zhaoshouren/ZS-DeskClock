@@ -45,7 +45,7 @@ public class AlarmBroadcastReceiver extends BroadcastReceiver {
      */
     private static final int STALE_WINDOW = 60 * 30 * 1000;
 
-    private static final String TAG = "ZS.AlarmBroadcastReceiver";
+    public static final String TAG = "ZS.AlarmBroadcastReceiver";
 
     /**
      * filtered Intent Actions for this receiver:

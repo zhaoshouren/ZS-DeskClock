@@ -54,7 +54,6 @@ import com.zhaoshouren.android.apps.clock.provider.AlarmContract;
 import com.zhaoshouren.android.apps.clock.util.Action;
 import com.zhaoshouren.android.apps.clock.util.Alarm;
 import com.zhaoshouren.android.apps.clock.util.FormattedTime;
-import com.zhaoshouren.android.apps.clock.util.Toaster;
 
 public class AlarmListActivity extends FragmentActivity implements OnItemClickListener,
         LoaderManager.LoaderCallbacks<Cursor> {
@@ -138,7 +137,7 @@ public class AlarmListActivity extends FragmentActivity implements OnItemClickLi
         }
     }
 
-    private static final String TAG = "ZS.AlarmListActivity";
+    public static final String TAG = "ZS.AlarmListActivity";
 
     private static AlarmTimeAdapter sAlarmTimeAdapter;
     private static ListView sAlarmsListView;
@@ -279,7 +278,7 @@ public class AlarmListActivity extends FragmentActivity implements OnItemClickLi
     protected void onDestroy() {
         super.onDestroy();
         sLoaderManager.destroyLoader(0);
-        Toaster.cancelToast();
+        Alarm.cancelToast();
     }
 
     @Override
@@ -325,7 +324,7 @@ public class AlarmListActivity extends FragmentActivity implements OnItemClickLi
     private void toggleAlarm(final Alarm alarm) {
         if (!alarm.enabled) {
             AlarmContract.enableAlarm(this, alarm);
-            Toaster.popAlarmToast(this, alarm);
+            alarm.showToast(this);
         } else {
             AlarmContract.disableAlarm(this, alarm);
         }

@@ -38,42 +38,42 @@ import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.AdapterView.AdapterContextMenuInfo;
 import android.widget.AdapterView.OnItemClickListener;
+import android.widget.AdapterView.OnItemLongClickListener;
 import android.widget.CheckBox;
 import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.ToggleButton;
 
 import com.zhaoshouren.android.apps.clock.R;
 import com.zhaoshouren.android.apps.clock.provider.AlarmContract;
 import com.zhaoshouren.android.apps.clock.util.Action;
 import com.zhaoshouren.android.apps.clock.util.Alarm;
 import com.zhaoshouren.android.apps.clock.util.FormattedTime;
-import com.zhaoshouren.android.apps.clock.util.Toaster;
 
-public class AlarmListActivityNew extends FragmentActivity implements OnItemClickListener,
+public class AlarmListActivityNew extends FragmentActivity implements OnItemClickListener, OnItemLongClickListener, OnClickListener,
         LoaderManager.LoaderCallbacks<Cursor> {
 
-    private class AlarmTimeAdapter extends CursorAdapter {
+    private static class AlarmListAdapter extends CursorAdapter {
 
         private class Views {
-            private ToggleButton alarmToggleButton;
             private CheckBox alarmCheckBox;
+            private View alarmInfo;
             private TextView timeTextView;
             private TextView amPmTextView;
             private TextView daysTextView;
             private TextView labelTextView;
         }
 
-        private final LayoutInflater mLayoutInflater;
+        private static LayoutInflater sLayoutInflater;
 
-        public AlarmTimeAdapter(final Context context, final LayoutInflater layoutInflater,
+        public AlarmListAdapter(final Context context, final LayoutInflater layoutInflater,
                 final Cursor cursor, final int flags) {
             super(context, cursor, flags);
-            mLayoutInflater = layoutInflater;
+            sLayoutInflater = layoutInflater;
         }
 
         @Override
@@ -83,20 +83,15 @@ public class AlarmListActivityNew extends FragmentActivity implements OnItemClic
 
             // Set toggle state and assign OnClickListener
             views.alarmCheckBox.setChecked(alarm.enabled);
-            // views.alarmToggleButton.setChecked(alarm.enabled);
-            // views.alarmToggleButton.setOnClickListener(new OnClickListener() {
-            // @Override
-            // public void onClick(final View v) {
-            // toggleAlarm(alarm);
-            // }
-            // });
+            views.alarmCheckBox.setTag(alarm);
+            views.alarmCheckBox.setOnClickListener((OnClickListener) context);
 
             // Set the time
             views.timeTextView.setText(alarm.formattedTime);
             views.amPmTextView.setText(alarm.formattedAmPm);
 
             // Set the selected days
-            views.daysTextView.setText(alarm.days.toString(AlarmListActivityNew.this));
+            views.daysTextView.setText(alarm.days.toString(context));
 
             // Set the label
             views.labelTextView.setText(alarm.label);
@@ -107,15 +102,16 @@ public class AlarmListActivityNew extends FragmentActivity implements OnItemClic
             // views.labelTextView.setVisibility(TextUtils.isEmpty(alarm.label) ? View.GONE
             // : View.VISIBLE);
             views.daysTextView.setVisibility(alarm.days.toInt() == 0 ? View.GONE : View.VISIBLE);
+            
         }
 
         @Override
         public View newView(final Context context, final Cursor cursor, final ViewGroup parent) {
-            final View view = mLayoutInflater.inflate(R.layout.alarm_time, parent, false);
+            final View view = sLayoutInflater.inflate(R.layout.alarm_list_item, parent, false);
             final Views views = new Views();
 
-            // views.alarmToggleButton = (ToggleButton) view.findViewById(R.id.alarm_on_off);
             views.alarmCheckBox = (CheckBox) view.findViewById(R.id.alarm_on_off);
+            views.alarmInfo = view.findViewById(R.id.alarm_info);
             views.timeTextView = (TextView) view.findViewById(R.id.time);
             views.amPmTextView = (TextView) view.findViewById(R.id.am_pm);
             views.daysTextView = (TextView) view.findViewById(R.id.days);
@@ -127,15 +123,19 @@ public class AlarmListActivityNew extends FragmentActivity implements OnItemClic
         }
     }
 
-    private static final String TAG = "ZS.AlarmListActivity";
+    public static final String TAG = "ZS.AlarmListActivity";
 
-    private static AlarmTimeAdapter sAlarmTimeAdapter;
+    private static AlarmListAdapter sAlarmListAdapter;
     private static ListView sAlarmsListView;
     private static LoaderManager sLoaderManager;
     private static LayoutInflater sLayoutInflater;;
 
-    private void addNewAlarm() {
-        startActivity(new Intent(Action.SET_ALARM));
+    private void toggleAlarm(final Alarm alarm) {
+        alarm.toggle();
+        AlarmContract.saveAlarm(this, alarm);
+        if (alarm.enabled) {
+            alarm.showToast(this);
+        }
     }
 
     @Override
@@ -166,8 +166,6 @@ public class AlarmListActivityNew extends FragmentActivity implements OnItemClic
         case R.id.edit_alarm:
             startActivity(new Intent(Action.SET_ALARM).putExtra(Alarm.Keys.ID, alarmId));
             return true;
-        default:
-            break;
         }
         return super.onContextItemSelected(menuItem);
     }
@@ -178,37 +176,20 @@ public class AlarmListActivityNew extends FragmentActivity implements OnItemClic
 
         sLayoutInflater = getLayoutInflater();
         sLoaderManager = getSupportLoaderManager();
-        sAlarmTimeAdapter = new AlarmTimeAdapter(this, sLayoutInflater, null, 0);
+        sAlarmListAdapter = new AlarmListAdapter(this, sLayoutInflater, null, 0);
 
         sLoaderManager.initLoader(0, icicle, this);
 
         setContentView(R.layout.alarm_list);
         sAlarmsListView = (ListView) findViewById(R.id.alarm_list);
-        sAlarmsListView.setAdapter(sAlarmTimeAdapter);
+        sAlarmsListView.setAdapter(sAlarmListAdapter);
         sAlarmsListView.setVerticalScrollBarEnabled(true);
         sAlarmsListView.setOnItemClickListener(this);
         sAlarmsListView.setOnCreateContextMenuListener(this);
-
-        findViewById(R.id.add_alarm).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(final View v) {
-                addNewAlarm();
-            }
-        });
-        // // Make the entire view selected when focused.
-        // addAlarmView.setOnFocusChangeListener(new View.OnFocusChangeListener() {
-        // @Override
-        // public void onFocusChange(final View view, final boolean hasFocus) {
-        // view.setSelected(hasFocus);
-        // }
-        // });
-
-        findViewById(R.id.desk_clock_button).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(final View v) {
-                startActivity(new Intent(Action.HOME));
-            }
-        });
+        sAlarmsListView.setAddStatesFromChildren(true);
+        
+        findViewById(R.id.add_alarm).setOnClickListener(this);
+        findViewById(R.id.desk_clock_button).setOnClickListener(this);
     }
 
     @Override
@@ -265,23 +246,17 @@ public class AlarmListActivityNew extends FragmentActivity implements OnItemClic
     protected void onDestroy() {
         super.onDestroy();
         sLoaderManager.destroyLoader(0);
-        Toaster.cancelToast();
-    }
-
-    @Override
-    public void onItemClick(final AdapterView<?> parent, final View view, final int pos,
-            final long id) {
-        startActivity(new Intent(Action.SET_ALARM).putExtra(Alarm.Keys.ID, (int) id));
+        Alarm.cancelToast();
     }
 
     @Override
     public void onLoaderReset(final Loader<Cursor> cursorLoader) {
-        sAlarmTimeAdapter.swapCursor(null);
+        sAlarmListAdapter.swapCursor(null);
     }
 
     @Override
     public void onLoadFinished(final Loader<Cursor> cursorLoader, final Cursor cursor) {
-        sAlarmTimeAdapter.swapCursor(cursor);
+        sAlarmListAdapter.swapCursor(cursor);
     }
 
     @Override
@@ -294,10 +269,8 @@ public class AlarmListActivityNew extends FragmentActivity implements OnItemClic
             startActivity(new Intent(Action.HOME));
             return true;
         case R.id.menu_item_add_alarm:
-            addNewAlarm();
+            startActivity(new Intent(Action.SET_ALARM));
             return true;
-        default:
-            break;
         }
         return super.onOptionsItemSelected(menuItem);
     }
@@ -307,12 +280,31 @@ public class AlarmListActivityNew extends FragmentActivity implements OnItemClic
         super.onRestart();
         getSupportLoaderManager().restartLoader(0, null, this);
     }
-
-    private void toggleAlarm(final Alarm alarm) {
-        alarm.toggle();
-        AlarmContract.saveAlarm(this, alarm);
-        if (alarm.enabled) {
-            Toaster.popAlarmToast(this, alarm);
-        }
+    
+    @Override
+    public void onItemClick(final AdapterView<?> parent, final View view, final int pos,
+            final long id) {
+        startActivity(new Intent(Action.SET_ALARM).putExtra(Alarm.Keys.ID, (int) id));
     }
+    
+    @Override
+    public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+        // TODO Auto-generated method stub
+        return false;
+    }
+
+    @Override
+    public void onClick(View v) {
+        switch (v.getId()) {
+        case R.id.alarm_on_off:
+            toggleAlarm((Alarm) v.getTag());
+            break;
+        case R.id.add_alarm:
+            startActivity(new Intent(Action.SET_ALARM));
+            break;
+        case R.id.desk_clock_button:
+            startActivity(new Intent(Action.HOME));
+            break;
+        }
+    }    
 }

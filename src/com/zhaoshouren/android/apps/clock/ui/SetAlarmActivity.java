@@ -47,7 +47,6 @@ import com.zhaoshouren.android.apps.clock.provider.AlarmContract;
 import com.zhaoshouren.android.apps.clock.util.Alarm;
 import com.zhaoshouren.android.apps.clock.util.Alarm.Keys;
 import com.zhaoshouren.android.apps.clock.util.Days;
-import com.zhaoshouren.android.apps.clock.util.Toaster;
 
 /**
  * Manages each alarm
@@ -56,8 +55,7 @@ public class SetAlarmActivity extends FragmentActivity implements
         AlarmFragment.OnAlarmLoadFinishedListener, TimePickerDialog.OnTimeSetListener,
         SelectDaysDialogFragment.OnSelectDaysChangeListener, View.OnClickListener {
 
-    private static final String TAG = "ZS.SetAlarmActivity";
-    private static final String TAG_SELECT_DAYS_DIALOG_FRAGMENT = "ZS.SelectDaysDialogFragment";
+    public static final String TAG = "ZS.SetAlarmActivity";
 
     private Alarm mAlarm;
 
@@ -259,7 +257,7 @@ public class SetAlarmActivity extends FragmentActivity implements
     protected void showSelectDaysDialog() {
         FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
         Fragment previousDialog =
-                getSupportFragmentManager().findFragmentByTag(TAG_SELECT_DAYS_DIALOG_FRAGMENT);
+                getSupportFragmentManager().findFragmentByTag(SelectDaysDialogFragment.TAG);
         if (previousDialog != null) {
             fragmentTransaction.remove(previousDialog);
         }
@@ -267,7 +265,7 @@ public class SetAlarmActivity extends FragmentActivity implements
 
         DialogFragment newFragment = SelectDaysDialogFragment.newInstance(mAlarm.days.selected);
 
-        newFragment.show(fragmentTransaction, TAG_SELECT_DAYS_DIALOG_FRAGMENT);
+        newFragment.show(fragmentTransaction, SelectDaysDialogFragment.TAG);
     }
 
     @Override
@@ -282,7 +280,7 @@ public class SetAlarmActivity extends FragmentActivity implements
         switch (view.getId()) {
         // Save Button
         case R.id.alarm_save:
-            Toaster.popAlarmToast(SetAlarmActivity.this, mAlarm);
+            mAlarm.showToast(SetAlarmActivity.this);
             saveAlarm();
             finish();
             break;

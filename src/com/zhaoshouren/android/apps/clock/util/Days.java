@@ -195,23 +195,12 @@ public class Days {
     }
 
     /**
-     * Returns the number of days till next selected day from today
-     * 
-     * @return number of days till next selected day from today
-     */
-    public int getDaysTillNextFromToday() {
-        final Time time = new Time();
-        time.setToNow();
-        return getDaysTillNext(time);
-    }
-
-    /**
      * Returns the number of days till next selected day from supplied day
      * 
      * @return number of days till next selected day from supplied day
      */
-    public int getDaysTillNext(Time from) {
-        if (selected == NO_DAYS_SELECTED) {
+    public int getDaysTillNextFrom(Time from) {
+        if (selected == NO_DAYS_SELECTED) {         
             return -1;
         }
 

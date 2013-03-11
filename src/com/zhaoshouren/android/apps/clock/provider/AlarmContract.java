@@ -131,7 +131,7 @@ public final class AlarmContract {
         public static final String PREFERENCES_DESKCLOCK = "zs.clock";
     }
 
-    private static final String TAG = "ZS.AlarmContract";
+    public static final String TAG = "ZS.AlarmContract";
 
     public static final Handler sHandler = new Handler();
 

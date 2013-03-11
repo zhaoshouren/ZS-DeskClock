@@ -39,7 +39,7 @@ import com.zhaoshouren.android.apps.clock.R;
  */
 public class DigitalClockLayout extends LinearLayout {
 
-    private static final String TAG = "ZS.DigitalClockLayout";
+    public static final String TAG = "ZS.DigitalClockLayout";
     
     //TODO refactor to support user customization
     public static final Typeface TYPEFACE_TIME_DEFAULT = Typeface.DEFAULT_BOLD;

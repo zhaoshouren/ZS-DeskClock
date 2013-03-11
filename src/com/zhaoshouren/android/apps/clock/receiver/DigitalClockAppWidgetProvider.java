@@ -29,7 +29,7 @@ import android.util.Log;
 
 public class DigitalClockAppWidgetProvider extends AppWidgetProvider {
 
-    private static final String TAG = "ZS.DigitalClockAppWidgetProvider";
+    public static final String TAG = "ZS.DigitalClockAppWidgetProvider";
 
     private static final Intent ACTION_DIGITAL_CLOCK = new Intent(
             "com.zhaoshouren.android.apps.clock.DIGITAL_CLOCK");

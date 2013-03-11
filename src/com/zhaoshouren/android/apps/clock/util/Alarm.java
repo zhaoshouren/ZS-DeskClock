@@ -26,11 +26,14 @@ import android.os.Parcel;
 import android.os.Parcelable;
 import android.text.TextUtils;
 import android.text.format.Time;
+import android.widget.Toast;
 
 import com.zhaoshouren.android.apps.clock.R;
 import com.zhaoshouren.android.apps.clock.provider.AlarmContract.Alarms;
 
 public class Alarm extends FormattedTime implements Parcelable {
+    public static final String TAG = "ZS.Alarm";
+    
     public static final int INVALID_ID = -1;
     public static final int GET_NEXT_ALARM = -2;
 
@@ -47,6 +50,31 @@ public class Alarm extends FormattedTime implements Parcelable {
          * a remote service which may trigger a ClassNotFoundException
          */
         public static final String RAW_DATA = "Alarm.RawData";
+    }
+    
+    private static class Toaster {
+        private static Toast sToast = null;
+              
+        private static void showToast(final Context context, final Alarm alarm) {
+            cancelToast();
+            sToast = Toast.makeText(context, formatToast(context, alarm), Toast.LENGTH_LONG);
+            sToast.show();
+        }
+        
+        private static String formatToast(final Context context, final Alarm alarm) {
+            final int days = alarm.getDaysTillNext();
+            final String date = days > 1 ? alarm.formattedDate : context.getString(days == 0 ? R.string.today : R.string.tomorrow);
+            final String occurrence = context.getString(alarm.days.selected == 0 ? R.string.alarm : R.string.next_occurrence); 
+            
+            return String.format(context.getResources().getString(R.string.alarm_next_occurrence_set, occurrence, date, alarm.formattedTimeAmPm));
+        }
+        
+        private static void cancelToast() {
+            if (sToast != null) {
+                sToast.cancel();
+                sToast = null;
+            }
+        }
     }
 
     /**
@@ -65,6 +93,7 @@ public class Alarm extends FormattedTime implements Parcelable {
     };
 
     private static final String SILENT = "silent";
+    private static final Time sTime = new Time();
 
     public int id;
     public boolean enabled;
@@ -80,7 +109,6 @@ public class Alarm extends FormattedTime implements Parcelable {
 
     public Alarm(final Context context) {
         super(context);
-        setToNow();
         updateScheduledTime();
 
         id = INVALID_ID;
@@ -165,9 +193,7 @@ public class Alarm extends FormattedTime implements Parcelable {
         ringtoneUri = alarm.ringtoneUri;
         days.selected = alarm.days.selected;
 
-        if (enabled) {
-            updateScheduledTime();
-        }
+        updateScheduledTime();
     }
 
     /**
@@ -202,32 +228,37 @@ public class Alarm extends FormattedTime implements Parcelable {
     }
 
     public void updateScheduledTime() {
-        final Time time = new Time();
-        time.setToNow();
-
-        monthDay += days.getDaysTillNext(this);
+        sTime.setToNow(); 
+        sTime.set(calculateNextScheduledTime(this, sTime));
+        
+        month = sTime.month;
+        monthDay = sTime.monthDay;
+        year = sTime.year;
         normalize(true);
-
-        if (compare(this, time) <= 0) {
-            month = time.month;
-            monthDay = time.monthDay;
-            year = time.year;
-            normalize(true);
-
-            if (compare(this, time) <= 0) {
-                monthDay += 1;
-                normalize(true);
-
-                int daysTillNext = days.getDaysTillNext(this);
-
-                if (daysTillNext >= 0) {
-                    monthDay += daysTillNext;
-                    normalize(true);
-                }
+    }
+    
+    public static long calculateNextScheduledTime(final Alarm alarm, final Time from) {
+        
+        if (!alarm.after(from)) {
+            alarm.month = from.month;
+            alarm.monthDay = from.monthDay;
+            alarm.year = from.year;
+            
+            if (!alarm.after(from)) {
+                alarm.monthDay += 1;
+            }
+            
+            alarm.normalize(true);
+            
+            if (alarm.days.selected != Days.NO_DAYS_SELECTED) {
+                alarm.monthDay += alarm.days.getDaysTillNextFrom(alarm);
+                alarm.normalize(true);
             }
         }
+        
+        return alarm.toMillis(false);
     }
-
+    
     @Override
     public void writeToParcel(final Parcel parcel, final int flag) {
         parcel.writeInt(id);
@@ -242,5 +273,19 @@ public class Alarm extends FormattedTime implements Parcelable {
 
     public void toggle() {
         enabled = !enabled;
+    }
+    
+    public void showToast(final Context context) {
+        Toaster.showToast(context, this);
+    }
+    
+    public static void cancelToast() {
+        Toaster.cancelToast();
+    }
+    
+    public int getDaysTillNext() {      
+        sTime.setToNow();
+        
+        return Time.getJulianDay(calculateNextScheduledTime(this, sTime), gmtoff) - Time.getJulianDay(sTime.toMillis(false), sTime.gmtoff);
     }
 }

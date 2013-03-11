@@ -9,7 +9,6 @@
         android:layout_height="wrap_content"
         android:layout_alignParentLeft="true"
         android:layout_centerVertical="true"
-        android:duplicateParentState="true"
         android:background="@null"
         android:button="@null"
         android:drawableBottom="@drawable/indicator_bar_onoff"
@@ -20,8 +19,7 @@
         android:paddingLeft="10dip"
         android:paddingRight="10dip"
         android:paddingTop="4dip"
-        android:textOff=""
-        android:textOn="" />
+        android:focusable="false"/>
     
 	<ImageView
 	    android:id="@+id/divider"
@@ -41,12 +39,8 @@
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:layout_centerVertical="true" 
-        android:layout_toRightOf="@+id/divider" >
-<!--     <RelativeLayout -->
-<!--         android:id="@+id/alarm_info" -->
-<!--         android:layout_width="fill_parent" -->
-<!--         android:layout_height="wrap_content" -->
-<!--         android:layout_centerVertical="true" > -->
+        android:layout_toRightOf="@+id/divider"
+        android:clickable="true" >
         <TextView
             android:id="@+id/label"
             android:layout_width="fill_parent"

@@ -15,68 +15,65 @@
 -->
 
 <!-- digital clock & date, together -->
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/appwidget_digital"
-    android:orientation="vertical"
-    android:layout_width="match_parent"
+    android:layout_width="wrap_content"
     android:layout_height="wrap_content"
+    android:layout_gravity="center"
     android:clickable="true"
-    android:focusable="true"
-    >
+    android:focusable="true" >
 
-    <LinearLayout android:id="@+id/time"
+    <TextView
+        android:id="@+id/time"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal"
-        android:layout_marginBottom="-20dip" 
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentTop="true"
         android:duplicateParentState="true"
-        >
-
-        <TextView android:id="@+id/time_display"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:singleLine="true"
-            android:textStyle="bold"
-            android:textAppearance="?android:attr/textAppearanceLarge"
-            android:ellipsize="none"
-            android:textSize="100dip"
-            android:shadowColor="#C0000000"
-            android:shadowDx="0"
-            android:shadowDy="0"
-            android:shadowRadius="4"
-            android:duplicateParentState="true"
-            android:text="12:00"
-            />
-        <TextView android:id="@+id/amPm"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textStyle="bold"
-            android:textAppearance="?android:attr/textAppearanceMedium"
-            android:singleLine="true"
-            android:ellipsize="none"
-            android:textSize="25dip"
-            android:paddingLeft="4dip"
-            android:shadowColor="#C0000000"
-            android:shadowDx="0"
-            android:shadowDy="0"
-            android:shadowRadius="4"
-            android:duplicateParentState="true"
-            android:text="AM"
-            />
-    </LinearLayout>
-
-    <TextView android:id="@+id/date"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal"
-        android:textAppearance="?android:attr/textAppearanceMedium"
-        android:textSize="25dip"
+        android:ellipsize="none"
+        android:hint="12:00"
         android:shadowColor="#C0000000"
         android:shadowDx="0"
         android:shadowDy="0"
         android:shadowRadius="4"
-        android:duplicateParentState="true"
-        android:text="Monday, January 1"
-        />
+        android:singleLine="true"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:textSize="100dip"
+        android:textStyle="bold" />
 
-</LinearLayout>
+    <TextView
+        android:id="@+id/am_pm"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBaseline="@+id/time"
+        android:layout_alignBottom="@+id/time"
+        android:layout_toRightOf="@+id/time"
+        android:duplicateParentState="true"
+        android:ellipsize="none"
+        android:hint="AM"
+        android:paddingLeft="4dip"
+        android:shadowColor="#C0000000"
+        android:shadowDx="0"
+        android:shadowDy="0"
+        android:shadowRadius="4"
+        android:singleLine="true"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:textSize="25dip"
+        android:textStyle="bold" />
+
+    <TextView
+        android:id="@+id/date"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/time"
+        android:layout_centerHorizontal="true"
+        android:duplicateParentState="true"
+        android:hint="Monday, January 1"
+        android:shadowColor="#C0000000"
+        android:shadowDx="0"
+        android:shadowDy="0"
+        android:shadowRadius="4"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:textSize="25dip" />
+
+</RelativeLayout>

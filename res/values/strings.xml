@@ -125,6 +125,23 @@
 
     <!-- Alarm confirmation toast: plural minutes  -->
     <string name="minutes">"<xliff:g id="minutes">%s</xliff:g> minutes"</string>
+    
+    
+    <!-- Alarm confirmation toast: next occurrence -->
+    <string name="alarm_next_occurrence_set"><xliff:g id="ALARM" example="Alarm | Next occurrrence">%1$s</xliff:g> set for <xliff:g id="DATE" example="Friday, January 20, 2012">%2$s</xliff:g> at <xliff:g id="TIME" example="12:00pm">%3$s</xliff:g>.</string>
+    
+    <!-- Alarm confirmation toast: alarm does not repeat -->
+    <string name="alarm">"Alarm"</string>
+    
+    <!-- Alarm confirmation toast: alarm does not repeat -->
+    <string name="next_occurrence">"Next occurrence"</string>
+   
+    <!-- Alarm confirmation toast: today -->
+    <string name="today">"today"</string>
+    
+    <!-- Alarm confirmation toast: tomorrow -->
+    <string name="tomorrow">"tomorrow"</string>
+    
 
     <!-- Repeat options that appear under an alarm on main Alarm Clock
          screen to identify repetition schedule: special case for when

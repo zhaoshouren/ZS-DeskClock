@@ -39,12 +39,7 @@ import java.util.Arrays;
 
 public class DigitalClockService extends Service {
 
-    private static final String TAG = "ZS.DigitalClockService";
-
-    private static final int LAYOUT_ID_APP_WIDGET_DIGITAL = R.layout.appwidget_digital;
-    private static final int VIEW_ID_AM_PM = R.id.amPm;
-    private static final int VIEW_ID_TIME_DISPLAY = R.id.time_display;
-    private static final int VIEW_ID_DATE = R.id.date;
+    public static final String TAG = "ZS.DigitalClockService";
 
     private DigitalClock mDigitalClock;
     private RemoteViews mRemoteViews;
@@ -72,8 +67,8 @@ public class DigitalClockService extends Service {
         }
 
         if (intent.getIntArrayExtra("appWidgetIds") != null) {
-            mRemoteViews = new RemoteViews(sContext.getPackageName(), LAYOUT_ID_APP_WIDGET_DIGITAL);
-            mRemoteViews.setOnClickPendingIntent(VIEW_ID_TIME_DISPLAY, PendingIntent.getActivity(
+            mRemoteViews = new RemoteViews(sContext.getPackageName(), R.layout.appwidget_digital);
+            mRemoteViews.setOnClickPendingIntent(R.id.time, PendingIntent.getActivity(
                     sContext, 0, new Intent(Action.HOME).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK),
                     PendingIntent.FLAG_UPDATE_CURRENT));
 
@@ -117,13 +112,13 @@ public class DigitalClockService extends Service {
                 }
 
                 if (mRemoteViews != null) {
-                    mRemoteViews.setTextViewText(VIEW_ID_TIME_DISPLAY, formattedTime.formattedTime);
+                    mRemoteViews.setTextViewText(R.id.time, formattedTime.formattedTime);
 
                     if (formattedTime.formattedAmPm.length() > 0) {
-                        mRemoteViews.setTextViewText(VIEW_ID_AM_PM, formattedTime.formattedAmPm);
-                        mRemoteViews.setViewVisibility(VIEW_ID_AM_PM, View.VISIBLE);
+                        mRemoteViews.setTextViewText(R.id.time, formattedTime.formattedAmPm);
+                        mRemoteViews.setViewVisibility(R.id.am_pm, View.VISIBLE);
                     } else {
-                        mRemoteViews.setViewVisibility(VIEW_ID_AM_PM, View.GONE);
+                        mRemoteViews.setViewVisibility(R.id.am_pm, View.GONE);
                     }
 
                     AppWidgetManager.getInstance(sContext).updateAppWidget(sComponentName,
@@ -147,7 +142,7 @@ public class DigitalClockService extends Service {
                 }
 
                 if (mRemoteViews != null) {
-                    mRemoteViews.setTextViewText(VIEW_ID_DATE, formattedTime.formattedDate);
+                    mRemoteViews.setTextViewText(R.id.date, formattedTime.formattedDate);
 
                     AppWidgetManager.getInstance(sContext).updateAppWidget(sComponentName,
                             mRemoteViews);

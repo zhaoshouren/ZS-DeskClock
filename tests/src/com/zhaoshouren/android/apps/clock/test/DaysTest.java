@@ -17,11 +17,6 @@ public class DaysTest extends AndroidTestCase {
         super.setUp();
     }
     
-    @Override
-    protected void tearDown() throws Exception {
-        super.tearDown();
-    }
-    
     public void testSet() {
         assertEquals(0, mDays.toInt());
         
@@ -58,7 +53,7 @@ public class DaysTest extends AndroidTestCase {
         assertEquals(7, mDays.toInt());
         
         mDays = new Days();
-        mDays.set(Time.WEDNESDAY, true);
+        mDays.set(Time.WEDNESDAY, true); // Time.WEDNESDAY = 3
         assertEquals(8, mDays.toInt());
         
         mDays = new Days();
@@ -72,50 +67,50 @@ public class DaysTest extends AndroidTestCase {
         assertEquals(127, mDays.toInt());
     }
 
-    public void testGetDaysTillNext() {     
-        // No days selected so getDaysTillNext should return -1
-        assertEquals(-1, mDays.getDaysTillNext(mTime));
+    public void testGetDaysTillNextFrom() {     
+        // No days selected so getDaysTillNextFrom should return -1
+        assertEquals(-1, mDays.getDaysTillNextFrom(mTime));
         
         mDays.set(Time.TUESDAY, true);
         
         // same day selected as day of alarm, should return 0
-        assertEquals(0, mDays.getDaysTillNext(mTime));
+        assertEquals(0, mDays.getDaysTillNextFrom(mTime));
         
         mDays.set(Time.TUESDAY, false);
         mDays.set(Time.WEDNESDAY, true);
         
         // 1 day after selected as day of alarm, should return 1
-        assertEquals(1, mDays.getDaysTillNext(mTime));
+        assertEquals(1, mDays.getDaysTillNextFrom(mTime));
         
         mDays.set(Time.WEDNESDAY, false);
         mDays.set(Time.THURSDAY, true);
         
         // 2 days after selected as day of alarm, should return 2
-        assertEquals(2, mDays.getDaysTillNext(mTime));
+        assertEquals(2, mDays.getDaysTillNextFrom(mTime));
         
         mDays.set(Time.THURSDAY, false);
         mDays.set(Time.FRIDAY, true);
         
         // 3 days after selected as day of alarm, should return 3
-        assertEquals(3, mDays.getDaysTillNext(mTime));
+        assertEquals(3, mDays.getDaysTillNextFrom(mTime));
         
         mDays.set(Time.FRIDAY, false);
         mDays.set(Time.SATURDAY, true);
         
         // 4 days after selected as day of alarm, should return 4
-        assertEquals(4, mDays.getDaysTillNext(mTime));
+        assertEquals(4, mDays.getDaysTillNextFrom(mTime));
         
         mDays.set(Time.SATURDAY, false);
         mDays.set(Time.SUNDAY, true);
         
         // 5 days after selected as day of alarm, should return 5
-        assertEquals(5, mDays.getDaysTillNext(mTime));
+        assertEquals(5, mDays.getDaysTillNextFrom(mTime));
         
         mDays.set(Time.SUNDAY, false);
         mDays.set(Time.MONDAY, true);
         
         // 5 days after selected as day of alarm, should return 6
-        assertEquals(6, mDays.getDaysTillNext(mTime));
+        assertEquals(6, mDays.getDaysTillNextFrom(mTime));
     }
     
     public void testGetDays() {

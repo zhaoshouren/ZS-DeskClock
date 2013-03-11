@@ -44,7 +44,7 @@
 		</activity>
 
 		<activity
-			android:name=".ui.AlarmListActivity"
+			android:name=".ui.AlarmListActivityNew"
 			android:label="@string/alarm_list_title" 
 			android:taskAffinity=""
 			android:excludeFromRecents="true"
