@@ -29,7 +29,6 @@ public class AlarmFragment extends Fragment implements LoaderManager.LoaderCallb
         return fragment;
     }
 
-    public static final int GET_NEXT_ALARM = -2;
     public static final String TAG = "ZS.AlarmFragment";
     private OnAlarmLoadFinishedListener mAlarmLoadFinishedListener;
 
@@ -48,7 +47,7 @@ public class AlarmFragment extends Fragment implements LoaderManager.LoaderCallb
     public Loader<Cursor> onCreateLoader(final int id, final Bundle savedInstanceState) {
         Loader<Cursor> cursorLoader = null;
 
-        if (id == GET_NEXT_ALARM) {
+        if (id == Alarm.GET_NEXT_ALARM) {
             cursorLoader = AlarmContract.getAlarmsCursorLoader(getActivity(), true);
         } else if (id >= 0) {
             cursorLoader = AlarmContract.getAlarmCursorLoader(getActivity(), id);
@@ -69,8 +68,7 @@ public class AlarmFragment extends Fragment implements LoaderManager.LoaderCallb
             Log.d(TAG, "activity: " + getActivity());
         }
 
-        mAlarmLoadFinishedListener.onAlarmLoadFinished(AlarmContract
-                .getAlarm(getActivity(), cursor));
+        mAlarmLoadFinishedListener.onAlarmLoadFinished(Alarm.getFrom(getActivity(), cursor));
     }
 
     @Override

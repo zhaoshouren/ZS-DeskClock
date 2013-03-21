@@ -86,7 +86,7 @@ public class AlarmBroadcastReceiver extends BroadcastReceiver {
         switch (ACTIONS.valueOf(action.substring(TextUtils.lastIndexOf(action, '.') + 1))) {
 
         case ALERT:
-            final Alarm alarm = new Alarm(context, intent.getByteArrayExtra(Alarm.Keys.RAW_DATA));
+            final Alarm alarm = Alarm.readFrom(context, intent.getByteArrayExtra(Alarm.Keys.RAW_DATA));
             final long alarmTime = alarm.toMillis(true);
 
             if (DEVELOPER_MODE) {
@@ -123,9 +123,9 @@ public class AlarmBroadcastReceiver extends BroadcastReceiver {
             // Disable this alarm if it does not repeat.
             if (alarm.days.selected == Days.NO_DAYS_SELECTED) {
                 alarm.enabled = false;
-                AlarmContract.saveAlarm(context, alarm);
+                AlarmContract.updateAlarm(context, alarm);
             }
-            AlarmContract.setNextAlarm(context);
+            AlarmContract.enableNextAlarm(context);
 
             context.startService(new Intent(Action.PLAY).putExtra(Alarm.Keys.PARCELABLE, alarm));
 
@@ -188,7 +188,7 @@ public class AlarmBroadcastReceiver extends BroadcastReceiver {
         case TIME_SET:
         case TIMEZONE_CHANGED:
         case LOCALE_CHANGED:
-            AlarmContract.setNextAlarm(context);
+            AlarmContract.enableNextAlarm(context);
             break;
         }
     }

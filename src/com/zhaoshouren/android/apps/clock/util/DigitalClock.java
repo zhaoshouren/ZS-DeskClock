@@ -99,7 +99,7 @@ public abstract class DigitalClock {
             @Override
             public void onChange(boolean selfChange) {
                 super.onChange(selfChange);
-                mFormattedTime.setFormats(mContext);            
+                mFormattedTime.setFormatted(mContext);            
                 updateTime(true);
             }
         };

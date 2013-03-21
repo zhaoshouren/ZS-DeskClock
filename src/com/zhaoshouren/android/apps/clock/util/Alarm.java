@@ -83,7 +83,7 @@ public class Alarm extends FormattedTime implements Parcelable {
     public static final Parcelable.Creator<Alarm> CREATOR = new Parcelable.Creator<Alarm>() {
         @Override
         public Alarm createFromParcel(final Parcel parcel) {
-            return new Alarm(parcel);
+            return Alarm.readFrom(null, parcel);
         }
 
         @Override
@@ -107,6 +107,19 @@ public class Alarm extends FormattedTime implements Parcelable {
         set(alarm);
     }
 
+    public Alarm() {
+        super();
+        setToNow();
+        updateScheduledTime();
+
+        id = INVALID_ID;
+        second = 0;
+        enabled = true;
+        vibrate = true;
+        label = "";
+        ringtoneUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM);
+    }
+
     public Alarm(final Context context) {
         super(context);
         updateScheduledTime();
@@ -119,17 +132,15 @@ public class Alarm extends FormattedTime implements Parcelable {
         ringtoneUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM);
     }
 
-    public Alarm(final Context context, final byte[] rawData) {
-        super(context);
-
-        final Parcel parcel = Parcel.obtain();
-        parcel.unmarshall(rawData, 0, rawData.length);
-
-        readFromParcel(parcel);
+    public static Alarm getFrom(Context context, Cursor cursor) {
+        Alarm alarm = null;
+        if (cursor.moveToFirst()) {
+            alarm = new Alarm(context, cursor);
+        }
+        return alarm;
     }
 
-    // TODO refactor
-    public Alarm(final Context context, final Cursor cursor) {
+    private Alarm(final Context context, final Cursor cursor) {
         super(context);
 
         set(cursor.getLong(cursor.getColumnIndex(Alarms.TIME)));
@@ -151,11 +162,6 @@ public class Alarm extends FormattedTime implements Parcelable {
         }
     }
 
-    private Alarm(final Parcel parcel) {
-        super();
-        readFromParcel(parcel);
-    }
-
     @Override
     public int describeContents() {
         return 0;
@@ -171,16 +177,41 @@ public class Alarm extends FormattedTime implements Parcelable {
                 : label;
     }
 
-    private void readFromParcel(final Parcel parcel) {
-        parcel.setDataPosition(0);
-        id = parcel.readInt();
-        enabled = parcel.readInt() == 1;
-        days = new Days(parcel.readInt());
-        vibrate = parcel.readInt() == 1;
-        label = parcel.readString();
-        ringtoneUri = (Uri) parcel.readParcelable(null);
-        set(parcel.readLong());
-        normalize(true);
+    private static Alarm readFrom(final Context context, final Parcel parcel) {
+        try {
+            Alarm alarm = new Alarm(context);
+
+            parcel.setDataPosition(0);
+
+            alarm.id = parcel.readInt();
+            alarm.enabled = parcel.readInt() == 1;
+            alarm.days = new Days(parcel.readInt());
+            alarm.vibrate = parcel.readInt() == 1;
+            alarm.label = parcel.readString();
+            alarm.ringtoneUri = (Uri) parcel.readParcelable(null);
+            alarm.set(parcel.readLong());
+            alarm.normalize(true);
+
+            return alarm;
+        } catch (Exception exception) {
+            // TODO: log exception
+        }
+
+        return null;
+    }
+
+    public static Alarm readFrom(final Context context, final byte[] rawData) {
+        final Parcel parcel = Parcel.obtain();
+
+        try {
+            parcel.unmarshall(rawData, 0, rawData.length);
+
+            return readFrom(context, parcel);
+        } catch (Exception exception) {
+            // TODO: log exception
+        }
+
+        return null;
     }
 
     public void set(final Alarm alarm) {
@@ -201,7 +232,7 @@ public class Alarm extends FormattedTime implements Parcelable {
      * 
      * @return ContentValues representation of Alarm minus ID
      */
-    public ContentValues toContentValues() {
+    public ContentValues writeToContentValues() {
         final ContentValues contentValues = new ContentValues(7);
         contentValues.put(Alarms.ENABLED, enabled);
         contentValues.put(Alarms.TIME, toMillis(true));
@@ -221,7 +252,7 @@ public class Alarm extends FormattedTime implements Parcelable {
      * 
      * @return byte[] representation of Alarm
      */
-    public byte[] toRawData() {
+    public byte[] writeToRawData() {
         final Parcel parcel = Parcel.obtain();
         writeToParcel(parcel, 0);
         return parcel.marshall();

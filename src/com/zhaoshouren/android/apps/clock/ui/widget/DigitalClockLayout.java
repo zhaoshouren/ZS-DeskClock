@@ -107,7 +107,10 @@ public class DigitalClockLayout extends LinearLayout {
     @Override
     protected void onWindowVisibilityChanged(int visibility) {
         super.onWindowVisibilityChanged(visibility);
-        // TODO Auto-generated method stub
+        if (DEVELOPER_MODE) {
+            Log.d(TAG, "onWindowVisibilityChanged()" 
+                    + "\n    visibility: " + visibility);
+        }
     }
     
     @Override

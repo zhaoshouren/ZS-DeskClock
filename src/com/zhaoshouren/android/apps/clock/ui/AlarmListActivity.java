@@ -30,7 +30,6 @@ import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
 import android.support.v4.widget.CursorAdapter;
 import android.text.TextUtils;
-import android.text.format.DateFormat;
 import android.util.Log;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
@@ -53,7 +52,6 @@ import com.zhaoshouren.android.apps.clock.R;
 import com.zhaoshouren.android.apps.clock.provider.AlarmContract;
 import com.zhaoshouren.android.apps.clock.util.Action;
 import com.zhaoshouren.android.apps.clock.util.Alarm;
-import com.zhaoshouren.android.apps.clock.util.FormattedTime;
 
 public class AlarmListActivity extends FragmentActivity implements OnItemClickListener,
         LoaderManager.LoaderCallbacks<Cursor> {
@@ -80,7 +78,7 @@ public class AlarmListActivity extends FragmentActivity implements OnItemClickLi
 
         @Override
         public void bindView(final View view, final Context context, final Cursor cursor) {
-            final Alarm alarm = new Alarm(context, cursor);
+            final Alarm alarm = Alarm.getFrom(context, cursor);
 
             final Views views = (Views) view.getTag();
 
@@ -120,6 +118,14 @@ public class AlarmListActivity extends FragmentActivity implements OnItemClickLi
         @Override
         public View newView(final Context context, final Cursor cursor, final ViewGroup parent) {
             final View view = mLayoutInflater.inflate(R.layout.alarm_time, parent, false);
+            
+            view.findViewById(R.id.alarm_info).setOnClickListener(new OnClickListener() {
+                
+                @Override
+                public void onClick(View v) {
+                    parent.performClick();
+                }
+            });
 
             final Views views = new Views();
             views.indicatorView = view.findViewById(R.id.indicator);
@@ -171,7 +177,7 @@ public class AlarmListActivity extends FragmentActivity implements OnItemClickLi
                     }).setNegativeButton(android.R.string.cancel, null).show();
             return true;
         case R.id.enable_alarm:
-            toggleAlarm(new Alarm(this, (Cursor) sAlarmsListView.getAdapter().getItem(
+            toggleAlarm(Alarm.getFrom(this, (Cursor) sAlarmsListView.getAdapter().getItem(
                     adapterContextMenuInfo.position)));
             return true;
         case R.id.edit_alarm:
@@ -231,7 +237,7 @@ public class AlarmListActivity extends FragmentActivity implements OnItemClickLi
         getMenuInflater().inflate(R.menu.context_menu, contextMenu);
 
         final Alarm alarm =
-                new Alarm(this, (Cursor) sAlarmsListView.getAdapter().getItem(
+                Alarm.getFrom(this, (Cursor) sAlarmsListView.getAdapter().getItem(
                         ((AdapterContextMenuInfo) contextMenuInfo).position));
 
         // Inflate the custom view and set each TextView's text.
@@ -239,14 +245,13 @@ public class AlarmListActivity extends FragmentActivity implements OnItemClickLi
                 sLayoutInflater.inflate(R.layout.context_menu_header, null);
 
         final boolean isLabelEmpty = TextUtils.isEmpty(alarm.label);
-        final boolean is24HourFormat = DateFormat.is24HourFormat(this);
         ((TextView) contextMenuHeaderView.findViewById(R.id.header_time)).setText(isLabelEmpty
-                ? alarm.format(this.getString(is24HourFormat
-                        ? FormattedTime.FORMAT_WEEKDAY_HOUR_MINUTE_24
-                        : FormattedTime.FORMAT_WEEKDAY_HOUR_MINUTE_CAP_AM_PM)) : alarm.format(this
-                        .getString(is24HourFormat
-                                ? FormattedTime.FORMAT_ABBREV_WEEKDAY_HOUR_MINUTE_24
-                                : FormattedTime.FORMAT_ABBREV_WEEKDAY_HOUR_MINUTE_CAP_AM_PM)));
+                ? alarm.format(this.getString(alarm.is24HourFormat
+                        ? Alarm.Format.WEEKDAY_HOUR_MINUTE_24
+                        : Alarm.Format.WEEKDAY_HOUR_MINUTE_CAP_AM_PM)) : alarm.format(this
+                        .getString(alarm.is24HourFormat
+                                ? Alarm.Format.ABBREV_WEEKDAY_HOUR_MINUTE_24
+                                : Alarm.Format.ABBREV_WEEKDAY_HOUR_MINUTE_CAP_AM_PM)));
 
         final TextView labelView = (TextView) contextMenuHeaderView.findViewById(R.id.header_label);
         if (isLabelEmpty) {
@@ -322,12 +327,17 @@ public class AlarmListActivity extends FragmentActivity implements OnItemClickLi
     }
 
     private void toggleAlarm(final Alarm alarm) {
-        if (!alarm.enabled) {
-            AlarmContract.enableAlarm(this, alarm);
+    	alarm.toggle();
+        AlarmContract.updateAlarm(this, alarm);
+        if (alarm.enabled) {
             alarm.showToast(this);
-        } else {
-            AlarmContract.disableAlarm(this, alarm);
         }
-        AlarmContract.setNextAlarm(this);
+
+//        if (!alarm.enabled) {
+//            AlarmContract.enableAlarm(this, alarm);
+//            alarm.showToast(this);
+//        } else {
+//            AlarmContract.disableAlarm(this, alarm);
+//        }
     }
 }

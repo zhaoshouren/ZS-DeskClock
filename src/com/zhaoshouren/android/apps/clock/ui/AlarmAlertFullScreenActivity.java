@@ -243,8 +243,7 @@ public class AlarmAlertFullScreenActivity extends FragmentActivity implements
     protected void onResume() {
         super.onResume();
         // If the alarm was deleted at some point, disable snooze.
-
-        if (mCursor != null && AlarmContract.getAlarm(this, mCursor) == null) {
+        if (mCursor != null && Alarm.getFrom(this, mCursor) == null) {
             final Button snoozeButton = (Button) findViewById(R.id.snooze);
             snoozeButton.setEnabled(false);
         }

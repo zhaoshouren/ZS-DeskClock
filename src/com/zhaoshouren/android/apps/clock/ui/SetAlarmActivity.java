@@ -113,7 +113,7 @@ public class SetAlarmActivity extends FragmentActivity implements
         new Handler().post(new Runnable() {
             @Override
             public void run() {
-                AlarmContract.saveAlarm(SetAlarmActivity.this, mAlarm);
+                AlarmContract.updateAlarm(SetAlarmActivity.this, mAlarm);
             }
         });
 
@@ -244,7 +244,7 @@ public class SetAlarmActivity extends FragmentActivity implements
         } else if (alarm != null) {
             onAlarmLoadFinished(alarm);
         } else if (rawData != null) {
-            onAlarmLoadFinished(new Alarm(this, rawData));
+            onAlarmLoadFinished(Alarm.readFrom(this, rawData));
         } else if (savedInstanceState == null) {
             FragmentTransaction fragmentTransaction =
                     getSupportFragmentManager().beginTransaction();
@@ -320,6 +320,12 @@ public class SetAlarmActivity extends FragmentActivity implements
 
     @Override
     public void onAlarmLoadFinished(final Alarm alarm) {
+        if (alarm == null) {
+            Log.e(TAG, "could not find alarm.");
+            // TODO send to Google Analytics
+            finish();
+        }
+        
         mAlarm = alarm;
 
         updateViews();
